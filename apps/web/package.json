@@ -23,7 +23,7 @@
     "@repo/security": "workspace:*",
     "@repo/seo": "workspace:*",
     "@sentry/nextjs": "^9.22.0",
-    "@t3-oss/env-nextjs": "^0.13.4",
+    "@t3-oss/env-nextjs": "^0.13.8",
     "date-fns": "^4.1.0",
     "fumadocs-core": "^15.4.0",
     "import-in-the-middle": "^1.13.2",

@@ -24,7 +24,7 @@
     "@repo/seo": "workspace:*",
     "@repo/webhooks": "workspace:*",
     "@sentry/nextjs": "^9.22.0",
-    "@t3-oss/env-nextjs": "^0.13.4",
+    "@t3-oss/env-nextjs": "^0.13.8",
     "fuse.js": "^7.1.0",
     "import-in-the-middle": "^1.13.2",
     "lucide-react": "^0.511.0",

@@ -8,7 +8,7 @@
   },
   "dependencies": {
     "@ai-sdk/openai": "^1.3.22",
-    "@t3-oss/env-nextjs": "^0.13.4",
+    "@t3-oss/env-nextjs": "^0.13.8",
     "ai": "^4.3.16",
     "react": "^19.1.0",
     "react-markdown": "^10.1.0",
