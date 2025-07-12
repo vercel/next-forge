@@ -1,4 +1,5 @@
 import { Tweet } from 'react-tweet';
+import {clsx} from 'clsx';
 
 const tweets = [
   '1853560800050651632',
@@ -71,8 +72,101 @@ export const Social = () => (
       </div>
     </div>
     <div className="columns-1 gap-4 p-8 sm:col-span-2 md:columns-2">
+    <style dangerouslySetInnerHTML={{__html: `
+    .tweet-customizer-wrapper .react-tweet-theme {
+  --tweet-container-margin: 1.5rem 0;
+  
+  /* Font Family */
+  --tweet-font-family: 'Geist';
+  
+  /* Header */
+  --tweet-header-font-size: 0.9375rem;
+  --tweet-header-line-height: 1.25rem;
+  
+  /* Text */
+  --tweet-body-font-size: 1.25rem;
+  --tweet-body-font-weight: 400;
+  --tweet-body-line-height: 1.5rem;
+  --tweet-body-margin: 0;
+  
+  /* Quoted Tweet */
+  --tweet-quoted-container-margin: 0.75rem 0;
+  --tweet-quoted-body-font-size: 0.938rem;
+  --tweet-quoted-body-font-weight: 400;
+  --tweet-quoted-body-line-height: 1.25rem;
+  --tweet-quoted-body-margin: 0.25rem 0 0.75rem 0;
+  
+  /* Info */
+  --tweet-info-font-size: 0.9375rem;
+  --tweet-info-line-height: 1.25rem;
+  
+  /* Actions */
+  --tweet-actions-font-size: 0.875rem;
+  --tweet-actions-line-height: 1rem;
+  --tweet-actions-font-weight: 700;
+  --tweet-actions-icon-size: 1.25em;
+  --tweet-actions-icon-wrapper-size: calc(var(--tweet-actions-icon-size) + 0.75em);
+  
+  /* Reply button - automatically follows actions styling */
+  --tweet-replies-font-size: 0.875rem;
+  --tweet-replies-line-height: 1rem;
+  --tweet-replies-font-weight: 700;
+}
+
+:where(.tweet-customizer-wrapper .react-tweet-theme) * {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:is([data-theme='light'], .light) :where(.tweet-customizer-wrapper .react-tweet-theme),
+:where(.tweet-customizer-wrapper .react-tweet-theme) {
+  --tweet-skeleton-gradient: linear-gradient(270deg, rgb(245, 245, 245), rgb(230, 230, 230), rgb(230, 230, 230), rgb(245, 245, 245));
+  --tweet-border: 1px solid rgb(229, 229, 229);
+  --tweet-font-family: 'Geist';
+  --tweet-font-color: rgb(10, 10, 10);
+  --tweet-font-color-secondary: rgb(115, 115, 115);
+  --tweet-bg-color: rgb(255, 255, 255);
+  --tweet-bg-color-hover: rgb(255, 255, 255);
+  --tweet-quoted-bg-color-hover: rgb(255, 255, 255);
+  --tweet-color-blue-primary: rgb(0, 150, 255);
+  --tweet-color-blue-primary-hover: rgba(0, 150, 255, 0.1);
+  --tweet-color-blue-secondary: rgb(0, 112, 191);
+  --tweet-color-blue-secondary-hover: rgba(0, 112, 191, 0.1);
+  --tweet-color-green-primary: rgb(10, 10, 10);
+  --tweet-color-green-primary-hover: rgba(10, 10, 10, 0.1);
+  --tweet-color-red-primary: rgb(255, 30, 86);
+  --tweet-color-red-primary-hover: rgba(255, 30, 86, 0.1);
+  --tweet-twitter-icon-color: var(--tweet-font-color);
+  --tweet-verified-old-color: rgb(130, 154, 171);
+  --tweet-verified-blue-color: var(--tweet-color-blue-primary);
+}
+
+:is([data-theme='dark'], .dark) :where(.tweet-customizer-wrapper .react-tweet-theme) {
+  --tweet-skeleton-gradient: linear-gradient(270deg, rgb(25, 25, 25), rgb(40, 40, 40), rgb(40, 40, 40), rgb(25, 25, 25));
+  --tweet-border: 1px solid rgb(35, 35, 35);
+  --tweet-font-family: 'Geist';
+  --tweet-font-color: rgb(250, 250, 250);
+  --tweet-font-color-secondary: rgb(161, 161, 161);
+  --tweet-bg-color: rgb(10, 10, 10);
+  --tweet-bg-color-hover: rgb(10, 10, 10);
+  --tweet-quoted-bg-color-hover: rgb(10, 10, 10);
+  --tweet-color-blue-primary: rgb(0, 150, 255);
+  --tweet-color-blue-primary-hover: rgba(0, 150, 255, 0.1);
+  --tweet-color-blue-secondary: rgb(0, 210, 255);
+  --tweet-color-blue-secondary-hover: rgba(0, 210, 255, 0.1);
+  --tweet-color-green-primary: rgb(250, 250, 250);
+  --tweet-color-green-primary-hover: rgba(250, 250, 250, 0.1);
+  --tweet-color-red-primary: rgb(255, 30, 86);
+  --tweet-color-red-primary-hover: rgba(255, 30, 86, 0.1);
+  --tweet-twitter-icon-color: var(--tweet-font-color);
+  --tweet-verified-old-color: rgb(130, 154, 171);
+  --tweet-verified-blue-color: #fff;
+}
+
+    `}} />
       {tweets.map((tweet, index) => (
-        <div key={tweet} className={index ? '' : 'sm:-mt-6'}>
+        <div key={tweet} className={clsx(index ? '' : 'sm:-mt-6', 'tweet-customizer-wrapper')}>
           <Tweet id={tweet} />
         </div>
       ))}
