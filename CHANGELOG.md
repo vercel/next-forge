@@ -1,3 +1,25 @@
+# v5.0.3 (Mon Jul 14 2025)
+
+:tada: This release contains work from new contributors! :tada:
+
+Thanks for all your work!
+
+:heart: Karel Vuong ([@karelvuong](https://github.com/karelvuong))
+
+:heart: Choco ([@chocochu](https://github.com/chocochu))
+
+#### 🐛 Bug Fix
+
+- fix: correct google analytics env [#600](https://github.com/vercel/next-forge/pull/600) ([@karelvuong](https://github.com/karelvuong))
+- add mobile menu [#574](https://github.com/vercel/next-forge/pull/574) ([@chocochu](https://github.com/chocochu))
+
+#### Authors: 2
+
+- Choco ([@chocochu](https://github.com/chocochu))
+- Karel Vuong ([@karelvuong](https://github.com/karelvuong))
+
+---
+
 # v5.0.2 (Thu Jun 05 2025)
 
 #### ⚠️ Pushed to `main`
