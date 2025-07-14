@@ -202,6 +202,12 @@ h1, h2, h3 {
   @apply hidden;
 }
 
-#nd-subnav button[data-search] + button {
-  @apply hidden!;
+/* Hide unnecessary links on mobile */
+#nd-sidebar-mobile a[href="/"],
+#nd-sidebar-mobile a[href="/docs"].lg\:hidden {
+  @apply hidden;
+}
+
+.landing-page #nd-subnav button[data-search] + button {
+  @apply hidden;
 }
