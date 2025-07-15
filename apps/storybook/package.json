@@ -10,6 +10,7 @@
     "typecheck": "tsc --noEmit --emitDeclarationOnly false"
   },
   "dependencies": {
+    "@hookform/resolvers": "^5.0.1",
     "@repo/design-system": "workspace:*",
     "@storybook/addon-actions": "^8.6.14",
     "cmdk": "^1.1.1",
