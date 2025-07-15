@@ -8,7 +8,7 @@
   },
   "dependencies": {
     "@next/third-parties": "15.3.2",
-    "@t3-oss/env-nextjs": "^0.13.4",
+    "@t3-oss/env-nextjs": "^0.13.8",
     "@vercel/analytics": "^1.5.0",
     "posthog-js": "^1.246.0",
     "posthog-node": "^4.17.2",

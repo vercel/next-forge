@@ -10,7 +10,7 @@
     "@repo/analytics": "workspace:*",
     "@repo/auth": "workspace:*",
     "@repo/design-system": "workspace:*",
-    "@t3-oss/env-nextjs": "^0.13.4",
+    "@t3-oss/env-nextjs": "^0.13.8",
     "@vercel/toolbar": "^0.1.37",
     "flags": "^4.0.1",
     "react": "^19.1.0",
