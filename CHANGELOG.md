@@ -1,3 +1,15 @@
+# v5.0.4 (Tue Jul 15 2025)
+
+#### 🐛 Bug Fix
+
+- Improve Metabase integration instructions [#601](https://github.com/vercel/next-forge/pull/601) ([@matthewhefferon](https://github.com/matthewhefferon))
+
+#### Authors: 1
+
+- Matthew Hefferon ([@matthewhefferon](https://github.com/matthewhefferon))
+
+---
+
 # v5.0.3 (Mon Jul 14 2025)
 
 :tada: This release contains work from new contributors! :tada:
