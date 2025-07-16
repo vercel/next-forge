@@ -1,6 +1,6 @@
 import Image from 'next/image';
 
-type Author = {
+export type Author = {
   company: {
     id: string;
     name: string;
