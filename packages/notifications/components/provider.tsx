@@ -1,6 +1,7 @@
 'use client';
 
 import { KnockFeedProvider, KnockProvider } from '@knocklabs/react';
+import { useTheme } from 'next-themes';
 import type { ReactNode } from 'react';
 import { keys } from '../keys';
 
@@ -20,9 +21,12 @@ export const NotificationsProvider = ({
     return children;
   }
 
+  const { theme: rawTheme } = useTheme();
+  const theme = rawTheme === 'dark' ? 'dark' : 'light';
+
   return (
     <KnockProvider apiKey={knockApiKey} userId={userId}>
-      <KnockFeedProvider feedId={knockFeedChannelId}>
+      <KnockFeedProvider feedId={knockFeedChannelId} colorMode={theme}>
         {children}
       </KnockFeedProvider>
     </KnockProvider>
