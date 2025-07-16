@@ -1,0 +1,112 @@
+name: Deploy Preview
+
+on:
+  pull_request:
+    paths-ignore:
+      - 'package.json'
+      - 'package-lock.json'
+      - 'yarn.lock'
+    branches:
+      - '**'
+      - '!dependabot/**'
+
+env:
+  NEON_DATABASE_USERNAME: ${{ secrets.NEON_DATABASE_USERNAME }}
+  NEON_API_KEY: ${{ secrets.NEON_API_KEY }}
+  NEON_PROJECT_ID: ${{ secrets.NEON_PROJECT_ID }}
+
+jobs:
+  run-migrations:
+    permissions: write-all
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install pnpm
+        run: npm install -g pnpm
+
+      - name: Install Dependencies
+        run: pnpm install
+
+      - name: Get branch name
+        id: branch-name
+        uses: tj-actions/branch-names@v8
+
+      - name: Get Neon Branch Details
+        id: neon-branch
+        run: |
+          BRANCH_NAME="preview/${{ steps.branch-name.outputs.current_branch }}"
+          
+          # Get branch details from Neon API
+          RESPONSE=$(curl -s \
+            -H "Authorization: Bearer ${{ env.NEON_API_KEY }}" \
+            -H "Accept: application/json" \
+            "https://console.neon.tech/api/v2/projects/${{ env.NEON_PROJECT_ID }}/branches")
+          
+          # Extract the branch details using jq
+          BRANCH_INFO=$(echo $RESPONSE | jq -r --arg BRANCH_NAME "$BRANCH_NAME" '.branches[] | select(.name == $BRANCH_NAME)')
+          BRANCH_ID=$(echo $BRANCH_INFO | jq -r '.id')
+          
+          if [ -z "$BRANCH_ID" ]; then
+            echo "Branch not found"
+            exit 1
+          fi
+          
+          # Get connection details
+          ENDPOINTS_RESPONSE=$(curl -s \
+            -H "Authorization: Bearer ${{ env.NEON_API_KEY }}" \
+            -H "Accept: application/json" \
+            "https://console.neon.tech/api/v2/projects/${{ env.NEON_PROJECT_ID }}/branches/$BRANCH_ID/endpoints")
+          
+          HOST=$(echo $ENDPOINTS_RESPONSE | jq -r '.endpoints[0].host')
+          
+          # Get password for the branch
+          PASSWORD_RESPONSE=$(curl -s \
+            -H "Authorization: Bearer ${{ env.NEON_API_KEY }}" \
+            -H "Accept: application/json" \
+            "https://console.neon.tech/api/v2/projects/${{ env.NEON_PROJECT_ID }}/branches/$BRANCH_ID/roles/neondb_owner/reveal_password")
+          
+          PASSWORD=$(echo $PASSWORD_RESPONSE | jq -r '.password')
+          
+          # Construct database URLs using retrieved password
+          DB_URL="postgres://${{ env.NEON_DATABASE_USERNAME }}:${PASSWORD}@${HOST}/neondb"
+          POOLER_URL="postgres://${{ env.NEON_DATABASE_USERNAME }}:${PASSWORD}@${HOST}/neondb"
+          
+          # Set outputs
+          echo "branch_id=$BRANCH_ID" >> $GITHUB_OUTPUT
+          echo "db_url=$DB_URL" >> $GITHUB_OUTPUT
+          echo "db_url_with_pooler=$POOLER_URL" >> $GITHUB_OUTPUT
+
+      - name: Run Migrations
+        id: migrations
+        run: |
+          touch .env
+          echo "DATABASE_URL=${{ steps.neon-branch.outputs.db_url_with_pooler }}?pgbouncer=true&sslmode=require" >> .env
+          echo "DATABASE_URL_UNPOOLED=${{ steps.neon-branch.outputs.db_url }}?sslmode=require" >> .env
+
+          # Add error handling and verification
+          npx prisma format --schema=packages/database/prisma/schema.prisma
+          npx prisma validate --schema=packages/database/prisma/schema.prisma
+          npx prisma generate --schema=packages/database/prisma/schema.prisma
+
+          # Capture migration output to check if any migrations were applied
+          MIGRATION_OUTPUT=$(npx prisma migrate deploy --schema=packages/database/prisma/schema.prisma)
+          if echo "$MIGRATION_OUTPUT" | grep -q "No pending migrations"; then
+            echo "has_migrations=false" >> $GITHUB_OUTPUT
+          else
+            echo "has_migrations=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Comment Branch Info on Pull Request
+        if: steps.migrations.outputs.has_migrations == 'true'
+        uses: thollander/actions-comment-pull-request@v2
+        with:
+          message: |
+            [Neon branch :elephant:](https://console.neon.tech/app/projects/${{ env.NEON_PROJECT_ID }}/branches/${{ steps.neon-branch.outputs.branch_id }}) has been updated with the latest schema changes.
+            
+            ⚠️ Remember: Make sure you've run `pnpm migrate:dev` locally and committed the migration files before merging this PR.
