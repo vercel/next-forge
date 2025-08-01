@@ -11,7 +11,7 @@
     "next": "15.3.2"
   },
   "dependencies": {
-    "@next/bundle-analyzer": "15.3.2",
+    "@next/bundle-analyzer": "15.4.5",
     "@prisma/nextjs-monorepo-workaround-plugin": "^6.8.2",
     "@t3-oss/env-core": "^0.13.4",
     "@t3-oss/env-nextjs": "^0.13.4",
