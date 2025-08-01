@@ -11,7 +11,7 @@
     "@knocklabs/react": "^0.7.11",
     "@t3-oss/env-nextjs": "^0.13.4",
     "react": "^19.1.0",
-    "zod": "^3.25.28"
+    "zod": "^4.0.14"
   },
   "devDependencies": {
     "@repo/typescript-config": "workspace:*",

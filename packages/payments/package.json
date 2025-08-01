@@ -11,7 +11,7 @@
     "@t3-oss/env-nextjs": "^0.13.4",
     "server-only": "^0.0.1",
     "stripe": "^18.1.1",
-    "zod": "^3.25.28"
+    "zod": "^4.0.14"
   },
   "devDependencies": {
     "@repo/typescript-config": "workspace:*",
