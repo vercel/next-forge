@@ -23,7 +23,7 @@
     "@repo/testing": "workspace:*",
     "@sentry/nextjs": "^9.22.0",
     "@t3-oss/env-nextjs": "^0.13.4",
-    "next": "15.3.2",
+    "next": "15.4.5",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "svix": "^1.66.0",
