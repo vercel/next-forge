@@ -15,6 +15,6 @@
     "@prisma/nextjs-monorepo-workaround-plugin": "^6.8.2",
     "@t3-oss/env-core": "^0.13.4",
     "@t3-oss/env-nextjs": "^0.13.4",
-    "zod": "^3.25.28"
+    "zod": "^4.0.14"
   }
 }

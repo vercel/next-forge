@@ -13,7 +13,7 @@
     "react": "^19.1.0",
     "react-markdown": "^10.1.0",
     "tailwind-merge": "^3.3.0",
-    "zod": "^3.25.28"
+    "zod": "^4.0.14"
   },
   "devDependencies": {
     "@repo/typescript-config": "workspace:*",

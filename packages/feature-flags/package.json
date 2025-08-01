@@ -14,7 +14,7 @@
     "@vercel/toolbar": "^0.1.37",
     "flags": "^4.0.1",
     "react": "^19.1.0",
-    "zod": "^3.25.28"
+    "zod": "^4.0.14"
   },
   "peerDependencies": {
     "next": "15.1.7"
