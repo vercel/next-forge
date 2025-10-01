@@ -9,8 +9,8 @@
   "dependencies": {
     "@react-email/components": "0.0.41",
     "@t3-oss/env-nextjs": "^0.13.4",
-    "react": "^19.1.0",
-    "react-dom": "^19.1.0",
+    "react": "19.1.1",
+    "react-dom": "19.1.1",
     "resend": "^4.5.1",
     "zod": "^3.25.28"
   },
