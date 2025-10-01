@@ -3,6 +3,6 @@
   "compilerOptions": {
     "baseUrl": "."
   },
-  "include": ["**/*.ts", "**/*.tsx", "basehub-types.d.ts"],
+  "include": ["**/*.ts", "**/*.tsx", "basehub-types.d.ts", "basehub.config.ts"],
   "exclude": ["node_modules"]
 }
