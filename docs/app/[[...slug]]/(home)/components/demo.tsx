@@ -1,5 +1,5 @@
-import { TerminalIcon } from 'lucide-react';
-import { Video } from './video';
+import { TerminalIcon } from "lucide-react";
+import { Video } from "./video";
 
 export const Demo = () => (
   <section id="demo" className="grid grid-cols-3">
@@ -21,7 +21,7 @@ export const Demo = () => (
         playing
         muted
         loop
-        url="https://youtu.be/4LRXL6l-FS4"
+        src="https://youtu.be/4LRXL6l-FS4"
         aspectRatio="3440 / 2160"
       />
     </div>
