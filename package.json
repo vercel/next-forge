@@ -10,8 +10,8 @@
   "scripts": {
     "build": "turbo build",
     "dev": "turbo dev",
-    "lint": "ultracite lint",
-    "format": "ultracite format",
+    "check": "npx ultracite@latest check",
+    "fix": "npx ultracite@latest fix",
     "test": "turbo test",
     "analyze": "turbo analyze",
     "translate": "turbo translate",
@@ -23,14 +23,14 @@
   },
   "devDependencies": {
     "@auto-it/first-time-contributor": "^11.3.0",
-    "@biomejs/biome": "1.9.4",
+    "@biomejs/biome": "2.2.4",
     "@repo/typescript-config": "workspace:*",
     "@turbo/gen": "^2.5.3",
     "@types/node": "^22.15.21",
     "tsup": "^8.5.0",
     "turbo": "^2.5.3",
     "typescript": "^5.8.3",
-    "ultracite": "^4.2.5",
+    "ultracite": "5.5.0",
     "vitest": "^3.1.4"
   },
   "engines": {
