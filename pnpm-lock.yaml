@@ -927,9 +927,6 @@ importers:
       '@next/bundle-analyzer':
         specifier: 15.5.4
         version: 15.5.4(bufferutil@4.0.9)
-      '@prisma/nextjs-monorepo-workaround-plugin':
-        specifier: ^6.16.3
-        version: 6.16.3
       '@t3-oss/env-core':
         specifier: ^0.13.8
         version: 0.13.8(arktype@2.1.20)(typescript@5.9.3)(zod@4.1.12)
@@ -3230,9 +3227,6 @@ packages:
     resolution: {integrity: sha512-6TXaH6OmDkMOQvOxwLZ8XS51hU2v4A3vmE2pSijCIiGRJYyNeMcL6nMHQMyYdZRD8wl7LF3Wzc+AMPMV/9Oo7A==}
     peerDependencies:
       '@opentelemetry/api': ^1.8
-
-  '@prisma/nextjs-monorepo-workaround-plugin@6.16.3':
-    resolution: {integrity: sha512-sTp5m7evUaQpcA9CdAqUYGYbrfPY7LBazIFTdgtMxHquDCVbzkkCHNguKs9xWoaNCWQKGWY6a+AxeASmLyJjPQ==}
 
   '@radix-ui/number@1.1.1':
     resolution: {integrity: sha512-MkKCwxlXTgz6CFoJx3pCwn07GKp36+aZyu/u2Ln2VrA5DcdyCZkASEDBTd8x5whTQQL5CiYf4prXKLcgQdv29g==}
@@ -13376,8 +13370,6 @@ snapshots:
       '@opentelemetry/instrumentation': 0.57.2(@opentelemetry/api@1.9.0)
     transitivePeerDependencies:
       - supports-color
-
-  '@prisma/nextjs-monorepo-workaround-plugin@6.16.3': {}
 
   '@radix-ui/number@1.1.1': {}
 

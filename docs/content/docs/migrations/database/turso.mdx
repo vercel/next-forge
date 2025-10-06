@@ -118,24 +118,7 @@ pnpm remove @neondatabase/serverless @prisma/adapter-neon ws @types/ws --filter 
 pnpm add @libsql/client --filter @repo/database
 ```
 
-## 6. Update Webpack configuration
-
-Open `packages/next-config/index.ts` and add `@libsql/client` to the list of externals:
-
-```ts title="packages/next-config/index.ts {5}"
-let nextConfig: NextConfig = {
-  ...config,
-  webpack: (config, { isServer }) => {
-    if (isServer) {
-      config.externals = [...(config.externals || []), "@libsql/client"];
-    }
-
-    // ...
-  },
-};
-```
-
-## 7. Update the database connection code
+## 6. Update the database connection code
 
 Open `packages/database/index.ts` and make the following changes:
 
@@ -153,7 +136,7 @@ const libsql = createClient({
 export const database = libsql;
 ```
 
-## 8. Apply schema changes
+## 7. Apply schema changes
 
 Now connect to the Turso database using the CLI:
 
@@ -171,7 +154,7 @@ CREATE TABLE pages (
 );
 ```
 
-## 9. Update application code
+## 8. Update application code
 
 Now wherever you would usually call Prisma, use the `libsql` client instead:
 
