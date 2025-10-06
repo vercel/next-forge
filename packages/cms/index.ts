@@ -1,5 +1,8 @@
 import { basehub as basehubClient, fragmentOn } from 'basehub';
 import { keys } from './keys';
+// ensures types are passed through to apps that use this package
+import type * as _types from './basehub-types.d.ts';
+import './basehub.config';
 
 const basehub = basehubClient({
   token: keys().BASEHUB_TOKEN,
@@ -91,13 +94,13 @@ export const blog = {
     return data.blog.posts.items;
   },
 
-  getLatestPost: async () => {
+  getLatestPost: async (): Promise<Post|null> => {
     const data = await basehub.query(blog.latestPostQuery);
 
     return data.blog.posts.item;
   },
 
-  getPost: async (slug: string) => {
+  getPost: async (slug: string): Promise<Post|null> => {
     const query = blog.postQuery(slug);
     const data = await basehub.query(query);
 
@@ -164,13 +167,13 @@ export const legal = {
     return data.legalPages.items;
   },
 
-  getLatestPost: async () => {
+  getLatestPost: async (): Promise<LegalPost|null> => {
     const data = await basehub.query(legal.latestPostQuery);
 
     return data.legalPages.item;
   },
 
-  getPost: async (slug: string) => {
+  getPost: async (slug: string): Promise<LegalPost|null> => {
     const query = legal.postQuery(slug);
     const data = await basehub.query(query);
 

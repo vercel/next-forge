@@ -12,14 +12,14 @@
   "dependencies": {
     "@react-email/components": "0.0.41",
     "@repo/email": "workspace:*",
-    "react": "19.1.0",
+    "react": "19.2.0",
     "react-email": "4.0.15"
   },
   "devDependencies": {
     "@repo/typescript-config": "workspace:*",
     "@types/node": "22.15.21",
-    "@types/react": "19.1.5",
-    "next": "15.3.2",
+    "@types/react": "19.2.0",
+    "next": "15.5.4",
     "typescript": "^5.8.3"
   }
 }
