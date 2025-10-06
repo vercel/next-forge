@@ -10,15 +10,15 @@
     "typecheck": "tsc --noEmit --emitDeclarationOnly false"
   },
   "dependencies": {
-    "@t3-oss/env-nextjs": "^0.13.4",
+    "@t3-oss/env-nextjs": "^0.13.8",
     "basehub": "^9.5.0",
     "react": "19.2.0",
-    "zod": "^3.25.28"
+    "zod": "^4.1.12"
   },
   "devDependencies": {
     "@repo/typescript-config": "workspace:*",
-    "@types/node": "22.15.21",
-    "@types/react": "19.2.0",
+    "@types/node": "24.7.0",
+    "@types/react": "19.2.1",
     "@types/react-dom": "19.2.0",
     "next": "15.5.4"
   }

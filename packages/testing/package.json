@@ -9,7 +9,7 @@
     "typecheck": "tsc --noEmit --emitDeclarationOnly false"
   },
   "devDependencies": {
-    "@vitejs/plugin-react": "^4.5.0",
-    "vitest": "^3.1.4"
+    "@vitejs/plugin-react": "^5.0.4",
+    "vitest": "^3.2.4"
   }
 }
