@@ -37,9 +37,7 @@ export function Mermaid({ chart }: { chart: string }) {
 
         bindFunctions?.(container as Element);
         setSvg(svg);
-      } catch (error) {
-        console.error("Error while rendering mermaid", error);
-      }
+      } catch (_error) {}
     }
 
     renderChart();

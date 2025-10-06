@@ -65,13 +65,11 @@ export const Header = ({ dictionary }: HeaderProps) => {
               {navigationItems.map((item) => (
                 <NavigationMenuItem key={item.title}>
                   {item.href ? (
-                    <>
-                      <NavigationMenuLink asChild>
-                        <Button asChild variant="ghost">
-                          <Link href={item.href}>{item.title}</Link>
-                        </Button>
-                      </NavigationMenuLink>
-                    </>
+                    <NavigationMenuLink asChild>
+                      <Button asChild variant="ghost">
+                        <Link href={item.href}>{item.title}</Link>
+                      </Button>
+                    </NavigationMenuLink>
                   ) : (
                     <>
                       <NavigationMenuTrigger className="font-medium text-sm">
