@@ -1,6 +1,6 @@
-import { Button } from '@/components/ui/button';
-import Link from 'next/link';
-import { Installer } from './installer';
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Installer } from "./installer";
 
 export const CallToAction = () => (
   <footer className="flex flex-col items-center justify-center gap-8 px-8 py-16 sm:py-24">

@@ -1,16 +1,16 @@
-'use client';
+"use client";
 
 import {
   NotificationFeedPopover,
   NotificationIconButton,
-} from '@knocklabs/react';
-import { useRef, useState } from 'react';
-import type { RefObject } from 'react';
-import { keys } from '../keys';
+} from "@knocklabs/react";
+import type { RefObject } from "react";
+import { useRef, useState } from "react";
+import { keys } from "../keys";
 
 // Required CSS import, unless you're overriding the styling
-import '@knocklabs/react/dist/index.css';
-import '../styles.css';
+import "@knocklabs/react/dist/index.css";
+import "../styles.css";
 
 export const NotificationsTrigger = () => {
   const [isVisible, setIsVisible] = useState(false);

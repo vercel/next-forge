@@ -1,20 +1,20 @@
-import merge from 'lodash.merge';
-import type { Metadata } from 'next';
+import merge from "lodash.merge";
+import type { Metadata } from "next";
 
-type MetadataGenerator = Omit<Metadata, 'description' | 'title'> & {
+type MetadataGenerator = Omit<Metadata, "description" | "title"> & {
   title: string;
   description: string;
   image?: string;
 };
 
-const applicationName = 'next-forge';
-const author: Metadata['authors'] = {
-  name: 'Vercel',
-  url: 'https://vercel.com/',
+const applicationName = "next-forge";
+const author: Metadata["authors"] = {
+  name: "Vercel",
+  url: "https://vercel.com/",
 };
-const publisher = 'Vercel';
-const twitterHandle = '@vercel';
-const protocol = process.env.NODE_ENV === 'production' ? 'https' : 'http';
+const publisher = "Vercel";
+const twitterHandle = "@vercel";
+const protocol = process.env.NODE_ENV === "production" ? "https" : "http";
 const productionUrl = process.env.VERCEL_PROJECT_PRODUCTION_URL;
 
 export const createMetadata = ({
@@ -38,19 +38,19 @@ export const createMetadata = ({
     },
     appleWebApp: {
       capable: true,
-      statusBarStyle: 'default',
+      statusBarStyle: "default",
       title: parsedTitle,
     },
     openGraph: {
       title: parsedTitle,
       description,
-      type: 'website',
+      type: "website",
       siteName: applicationName,
-      locale: 'en_US',
+      locale: "en_US",
     },
     publisher,
     twitter: {
-      card: 'summary_large_image',
+      card: "summary_large_image",
       creator: twitterHandle,
     },
   };

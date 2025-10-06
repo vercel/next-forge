@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import { useAnalytics } from '@repo/analytics/posthog/client';
-import { useUser } from '@repo/auth/client';
-import { usePathname, useSearchParams } from 'next/navigation';
-import { useEffect, useRef } from 'react';
+import { useAnalytics } from "@repo/analytics/posthog/client";
+import { useUser } from "@repo/auth/client";
+import { usePathname, useSearchParams } from "next/navigation";
+import { useEffect, useRef } from "react";
 
 export const PostHogIdentifier = () => {
   const { user } = useUser();
@@ -19,7 +19,7 @@ export const PostHogIdentifier = () => {
       if (searchParams.toString()) {
         url = `${url}?${searchParams.toString()}`;
       }
-      analytics.capture('$pageview', {
+      analytics.capture("$pageview", {
         $current_url: url,
       });
     }

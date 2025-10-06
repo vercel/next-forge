@@ -1,6 +1,6 @@
-import 'server-only';
-import type en from './dictionaries/en.json';
-import languine from './languine.json';
+import "server-only";
+import type en from "./dictionaries/en.json" with { type: "json" };
+import languine from "./languine.json" with { type: "json" };
 
 export const locales = [
   languine.locale.source,
@@ -21,17 +21,17 @@ const dictionaries: Record<string, () => Promise<Dictionary>> =
               `Failed to load dictionary for locale: ${locale}`,
               err
             );
-            return import('./dictionaries/en.json').then((mod) => mod.default);
+            return import("./dictionaries/en.json").then((mod) => mod.default);
           }),
     ])
   );
 
 export const getDictionary = async (locale: string): Promise<Dictionary> => {
-  const normalizedLocale = locale.split('-')[0];
+  const normalizedLocale = locale.split("-")[0];
 
   if (!locales.includes(normalizedLocale as any)) {
     console.warn(`Locale "${locale}" is not supported, defaulting to "en"`);
-    return dictionaries['en']();
+    return dictionaries["en"]();
   }
 
   try {
@@ -41,6 +41,6 @@ export const getDictionary = async (locale: string): Promise<Dictionary> => {
       `Error loading dictionary for locale "${normalizedLocale}", falling back to "en"`,
       error
     );
-    return dictionaries['en']();
+    return dictionaries["en"]();
   }
 };

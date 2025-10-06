@@ -1,6 +1,6 @@
-import { ModeToggle } from '@repo/design-system/components/mode-toggle';
-import { CommandIcon } from 'lucide-react';
-import type { ReactNode } from 'react';
+import { ModeToggle } from "@repo/design-system/components/mode-toggle";
+import { CommandIcon } from "lucide-react";
+import type { ReactNode } from "react";
 
 type AuthLayoutProps = {
   readonly children: ReactNode;

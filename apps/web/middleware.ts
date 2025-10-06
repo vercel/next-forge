@@ -1,23 +1,23 @@
-import { env } from '@/env';
-import { authMiddleware } from '@repo/auth/middleware';
-import { internationalizationMiddleware } from '@repo/internationalization/middleware';
-import { parseError } from '@repo/observability/error';
-import { secure } from '@repo/security';
+import { authMiddleware } from "@repo/auth/middleware";
+import { internationalizationMiddleware } from "@repo/internationalization/middleware";
+import { parseError } from "@repo/observability/error";
+import { secure } from "@repo/security";
 import {
   noseconeMiddleware,
   noseconeOptions,
   noseconeOptionsWithToolbar,
-} from '@repo/security/middleware';
+} from "@repo/security/middleware";
 import {
   type NextMiddleware,
   type NextRequest,
   NextResponse,
-} from 'next/server';
+} from "next/server";
+import { env } from "@/env";
 
 export const config = {
   // matcher tells Next.js which routes to run the middleware on. This runs the
   // middleware on all routes except for static assets and Posthog ingest
-  matcher: ['/((?!_next/static|_next/image|ingest|favicon.ico).*)'],
+  matcher: ["/((?!_next/static|_next/image|ingest|favicon.ico).*)"],
 };
 
 const securityHeaders = env.FLAGS_SECRET
@@ -40,9 +40,9 @@ const middleware = authMiddleware(async (_auth, request) => {
     await secure(
       [
         // See https://docs.arcjet.com/bot-protection/identifying-bots
-        'CATEGORY:SEARCH_ENGINE', // Allow search engines
-        'CATEGORY:PREVIEW', // Allow preview links to show OG images
-        'CATEGORY:MONITOR', // Allow uptime monitoring services
+        "CATEGORY:SEARCH_ENGINE", // Allow search engines
+        "CATEGORY:PREVIEW", // Allow preview links to show OG images
+        "CATEGORY:MONITOR", // Allow uptime monitoring services
       ],
       request
     );

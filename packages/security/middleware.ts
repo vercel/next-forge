@@ -1,9 +1,10 @@
 import {
-  type NoseconeOptions,
   defaults,
+  type NoseconeOptions,
   withVercelToolbar,
-} from '@nosecone/next';
-export { createMiddleware as noseconeMiddleware } from '@nosecone/next';
+} from "@nosecone/next";
+
+export { createMiddleware as noseconeMiddleware } from "@nosecone/next";
 
 // Nosecone security headers configuration
 // https://docs.arcjet.com/nosecone/quick-start

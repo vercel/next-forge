@@ -1,10 +1,10 @@
-'use server';
+"use server";
 
 import {
-  type OrganizationMembership,
   auth,
   clerkClient,
-} from '@repo/auth/server';
+  type OrganizationMembership,
+} from "@repo/auth/server";
 
 const getName = (user: OrganizationMembership): string | undefined => {
   let name = user.publicUserData?.firstName;
@@ -19,30 +19,30 @@ const getName = (user: OrganizationMembership): string | undefined => {
 };
 
 const colors = [
-  'var(--color-red-500)',
-  'var(--color-orange-500)',
-  'var(--color-amber-500)',
-  'var(--color-yellow-500)',
-  'var(--color-lime-500)',
-  'var(--color-green-500)',
-  'var(--color-emerald-500)',
-  'var(--color-teal-500)',
-  'var(--color-cyan-500)',
-  'var(--color-sky-500)',
-  'var(--color-blue-500)',
-  'var(--color-indigo-500)',
-  'var(--color-violet-500)',
-  'var(--color-purple-500)',
-  'var(--color-fuchsia-500)',
-  'var(--color-pink-500)',
-  'var(--color-rose-500)',
+  "var(--color-red-500)",
+  "var(--color-orange-500)",
+  "var(--color-amber-500)",
+  "var(--color-yellow-500)",
+  "var(--color-lime-500)",
+  "var(--color-green-500)",
+  "var(--color-emerald-500)",
+  "var(--color-teal-500)",
+  "var(--color-cyan-500)",
+  "var(--color-sky-500)",
+  "var(--color-blue-500)",
+  "var(--color-indigo-500)",
+  "var(--color-violet-500)",
+  "var(--color-purple-500)",
+  "var(--color-fuchsia-500)",
+  "var(--color-pink-500)",
+  "var(--color-rose-500)",
 ];
 
 export const getUsers = async (
   userIds: string[]
 ): Promise<
   | {
-      data: Liveblocks['UserMeta']['info'][];
+      data: Liveblocks["UserMeta"]["info"][];
     }
   | {
       error: unknown;
@@ -52,7 +52,7 @@ export const getUsers = async (
     const { orgId } = await auth();
 
     if (!orgId) {
-      throw new Error('Not logged in');
+      throw new Error("Not logged in");
     }
 
     const clerk = await clerkClient();
@@ -62,15 +62,15 @@ export const getUsers = async (
       limit: 100,
     });
 
-    const data: Liveblocks['UserMeta']['info'][] = members.data
+    const data: Liveblocks["UserMeta"]["info"][] = members.data
       .filter(
         (user) =>
           user.publicUserData?.userId &&
           userIds.includes(user.publicUserData.userId)
       )
       .map((user) => ({
-        name: getName(user) ?? 'Unknown user',
-        picture: user.publicUserData?.imageUrl ?? '',
+        name: getName(user) ?? "Unknown user",
+        picture: user.publicUserData?.imageUrl ?? "",
         color: colors[Math.floor(Math.random() * colors.length)],
       }));
 

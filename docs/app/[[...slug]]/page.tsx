@@ -1,17 +1,17 @@
-import { getMDXComponents } from '@/mdx-components';
-import { DocsLayout } from 'fumadocs-ui/layouts/notebook';
-import { createRelativeLink } from 'fumadocs-ui/mdx';
+import { DocsLayout } from "fumadocs-ui/layouts/notebook";
+import { createRelativeLink } from "fumadocs-ui/mdx";
 import {
   DocsBody,
   DocsDescription,
   DocsPage,
   DocsTitle,
-} from 'fumadocs-ui/page';
-import type { Metadata } from 'next';
-import { notFound } from 'next/navigation';
-import { source } from '../../lib/source';
-import { baseOptions } from '../layout.config';
-import Home from './(home)';
+} from "fumadocs-ui/page";
+import type { Metadata } from "next";
+import { notFound } from "next/navigation";
+import { getMDXComponents } from "@/mdx-components";
+import { source } from "../../lib/source";
+import { baseOptions } from "../layout.config";
+import Home from "./(home)";
 
 type PageProps = {
   params: Promise<{ slug?: string[] }>;
@@ -25,10 +25,10 @@ const Page = async (props: PageProps) => {
     return (
       <DocsLayout
         {...baseOptions}
-        tree={source.pageTree}
+        containerProps={{ className: "landing-page" }}
+        nav={{ ...baseOptions.nav, mode: "top" }}
         sidebar={{ hidden: true, collapsible: false }}
-        nav={{ ...baseOptions.nav, mode: 'top' }}
-        containerProps={{ className: 'landing-page' }}
+        tree={source.pageTree}
       >
         <Home />
       </DocsLayout>
@@ -44,42 +44,42 @@ const Page = async (props: PageProps) => {
   return (
     <DocsLayout
       {...baseOptions}
-      tree={source.pageTree}
+      nav={{
+        ...baseOptions.nav,
+        mode: "top",
+      }}
       sidebar={{
         collapsible: false,
         tabs: [
           {
-            title: 'Docs',
-            url: '/docs',
+            title: "Docs",
+            url: "/docs",
           },
           {
-            title: 'Apps',
-            url: '/apps',
+            title: "Apps",
+            url: "/apps",
           },
           {
-            title: 'Packages',
-            url: '/packages',
+            title: "Packages",
+            url: "/packages",
           },
           {
-            title: 'Migrations',
-            url: '/migrations',
+            title: "Migrations",
+            url: "/migrations",
           },
           {
-            title: 'Addons',
-            url: '/addons',
+            title: "Addons",
+            url: "/addons",
           },
         ],
       }}
       tabMode="navbar"
-      nav={{
-        ...baseOptions.nav,
-        mode: 'top',
-      }}
+      tree={source.pageTree}
     >
       <DocsPage
-        toc={page.data.toc}
         full={page.data.full}
-        tableOfContent={{ style: 'clerk' }}
+        tableOfContent={{ style: "clerk" }}
+        toc={page.data.toc}
       >
         <DocsTitle>{page.data.title}</DocsTitle>
         <DocsDescription>{page.data.description}</DocsDescription>
@@ -106,7 +106,7 @@ export async function generateMetadata(props: {
 
   if (!params.slug) {
     return {
-      title: 'Production-grade Turborepo template for Next.js apps',
+      title: "Production-grade Turborepo template for Next.js apps",
       description:
         "A monorepo template designed to have everything you need to build your new SaaS app as quick as possible. Authentication, billing, analytics, SEO, database ORM and more — it's all here.",
     };
@@ -122,10 +122,10 @@ export async function generateMetadata(props: {
     openGraph: {
       title: page.data.title,
       description: page.data.description,
-      type: 'website',
+      type: "website",
       images: [
         {
-          url: `/og?slug=${params.slug?.join('/') ?? ''}`,
+          url: `/og?slug=${params.slug?.join("/") ?? ""}`,
           width: 1200,
           height: 630,
         },

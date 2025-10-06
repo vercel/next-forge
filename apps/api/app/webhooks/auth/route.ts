@@ -1,16 +1,16 @@
-import { env } from '@/env';
-import { analytics } from '@repo/analytics/posthog/server';
+import { analytics } from "@repo/analytics/posthog/server";
 import type {
   DeletedObjectJSON,
   OrganizationJSON,
   OrganizationMembershipJSON,
   UserJSON,
   WebhookEvent,
-} from '@repo/auth/server';
-import { log } from '@repo/observability/log';
-import { headers } from 'next/headers';
-import { NextResponse } from 'next/server';
-import { Webhook } from 'svix';
+} from "@repo/auth/server";
+import { log } from "@repo/observability/log";
+import { headers } from "next/headers";
+import { NextResponse } from "next/server";
+import { Webhook } from "svix";
+import { env } from "@/env";
 
 const handleUserCreated = (data: UserJSON) => {
   analytics.identify({
@@ -26,11 +26,11 @@ const handleUserCreated = (data: UserJSON) => {
   });
 
   analytics.capture({
-    event: 'User Created',
+    event: "User Created",
     distinctId: data.id,
   });
 
-  return new Response('User created', { status: 201 });
+  return new Response("User created", { status: 201 });
 };
 
 const handleUserUpdated = (data: UserJSON) => {
@@ -47,11 +47,11 @@ const handleUserUpdated = (data: UserJSON) => {
   });
 
   analytics.capture({
-    event: 'User Updated',
+    event: "User Updated",
     distinctId: data.id,
   });
 
-  return new Response('User updated', { status: 201 });
+  return new Response("User updated", { status: 201 });
 };
 
 const handleUserDeleted = (data: DeletedObjectJSON) => {
@@ -64,18 +64,18 @@ const handleUserDeleted = (data: DeletedObjectJSON) => {
     });
 
     analytics.capture({
-      event: 'User Deleted',
+      event: "User Deleted",
       distinctId: data.id,
     });
   }
 
-  return new Response('User deleted', { status: 201 });
+  return new Response("User deleted", { status: 201 });
 };
 
 const handleOrganizationCreated = (data: OrganizationJSON) => {
   analytics.groupIdentify({
     groupKey: data.id,
-    groupType: 'company',
+    groupType: "company",
     distinctId: data.created_by,
     properties: {
       name: data.name,
@@ -85,18 +85,18 @@ const handleOrganizationCreated = (data: OrganizationJSON) => {
 
   if (data.created_by) {
     analytics.capture({
-      event: 'Organization Created',
+      event: "Organization Created",
       distinctId: data.created_by,
     });
   }
 
-  return new Response('Organization created', { status: 201 });
+  return new Response("Organization created", { status: 201 });
 };
 
 const handleOrganizationUpdated = (data: OrganizationJSON) => {
   analytics.groupIdentify({
     groupKey: data.id,
-    groupType: 'company',
+    groupType: "company",
     distinctId: data.created_by,
     properties: {
       name: data.name,
@@ -106,12 +106,12 @@ const handleOrganizationUpdated = (data: OrganizationJSON) => {
 
   if (data.created_by) {
     analytics.capture({
-      event: 'Organization Updated',
+      event: "Organization Updated",
       distinctId: data.created_by,
     });
   }
 
-  return new Response('Organization updated', { status: 201 });
+  return new Response("Organization updated", { status: 201 });
 };
 
 const handleOrganizationMembershipCreated = (
@@ -119,16 +119,16 @@ const handleOrganizationMembershipCreated = (
 ) => {
   analytics.groupIdentify({
     groupKey: data.organization.id,
-    groupType: 'company',
+    groupType: "company",
     distinctId: data.public_user_data.user_id,
   });
 
   analytics.capture({
-    event: 'Organization Member Created',
+    event: "Organization Member Created",
     distinctId: data.public_user_data.user_id,
   });
 
-  return new Response('Organization membership created', { status: 201 });
+  return new Response("Organization membership created", { status: 201 });
 };
 
 const handleOrganizationMembershipDeleted = (
@@ -137,27 +137,27 @@ const handleOrganizationMembershipDeleted = (
   // Need to unlink the user from the group
 
   analytics.capture({
-    event: 'Organization Member Deleted',
+    event: "Organization Member Deleted",
     distinctId: data.public_user_data.user_id,
   });
 
-  return new Response('Organization membership deleted', { status: 201 });
+  return new Response("Organization membership deleted", { status: 201 });
 };
 
 export const POST = async (request: Request): Promise<Response> => {
   if (!env.CLERK_WEBHOOK_SECRET) {
-    return NextResponse.json({ message: 'Not configured', ok: false });
+    return NextResponse.json({ message: "Not configured", ok: false });
   }
 
   // Get the headers
   const headerPayload = await headers();
-  const svixId = headerPayload.get('svix-id');
-  const svixTimestamp = headerPayload.get('svix-timestamp');
-  const svixSignature = headerPayload.get('svix-signature');
+  const svixId = headerPayload.get("svix-id");
+  const svixTimestamp = headerPayload.get("svix-timestamp");
+  const svixSignature = headerPayload.get("svix-signature");
 
   // If there are no headers, error out
-  if (!svixId || !svixTimestamp || !svixSignature) {
-    return new Response('Error occured -- no svix headers', {
+  if (!(svixId && svixTimestamp && svixSignature)) {
+    return new Response("Error occured -- no svix headers", {
       status: 400,
     });
   }
@@ -174,13 +174,13 @@ export const POST = async (request: Request): Promise<Response> => {
   // Verify the payload with the headers
   try {
     event = webhook.verify(body, {
-      'svix-id': svixId,
-      'svix-timestamp': svixTimestamp,
-      'svix-signature': svixSignature,
+      "svix-id": svixId,
+      "svix-timestamp": svixTimestamp,
+      "svix-signature": svixSignature,
     }) as WebhookEvent;
   } catch (error) {
-    log.error('Error verifying webhook:', { error });
-    return new Response('Error occured', {
+    log.error("Error verifying webhook:", { error });
+    return new Response("Error occured", {
       status: 400,
     });
   }
@@ -189,36 +189,36 @@ export const POST = async (request: Request): Promise<Response> => {
   const { id } = event.data;
   const eventType = event.type;
 
-  log.info('Webhook', { id, eventType, body });
+  log.info("Webhook", { id, eventType, body });
 
-  let response: Response = new Response('', { status: 201 });
+  let response: Response = new Response("", { status: 201 });
 
   switch (eventType) {
-    case 'user.created': {
+    case "user.created": {
       response = handleUserCreated(event.data);
       break;
     }
-    case 'user.updated': {
+    case "user.updated": {
       response = handleUserUpdated(event.data);
       break;
     }
-    case 'user.deleted': {
+    case "user.deleted": {
       response = handleUserDeleted(event.data);
       break;
     }
-    case 'organization.created': {
+    case "organization.created": {
       response = handleOrganizationCreated(event.data);
       break;
     }
-    case 'organization.updated': {
+    case "organization.updated": {
       response = handleOrganizationUpdated(event.data);
       break;
     }
-    case 'organizationMembership.created': {
+    case "organizationMembership.created": {
       response = handleOrganizationMembershipCreated(event.data);
       break;
     }
-    case 'organizationMembership.deleted': {
+    case "organizationMembership.deleted": {
       response = handleOrganizationMembershipDeleted(event.data);
       break;
     }

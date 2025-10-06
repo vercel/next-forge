@@ -1,7 +1,7 @@
-import { getDictionary } from '@repo/internationalization';
-import { createMetadata } from '@repo/seo/metadata';
-import type { Metadata } from 'next';
-import { ContactForm } from './components/contact-form';
+import { getDictionary } from "@repo/internationalization";
+import { createMetadata } from "@repo/seo/metadata";
+import type { Metadata } from "next";
+import { ContactForm } from "./components/contact-form";
 
 type ContactProps = {
   params: Promise<{

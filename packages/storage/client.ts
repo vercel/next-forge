@@ -1,1 +1,1 @@
-export * from '@vercel/blob/client';
+export * from "@vercel/blob/client";

@@ -1,13 +1,13 @@
-'use client';
+"use client";
 
-import type { ResolveMentionSuggestionsArgs } from '@liveblocks/client';
-import type { ResolveUsersArgs } from '@liveblocks/node';
+import type { ResolveMentionSuggestionsArgs } from "@liveblocks/client";
+import type { ResolveUsersArgs } from "@liveblocks/node";
 import {
   ClientSideSuspense,
   LiveblocksProvider,
   RoomProvider,
-} from '@liveblocks/react/suspense';
-import type { ComponentProps, ReactNode } from 'react';
+} from "@liveblocks/react/suspense";
+import type { ComponentProps, ReactNode } from "react";
 
 type RoomProps = ComponentProps<typeof LiveblocksProvider> & {
   id: string;
@@ -16,7 +16,7 @@ type RoomProps = ComponentProps<typeof LiveblocksProvider> & {
   fallback: ReactNode;
   resolveUsers?: (
     args: ResolveUsersArgs
-  ) => Promise<Liveblocks['UserMeta']['info'][]>;
+  ) => Promise<Liveblocks["UserMeta"]["info"][]>;
   resolveMentionSuggestions?: (
     args: ResolveMentionSuggestionsArgs
   ) => Promise<string[]>;
