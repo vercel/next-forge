@@ -1,3 +1,16 @@
+# v5.0.6 (Mon Oct 06 2025)
+
+#### 🐛 Bug Fix
+
+- fix: knock provider theme [#566](https://github.com/vercel/next-forge/pull/566) ([@jpvalery](https://github.com/jpvalery) [@haydenbleasel](https://github.com/haydenbleasel))
+
+#### Authors: 2
+
+- Hayden Bleasel ([@haydenbleasel](https://github.com/haydenbleasel))
+- Jp ([@jpvalery](https://github.com/jpvalery))
+
+---
+
 # v5.0.5 (Mon Oct 06 2025)
 
 :tada: This release contains work from a new contributor! :tada:
