@@ -21,12 +21,11 @@ export const NotificationsProvider = ({
     return children;
   }
 
-  const { theme: rawTheme } = useTheme();
-  const theme = rawTheme === 'dark' ? 'dark' : 'light';
+  const { resolvedTheme } = useTheme();
 
   return (
     <KnockProvider apiKey={knockApiKey} userId={userId}>
-      <KnockFeedProvider feedId={knockFeedChannelId} colorMode={theme}>
+      <KnockFeedProvider feedId={knockFeedChannelId} colorMode={resolvedTheme}>
         {children}
       </KnockFeedProvider>
     </KnockProvider>
