@@ -20,14 +20,12 @@
     "@repo/next-config": "workspace:*",
     "@repo/observability": "workspace:*",
     "@repo/payments": "workspace:*",
-    "@repo/testing": "workspace:*",
     "@sentry/nextjs": "^10.17.0",
     "@t3-oss/env-nextjs": "^0.13.8",
     "next": "15.5.4",
     "react": "19.2.0",
     "react-dom": "19.2.0",
     "svix": "^1.76.1",
-    "vitest": "^3.2.4",
     "zod": "^4.1.12"
   },
   "devDependencies": {
@@ -35,7 +33,9 @@
     "@types/node": "24.7.0",
     "@types/react": "19.2.1",
     "@types/react-dom": "19.2.0",
+    "@vitejs/plugin-react": "^5.0.4",
     "concurrently": "^9.2.1",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vitest": "^3.2.4"
   }
 }
