@@ -272,3 +272,8 @@ packages/database/generated
 
 # Sentry
 .sentryclirc
+
+# Documentation
+.contentlayer
+.content-collections
+.source
