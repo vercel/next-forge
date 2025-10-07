@@ -1,3 +1,15 @@
+# v5.0.7 (Tue Oct 07 2025)
+
+#### 🐛 Bug Fix
+
+- 5.1 [#637](https://github.com/vercel/next-forge/pull/637) ([@haydenbleasel](https://github.com/haydenbleasel))
+
+#### Authors: 1
+
+- Hayden Bleasel ([@haydenbleasel](https://github.com/haydenbleasel))
+
+---
+
 # v5.0.6 (Mon Oct 06 2025)
 
 #### 🐛 Bug Fix
