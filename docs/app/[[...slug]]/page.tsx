@@ -9,7 +9,7 @@ import {
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getMDXComponents } from "@/mdx-components";
-import { source } from "../../lib/source";
+import { source, getPageImage } from "../../lib/source";
 import { baseOptions } from "../layout.config";
 import Home from "./(home)";
 
@@ -123,13 +123,7 @@ export async function generateMetadata(props: {
       title: page.data.title,
       description: page.data.description,
       type: "website",
-      images: [
-        {
-          url: `/og?slug=${params.slug?.join("/") ?? ""}`,
-          width: 1200,
-          height: 630,
-        },
-      ],
+      images: getPageImage(page).url,
     },
   };
 }
