@@ -11,13 +11,12 @@ import {
   NavigationMenuTrigger,
 } from "@repo/design-system/components/ui/navigation-menu";
 import type { Dictionary } from "@repo/internationalization";
-import { Menu, MoveRight, X } from "lucide-react";
+import { CommandIcon, Menu, MoveRight, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { env } from "@/env";
 import { LanguageSwitcher } from "./language-switcher";
-import Logo from "./logo.svg";
 
 type HeaderProps = {
   dictionary: Dictionary;
@@ -112,13 +111,19 @@ export const Header = ({ dictionary }: HeaderProps) => {
           </NavigationMenu>
         </div>
         <div className="flex items-center gap-2 lg:justify-center">
-          <Image
-            alt="Logo"
-            className="dark:invert"
-            height={24}
-            src={Logo}
-            width={24}
-          />
+          <svg
+            className="-translate-y-[0.5px] h-[18px] w-[18px] fill-current"
+            fill="none"
+            height="22"
+            viewBox="0 0 235 203"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <title>Vercel</title>
+            <path
+              d="M117.082 0L234.164 202.794H0L117.082 0Z"
+              fill="currentColor"
+            />
+          </svg>
           <p className="whitespace-nowrap font-semibold">next-forge</p>
         </div>
         <div className="flex w-full justify-end gap-4">
