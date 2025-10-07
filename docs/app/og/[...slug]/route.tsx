@@ -51,26 +51,17 @@ export const GET = async (_request: NextRequest, context: GetContext) => {
       <div tw="absolute left-48 top-60 z-10 w-12 h-12 bg-white opacity-10" />
 
       <div tw="flex top-12 left-12 z-10">
-        {/* biome-ignore lint/a11y/noSvgWithoutTitle: "satori" */}
+        {/** biome-ignore lint/a11y/noSvgWithoutTitle: "satori" */}
         <svg
           fill="none"
           height="48"
-          viewBox="0 0 96 96"
-          width="48"
+          viewBox="0 0 235 203"
           xmlns="http://www.w3.org/2000/svg"
-          xmlnsXlink="http://www.w3.org/1999/xlink"
         >
-          <clipPath id="a">
-            <path d="m0 0h96v96h-96z" />
-          </clipPath>
-          <g clip-path="url(#a)">
-            <path
-              clip-rule="evenodd"
-              d="m48 0h-48l48 48h-48l48 48h48l-48-48h48z"
-              fill="#000"
-              fill-rule="evenodd"
-            />
-          </g>
+          <path
+            d="M117.082 0L234.164 202.794H0L117.082 0Z"
+            fill="currentColor"
+          />
         </svg>
       </div>
       <div
