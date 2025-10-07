@@ -8,7 +8,7 @@ import { Review } from "./components/review";
 import { Social } from "./components/social";
 
 const Home = () => (
-  <main className="divide-y px-0 pt-[var(--fd-nav-height)]">
+  <main className="container mx-auto divide-y border-x px-0">
     <Hero />
     <div className="grid divide-y sm:grid-cols-3 sm:divide-x sm:divide-y-0">
       <div className="sm:col-span-2">
