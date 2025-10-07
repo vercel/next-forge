@@ -7,7 +7,7 @@ type VideoProps = ComponentProps<typeof ReactPlayer> & {
   aspectRatio: string;
 };
 
-const ReactPlayer = dynamic(() => import("react-player/youtube"), {
+const ReactPlayer = dynamic(() => import("react-player"), {
   ssr: false,
   loading: () => <div className="h-full w-full bg-black" />,
 });
