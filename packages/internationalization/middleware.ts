@@ -21,9 +21,8 @@ const I18nMiddleware = createI18nMiddleware({
   },
 });
 
-export function internationalizationMiddleware(request: NextRequest) {
-  return I18nMiddleware(request);
-}
+export const internationalizationMiddleware = (request: NextRequest) =>
+  I18nMiddleware(request);
 
 export const config = {
   matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],

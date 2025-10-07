@@ -1,14 +1,11 @@
-import {
-  defaults,
-  type NoseconeOptions,
-  withVercelToolbar,
-} from "@nosecone/next";
+import { defaults, type Options, withVercelToolbar } from "@nosecone/next";
 
-export { createMiddleware as noseconeMiddleware } from "@nosecone/next";
+// biome-ignore lint/performance/noBarrelFile: "re-exporting"
+export { createMiddleware as securityMiddleware } from "@nosecone/next";
 
 // Nosecone security headers configuration
 // https://docs.arcjet.com/nosecone/quick-start
-export const noseconeOptions: NoseconeOptions = {
+export const noseconeOptions: Options = {
   ...defaults,
   // Content Security Policy (CSP) is disabled by default because the values
   // depend on which Next Forge features are enabled. See
@@ -17,5 +14,5 @@ export const noseconeOptions: NoseconeOptions = {
   contentSecurityPolicy: false,
 };
 
-export const noseconeOptionsWithToolbar: NoseconeOptions =
+export const noseconeOptionsWithToolbar: Options =
   withVercelToolbar(noseconeOptions);
