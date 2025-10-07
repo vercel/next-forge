@@ -20,7 +20,7 @@
     "react": "19.2.0",
     "react-dom": "19.2.0",
     "react-hook-form": "^7.64.0",
-    "recharts": "^3.2.1",
+    "recharts": "^2.15.4",
     "sonner": "^2.0.7",
     "zod": "^4.1.12"
   },
