@@ -5,6 +5,7 @@
     "---Authentication---",
     "authentication/authjs",
     "authentication/better-auth",
+    "authentication/supabase",
     "---CMS---",
     "cms/content-collections",
     "---Database---",
