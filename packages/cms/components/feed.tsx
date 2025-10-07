@@ -1,1 +1,1 @@
-export { Pump as Feed } from 'basehub/react-pump';
+export { Pump as Feed } from "basehub/react-pump";

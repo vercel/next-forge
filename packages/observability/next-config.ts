@@ -1,6 +1,6 @@
-import { withLogtail } from '@logtail/next';
-import { withSentryConfig } from '@sentry/nextjs';
-import { keys } from './keys';
+import { withLogtail } from "@logtail/next";
+import { withSentryConfig } from "@sentry/nextjs";
+import { keys } from "./keys";
 
 export const sentryConfig: Parameters<typeof withSentryConfig>[1] = {
   org: keys().SENTRY_ORG,
@@ -23,7 +23,7 @@ export const sentryConfig: Parameters<typeof withSentryConfig>[1] = {
    * Note: Check that the configured route will not match with your Next.js middleware, otherwise reporting of client-
    * side errors will fail.
    */
-  tunnelRoute: '/monitoring',
+  tunnelRoute: "/monitoring",
 
   // Automatically tree-shake Sentry logger statements to reduce bundle size
   disableLogger: true,
@@ -40,12 +40,10 @@ export const sentryConfig: Parameters<typeof withSentryConfig>[1] = {
 export const withSentry = (sourceConfig: object): object => {
   const configWithTranspile = {
     ...sourceConfig,
-    transpilePackages: ['@sentry/nextjs'],
+    transpilePackages: ["@sentry/nextjs"],
   };
 
   return withSentryConfig(configWithTranspile, sentryConfig);
 };
 
-export const withLogging = (config: object): object => {
-  return withLogtail(config);
-};
+export const withLogging = (config: object): object => withLogtail(config);

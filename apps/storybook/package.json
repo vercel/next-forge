@@ -10,22 +10,23 @@
     "typecheck": "tsc --noEmit --emitDeclarationOnly false"
   },
   "dependencies": {
+    "@hookform/resolvers": "^5.2.2",
     "@repo/design-system": "workspace:*",
     "@storybook/addon-actions": "^8.6.14",
     "cmdk": "^1.1.1",
     "date-fns": "^4.1.0",
     "input-otp": "^1.4.2",
-    "lucide-react": "^0.511.0",
+    "lucide-react": "^0.545.0",
     "next": "15.5.4",
     "react": "19.2.0",
     "react-dom": "19.2.0",
-    "react-hook-form": "^7.56.4",
-    "recharts": "^2.15.3",
-    "sonner": "^2.0.3",
-    "zod": "^3.25.28"
+    "react-hook-form": "^7.64.0",
+    "recharts": "^2.15.4",
+    "sonner": "^2.0.7",
+    "zod": "^4.1.12"
   },
   "devDependencies": {
-    "@chromatic-com/storybook": "^3.2.6",
+    "@chromatic-com/storybook": "^3.2.7",
     "@repo/typescript-config": "workspace:*",
     "@storybook/addon-essentials": "^8.6.14",
     "@storybook/addon-interactions": "^8.6.14",
@@ -35,13 +36,13 @@
     "@storybook/nextjs": "^8.6.14",
     "@storybook/react": "^8.6.14",
     "@storybook/test": "^8.6.14",
-    "@types/node": "^22",
-    "@types/react": "19.2.0",
+    "@types/node": "^24",
+    "@types/react": "19.2.1",
     "@types/react-dom": "19.2.0",
-    "chromatic": "^12.0.0",
+    "chromatic": "^13.3.0",
     "postcss": "^8",
     "storybook": "^8.6.14",
-    "tailwindcss": "^4.1.7",
+    "tailwindcss": "^4.1.14",
     "typescript": "^5"
   }
 }

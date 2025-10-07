@@ -1,20 +1,20 @@
-'use client';
+"use client";
 
-import { OrganizationSwitcher, UserButton } from '@repo/auth/client';
-import { ModeToggle } from '@repo/design-system/components/mode-toggle';
-import { Button } from '@repo/design-system/components/ui/button';
+import { OrganizationSwitcher, UserButton } from "@repo/auth/client";
+import { ModeToggle } from "@repo/design-system/components/mode-toggle";
+import { Button } from "@repo/design-system/components/ui/button";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from '@repo/design-system/components/ui/collapsible';
+} from "@repo/design-system/components/ui/collapsible";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@repo/design-system/components/ui/dropdown-menu';
+} from "@repo/design-system/components/ui/dropdown-menu";
 import {
   Sidebar,
   SidebarContent,
@@ -32,9 +32,9 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
   useSidebar,
-} from '@repo/design-system/components/ui/sidebar';
-import { cn } from '@repo/design-system/lib/utils';
-import { NotificationsTrigger } from '@repo/notifications/components/trigger';
+} from "@repo/design-system/components/ui/sidebar";
+import { cn } from "@repo/design-system/lib/utils";
+import { NotificationsTrigger } from "@repo/notifications/components/trigger";
 import {
   AnchorIcon,
   BookOpenIcon,
@@ -51,10 +51,10 @@ import {
   ShareIcon,
   SquareTerminalIcon,
   Trash2Icon,
-} from 'lucide-react';
-import Link from 'next/link';
-import type { ReactNode } from 'react';
-import { Search } from './search';
+} from "lucide-react";
+import Link from "next/link";
+import type { ReactNode } from "react";
+import { Search } from "./search";
 
 type GlobalSidebarProperties = {
   readonly children: ReactNode;
@@ -62,128 +62,128 @@ type GlobalSidebarProperties = {
 
 const data = {
   user: {
-    name: 'shadcn',
-    email: 'm@example.com',
-    avatar: '/avatars/shadcn.jpg',
+    name: "shadcn",
+    email: "m@example.com",
+    avatar: "/avatars/shadcn.jpg",
   },
   navMain: [
     {
-      title: 'Playground',
-      url: '#',
+      title: "Playground",
+      url: "#",
       icon: SquareTerminalIcon,
       isActive: true,
       items: [
         {
-          title: 'History',
-          url: '#',
+          title: "History",
+          url: "#",
         },
         {
-          title: 'Starred',
-          url: '#',
+          title: "Starred",
+          url: "#",
         },
         {
-          title: 'Settings',
-          url: '#',
+          title: "Settings",
+          url: "#",
         },
       ],
     },
     {
-      title: 'Models',
-      url: '#',
+      title: "Models",
+      url: "#",
       icon: BotIcon,
       items: [
         {
-          title: 'Genesis',
-          url: '#',
+          title: "Genesis",
+          url: "#",
         },
         {
-          title: 'Explorer',
-          url: '#',
+          title: "Explorer",
+          url: "#",
         },
         {
-          title: 'Quantum',
-          url: '#',
+          title: "Quantum",
+          url: "#",
         },
       ],
     },
     {
-      title: 'Documentation',
-      url: '#',
+      title: "Documentation",
+      url: "#",
       icon: BookOpenIcon,
       items: [
         {
-          title: 'Introduction',
-          url: '#',
+          title: "Introduction",
+          url: "#",
         },
         {
-          title: 'Get Started',
-          url: '#',
+          title: "Get Started",
+          url: "#",
         },
         {
-          title: 'Tutorials',
-          url: '#',
+          title: "Tutorials",
+          url: "#",
         },
         {
-          title: 'Changelog',
-          url: '#',
+          title: "Changelog",
+          url: "#",
         },
       ],
     },
     {
-      title: 'Settings',
-      url: '#',
+      title: "Settings",
+      url: "#",
       icon: Settings2Icon,
       items: [
         {
-          title: 'General',
-          url: '#',
+          title: "General",
+          url: "#",
         },
         {
-          title: 'Team',
-          url: '#',
+          title: "Team",
+          url: "#",
         },
         {
-          title: 'Billing',
-          url: '#',
+          title: "Billing",
+          url: "#",
         },
         {
-          title: 'Limits',
-          url: '#',
+          title: "Limits",
+          url: "#",
         },
       ],
     },
   ],
   navSecondary: [
     {
-      title: 'Webhooks',
-      url: '/webhooks',
+      title: "Webhooks",
+      url: "/webhooks",
       icon: AnchorIcon,
     },
     {
-      title: 'Support',
-      url: '#',
+      title: "Support",
+      url: "#",
       icon: LifeBuoyIcon,
     },
     {
-      title: 'Feedback',
-      url: '#',
+      title: "Feedback",
+      url: "#",
       icon: SendIcon,
     },
   ],
   projects: [
     {
-      name: 'Design Engineering',
-      url: '#',
+      name: "Design Engineering",
+      url: "#",
       icon: FrameIcon,
     },
     {
-      name: 'Sales & Marketing',
-      url: '#',
+      name: "Sales & Marketing",
+      url: "#",
       icon: PieChartIcon,
     },
     {
-      name: 'Travel',
-      url: '#',
+      name: "Travel",
+      url: "#",
       icon: MapIcon,
     },
   ],
@@ -200,13 +200,13 @@ export const GlobalSidebar = ({ children }: GlobalSidebarProperties) => {
             <SidebarMenuItem>
               <div
                 className={cn(
-                  'h-[36px] overflow-hidden transition-all [&>div]:w-full',
-                  sidebar.open ? '' : '-mx-1'
+                  "h-[36px] overflow-hidden transition-all [&>div]:w-full",
+                  sidebar.open ? "" : "-mx-1"
                 )}
               >
                 <OrganizationSwitcher
-                  hidePersonal
                   afterSelectOrganizationUrl="/"
+                  hidePersonal
                 />
               </div>
             </SidebarMenuItem>
@@ -219,9 +219,9 @@ export const GlobalSidebar = ({ children }: GlobalSidebarProperties) => {
             <SidebarMenu>
               {data.navMain.map((item) => (
                 <Collapsible
-                  key={item.title}
                   asChild
                   defaultOpen={item.isActive}
+                  key={item.title}
                 >
                   <SidebarMenuItem>
                     <SidebarMenuButton asChild tooltip={item.title}>
@@ -277,9 +277,9 @@ export const GlobalSidebar = ({ children }: GlobalSidebarProperties) => {
                       </SidebarMenuAction>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent
+                      align="end"
                       className="w-48"
                       side="bottom"
-                      align="end"
                     >
                       <DropdownMenuItem>
                         <FolderIcon className="text-muted-foreground" />
@@ -327,22 +327,22 @@ export const GlobalSidebar = ({ children }: GlobalSidebarProperties) => {
           <SidebarMenu>
             <SidebarMenuItem className="flex items-center gap-2">
               <UserButton
-                showName
                 appearance={{
                   elements: {
-                    rootBox: 'flex overflow-hidden w-full',
-                    userButtonBox: 'flex-row-reverse',
-                    userButtonOuterIdentifier: 'truncate pl-0',
+                    rootBox: "flex overflow-hidden w-full",
+                    userButtonBox: "flex-row-reverse",
+                    userButtonOuterIdentifier: "truncate pl-0",
                   },
                 }}
+                showName
               />
               <div className="flex shrink-0 items-center gap-px">
                 <ModeToggle />
                 <Button
-                  variant="ghost"
-                  size="icon"
-                  className="shrink-0"
                   asChild
+                  className="shrink-0"
+                  size="icon"
+                  variant="ghost"
                 >
                   <div className="h-4 w-4">
                     <NotificationsTrigger />

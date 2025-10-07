@@ -1,13 +1,13 @@
-'use client';
+"use client";
 
 import {
   Carousel,
   type CarouselApi,
   CarouselContent,
   CarouselItem,
-} from '@repo/design-system/components/ui/carousel';
-import type { Dictionary } from '@repo/internationalization';
-import { useEffect, useState } from 'react';
+} from "@repo/design-system/components/ui/carousel";
+import type { Dictionary } from "@repo/internationalization";
+import { useEffect, useState } from "react";
 
 type CasesProps = {
   dictionary: Dictionary;
@@ -40,7 +40,7 @@ export const Cases = ({ dictionary }: CasesProps) => {
           <h2 className="text-left font-regular text-xl tracking-tighter md:text-5xl lg:max-w-xl">
             {dictionary.web.home.cases.title}
           </h2>
-          <Carousel setApi={setApi} className="w-full">
+          <Carousel className="w-full" setApi={setApi}>
             <CarouselContent>
               {Array.from({ length: 15 }).map((_, index) => (
                 <CarouselItem className="basis-1/4 lg:basis-1/6" key={index}>

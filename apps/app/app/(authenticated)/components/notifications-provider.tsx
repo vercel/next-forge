@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { NotificationsProvider as RawNotificationsProvider } from '@repo/notifications/components/provider';
-import { useTheme } from 'next-themes';
-import { ReactNode } from 'react';
+import { NotificationsProvider as RawNotificationsProvider } from "@repo/notifications/components/provider";
+import { useTheme } from "next-themes";
+import type { ReactNode } from "react";
 
 type NotificationsProviderProperties = {
   children: ReactNode;
@@ -14,9 +14,12 @@ export const NotificationsProvider = ({
   userId,
 }: NotificationsProviderProperties) => {
   const { resolvedTheme } = useTheme();
-  
+
   return (
-    <RawNotificationsProvider userId={userId} theme={resolvedTheme as 'light' | 'dark'}>
+    <RawNotificationsProvider
+      theme={resolvedTheme as "light" | "dark"}
+      userId={userId}
+    >
       {children}
     </RawNotificationsProvider>
   );

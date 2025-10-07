@@ -1,6 +1,6 @@
-@import 'tailwindcss';
-@import 'fumadocs-ui/css/shadcn.css';
-@import 'fumadocs-ui/css/preset.css';
+@import "tailwindcss";
+@import "fumadocs-ui/css/shadcn.css";
+@import "fumadocs-ui/css/preset.css";
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
@@ -173,41 +173,27 @@
   }
 }
 
-h1, h2, h3 {
+h1,
+h2,
+h3 {
   @apply tracking-tight;
 }
 
-/* Fix Fumadocs theme toggle icons */
-[data-theme-toggle] svg {
-  @apply fill-none;
+@layer base {
+  /* Fix Fumadocs theme toggle icons */
+  [data-theme-toggle] svg {
+    @apply fill-none;
+  }
 }
 
-#nd-subnav [data-active="true"] {
-  @apply font-medium text-primary;
+.landing-page {
+  --fd-sidebar-width: 0 !important;
 }
 
-#nd-subnav > div {
-  @apply container border-x;
+:root {
+  --fd-layout-width: 1200px;
 }
 
-#nd-docs-layout {
-  @apply container mx-auto p-0 border-x;
-}
-
-#nd-tocnav {
-  @apply translate-y-px;
-}
-
-#nd-sidebar [data-hide-if-empty] {
-  @apply hidden;
-}
-
-/* Hide unnecessary links on mobile */
-#nd-sidebar-mobile a[href="/"],
-#nd-sidebar-mobile a[href="/docs"].lg\:hidden {
-  @apply hidden;
-}
-
-.landing-page #nd-subnav button[data-search] + button {
-  @apply hidden;
+#nd-sidebar {
+  @apply bg-transparent!;
 }

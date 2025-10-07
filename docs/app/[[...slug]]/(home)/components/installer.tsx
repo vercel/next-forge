@@ -1,15 +1,15 @@
-'use client';
+"use client";
 
-import { Button } from '@/components/ui/button';
-import { CopyIcon } from 'lucide-react';
-import { toast } from 'sonner';
+import { CopyIcon } from "lucide-react";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
 
-const command = 'npx next-forge@latest init';
+const command = "npx next-forge@latest init";
 
 export const Installer = () => {
   const handleCopy = () => {
     navigator.clipboard.writeText(command);
-    toast.success('Copied to clipboard');
+    toast.success("Copied to clipboard");
   };
 
   return (
@@ -20,13 +20,13 @@ export const Installer = () => {
       <div className="flex-1 truncate text-left font-mono">{command}</div>
       <div className="flex shrink-0 items-center gap-2">
         <Button
+          aria-label="Copy"
+          className="rounded-[6px]"
+          onClick={handleCopy}
           size="icon"
           variant="ghost"
-          aria-label="Copy"
-          onClick={handleCopy}
-          className="rounded-[6px]"
         >
-          <CopyIcon size={14} className="text-muted-foreground" />
+          <CopyIcon className="text-muted-foreground" size={14} />
         </Button>
       </div>
     </div>

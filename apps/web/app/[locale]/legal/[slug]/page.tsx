@@ -1,13 +1,13 @@
-import { Sidebar } from '@/components/sidebar';
-import { ArrowLeftIcon } from '@radix-ui/react-icons';
-import { legal } from '@repo/cms';
-import { Body } from '@repo/cms/components/body';
-import { Feed } from '@repo/cms/components/feed';
-import { TableOfContents } from '@repo/cms/components/toc';
-import { createMetadata } from '@repo/seo/metadata';
-import type { Metadata } from 'next';
-import Link from 'next/link';
-import { notFound } from 'next/navigation';
+import { ArrowLeftIcon } from "@radix-ui/react-icons";
+import { legal } from "@repo/cms";
+import { Body } from "@repo/cms/components/body";
+import { Feed } from "@repo/cms/components/feed";
+import { TableOfContents } from "@repo/cms/components/toc";
+import { createMetadata } from "@repo/seo/metadata";
+import type { Metadata } from "next";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { Sidebar } from "@/components/sidebar";
 
 type LegalPageProperties = {
   readonly params: Promise<{
@@ -44,7 +44,7 @@ const LegalPage = async ({ params }: LegalPageProperties) => {
     <Feed queries={[legal.postQuery(slug)]}>
       {/* biome-ignore lint/suspicious/useAwait: "Server Actions must be async" */}
       {async ([data]) => {
-        'use server';
+        "use server";
 
         const page = data.legalPages.item;
 
@@ -75,9 +75,9 @@ const LegalPage = async ({ params }: LegalPageProperties) => {
               </div>
               <div className="sticky top-24 hidden shrink-0 md:block">
                 <Sidebar
-                  toc={<TableOfContents data={page.body.json.toc} />}
-                  readingTime={`${page.body.readingTime} min read`}
                   date={new Date()}
+                  readingTime={`${page.body.readingTime} min read`}
+                  toc={<TableOfContents data={page.body.json.toc} />}
                 />
               </div>
             </div>

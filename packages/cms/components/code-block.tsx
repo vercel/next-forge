@@ -1,1 +1,1 @@
-export { CodeBlock } from 'basehub/react-code-block';
+export { CodeBlock } from "basehub/react-code-block";

@@ -1,19 +1,19 @@
-'use client';
+"use client";
 
-import { Button } from '@repo/design-system/components/ui/button';
-import { Calendar } from '@repo/design-system/components/ui/calendar';
-import { Input } from '@repo/design-system/components/ui/input';
-import { Label } from '@repo/design-system/components/ui/label';
+import { Button } from "@repo/design-system/components/ui/button";
+import { Calendar } from "@repo/design-system/components/ui/calendar";
+import { Input } from "@repo/design-system/components/ui/input";
+import { Label } from "@repo/design-system/components/ui/label";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from '@repo/design-system/components/ui/popover';
-import { cn } from '@repo/design-system/lib/utils';
-import type { Dictionary } from '@repo/internationalization';
-import { format } from 'date-fns';
-import { CalendarIcon, Check, MoveRight } from 'lucide-react';
-import { useState } from 'react';
+} from "@repo/design-system/components/ui/popover";
+import { cn } from "@repo/design-system/lib/utils";
+import type { Dictionary } from "@repo/internationalization";
+import { format } from "date-fns";
+import { CalendarIcon, Check, MoveRight } from "lucide-react";
+import { useState } from "react";
 
 type ContactFormProps = {
   dictionary: Dictionary;
@@ -63,15 +63,15 @@ export const ContactForm = ({ dictionary }: ContactFormProps) => {
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button
-                      variant="outline"
                       className={cn(
-                        'w-full max-w-sm justify-start text-left font-normal',
-                        !date && 'text-muted-foreground'
+                        "w-full max-w-sm justify-start text-left font-normal",
+                        !date && "text-muted-foreground"
                       )}
+                      variant="outline"
                     >
                       <CalendarIcon className="mr-2 h-4 w-4" />
                       {date ? (
-                        format(date, 'PPP')
+                        format(date, "PPP")
                       ) : (
                         <span>{dictionary.web.contact.hero.form.date}</span>
                       )}
@@ -79,10 +79,10 @@ export const ContactForm = ({ dictionary }: ContactFormProps) => {
                   </PopoverTrigger>
                   <PopoverContent className="w-auto p-0">
                     <Calendar
-                      mode="single"
-                      selected={date}
-                      onSelect={setDate}
                       initialFocus
+                      mode="single"
+                      onSelect={setDate}
+                      selected={date}
                     />
                   </PopoverContent>
                 </Popover>
@@ -107,7 +107,7 @@ export const ContactForm = ({ dictionary }: ContactFormProps) => {
               </div>
 
               <Button className="w-full gap-4">
-                {dictionary.web.contact.hero.form.cta}{' '}
+                {dictionary.web.contact.hero.form.cta}{" "}
                 <MoveRight className="h-4 w-4" />
               </Button>
             </div>

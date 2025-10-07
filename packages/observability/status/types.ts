@@ -11,12 +11,12 @@ export type BetterStackResponse = {
       monitor_group_id: unknown;
       last_checked_at: string;
       status:
-        | 'down'
-        | 'maintenance'
-        | 'paused'
-        | 'pending'
-        | 'up'
-        | 'validating';
+        | "down"
+        | "maintenance"
+        | "paused"
+        | "pending"
+        | "up"
+        | "validating";
       policy_id: unknown;
       required_keyword: unknown;
       verify_ssl: boolean;

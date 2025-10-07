@@ -1,16 +1,11 @@
-import { init } from '@sentry/nextjs';
-import { keys } from './keys';
-
-const opts = {
-  dsn: keys().NEXT_PUBLIC_SENTRY_DSN,
-};
-
-export const initializeSentry = () => {
-  if (process.env.NEXT_RUNTIME === 'nodejs') {
-    init(opts);
+export const initializeSentry = async () => {
+  if (process.env.NEXT_RUNTIME === "nodejs") {
+    const { initializeSentry: initServer } = await import("./server");
+    initServer();
   }
 
-  if (process.env.NEXT_RUNTIME === 'edge') {
-    init(opts);
+  if (process.env.NEXT_RUNTIME === "edge") {
+    const { initializeSentry: initEdge } = await import("./edge");
+    initEdge();
   }
 };

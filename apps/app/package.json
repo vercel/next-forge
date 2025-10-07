@@ -3,7 +3,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev -p 3000 --turbopack",
-    "build": "next build",
+    "build": "next build --turbopack",
     "start": "next start",
     "analyze": "ANALYZE=true npm run build",
     "test": "NODE_ENV=test vitest run",
@@ -23,29 +23,29 @@
     "@repo/security": "workspace:*",
     "@repo/seo": "workspace:*",
     "@repo/webhooks": "workspace:*",
-    "@sentry/nextjs": "^9.22.0",
-    "@t3-oss/env-nextjs": "^0.13.4",
+    "@sentry/nextjs": "^10.17.0",
+    "@t3-oss/env-nextjs": "^0.13.8",
     "fuse.js": "^7.1.0",
-    "import-in-the-middle": "^1.13.2",
-    "lucide-react": "^0.511.0",
+    "import-in-the-middle": "^1.14.4",
+    "lucide-react": "^0.545.0",
     "next": "15.5.4",
     "next-themes": "^0.4.6",
     "react": "19.2.0",
     "react-dom": "19.2.0",
-    "require-in-the-middle": "^7.5.2",
-    "zod": "^3.25.28"
+    "require-in-the-middle": "^8.0.0",
+    "zod": "^4.1.12"
   },
   "devDependencies": {
-    "@repo/testing": "workspace:*",
     "@repo/typescript-config": "workspace:*",
-    "@testing-library/dom": "^10.4.0",
+    "@testing-library/dom": "^10.4.1",
     "@testing-library/react": "^16.3.0",
-    "@types/node": "22.15.21",
-    "@types/react": "19.2.0",
+    "@types/node": "24.7.0",
+    "@types/react": "19.2.1",
     "@types/react-dom": "19.2.0",
-    "jsdom": "^26.1.0",
-    "tailwindcss": "^4.1.7",
-    "typescript": "^5.8.3",
-    "vitest": "^3.1.4"
+    "@vitejs/plugin-react": "^5.0.4",
+    "jsdom": "^27.0.0",
+    "tailwindcss": "^4.1.14",
+    "typescript": "^5.9.3",
+    "vitest": "^3.2.4"
   }
 }
