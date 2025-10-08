@@ -1,3 +1,15 @@
+# v5.1.1 (Wed Oct 08 2025)
+
+#### 🐛 Bug Fix
+
+- Update Analytics package [#640](https://github.com/vercel/next-forge/pull/640) ([@haydenbleasel](https://github.com/haydenbleasel))
+
+#### Authors: 1
+
+- Hayden Bleasel ([@haydenbleasel](https://github.com/haydenbleasel))
+
+---
+
 # v5.1.0 (Tue Oct 07 2025)
 
 #### 🚀 Enhancement
