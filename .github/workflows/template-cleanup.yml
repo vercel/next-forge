@@ -1,0 +1,48 @@
+name: Template Cleanup
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+
+  template-cleanup:
+    name: Template Cleanup
+    runs-on: ubuntu-latest
+    if: github.event.repository.is_template == false
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Cleanup
+        run: |
+          rm -rf \
+            .github/workflows \
+            docs \
+            splash \
+            scripts \
+            .github/CONTRIBUTING.md \
+            .github/FUNDING.yml \
+            .github/SECURITY.md \
+            .autorc \
+            .coderabbit.yaml \
+            CHANGELOG.md \
+            license.md
+
+
+      - name: Commit and push changes
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add -A
+          git commit -m "chore: cleanup template files [skip ci]" || echo "No changes to commit"
+
+      - name: Push changes
+        uses: ad-m/github-push-action@0.8.0
+        with:
+          branch: main
+          github_token: ${{ secrets.GITHUB_TOKEN }}
