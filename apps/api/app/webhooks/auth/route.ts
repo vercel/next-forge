@@ -1,4 +1,4 @@
-import { analytics } from "@repo/analytics/posthog/server";
+import { analytics } from "@repo/analytics/server";
 import type {
   DeletedObjectJSON,
   OrganizationJSON,

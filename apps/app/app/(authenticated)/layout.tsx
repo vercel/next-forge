@@ -5,7 +5,6 @@ import { secure } from "@repo/security";
 import type { ReactNode } from "react";
 import { env } from "@/env";
 import { NotificationsProvider } from "./components/notifications-provider";
-import { PostHogIdentifier } from "./components/posthog-identifier";
 import { GlobalSidebar } from "./components/sidebar";
 
 type AppLayoutProperties = {
@@ -36,7 +35,6 @@ const AppLayout = async ({ children }: AppLayoutProperties) => {
           )}
           {children}
         </GlobalSidebar>
-        <PostHogIdentifier />
       </SidebarProvider>
     </NotificationsProvider>
   );
