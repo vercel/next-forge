@@ -1,0 +1,26 @@
+name: Cleanup Neon Preview Database
+on:
+  pull_request:
+    types: [closed]
+
+env:
+  NEON_PROJECT_ID: ${{ secrets.NEON_PROJECT_ID }}
+
+jobs:
+  delete-preview:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get Branch Name
+        id: branch-name
+        run: |
+          # Convert branch name to Neon-compatible format and add preview/ prefix
+          BRANCH_NAME="preview/$(echo "${{ github.event.pull_request.head.ref }}" | tr '/' '-')"
+          echo "branch_name=$BRANCH_NAME" >> $GITHUB_OUTPUT
+
+      - name: Delete Neon Branch
+        uses: neondatabase/delete-branch-action@v3
+        with:
+          project_id: ${{ env.NEON_PROJECT_ID }}
+          branch: ${{ steps.branch-name.outputs.branch_name }}
+          api_key: ${{ secrets.NEON_API_KEY }}
