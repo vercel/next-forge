@@ -1,3 +1,33 @@
+# v5.2.0 (Sat Oct 25 2025)
+
+:tada: This release contains work from new contributors! :tada:
+
+Thanks for all your work!
+
+:heart: Kuizuo ([@kuizuo](https://github.com/kuizuo))
+
+:heart: Ryan ([@rnwolfe](https://github.com/rnwolfe))
+
+:heart: Lakshya Thakur ([@lakbychance](https://github.com/lakbychance))
+
+#### 🚀 Enhancement
+
+- Use improved colors and font for react-tweet [#599](https://github.com/vercel/next-forge/pull/599) ([@lakbychance](https://github.com/lakbychance) [@haydenbleasel](https://github.com/haydenbleasel))
+
+#### 🐛 Bug Fix
+
+- Update Storybook to the latest version [#645](https://github.com/vercel/next-forge/pull/645) ([@kuizuo](https://github.com/kuizuo))
+- fix: Refactor PrismaNeon initialization to use PoolConfig instead of Pool directly [#644](https://github.com/vercel/next-forge/pull/644) ([@rnwolfe](https://github.com/rnwolfe))
+
+#### Authors: 4
+
+- Hayden Bleasel ([@haydenbleasel](https://github.com/haydenbleasel))
+- Kuizuo ([@kuizuo](https://github.com/kuizuo))
+- Lakshya Thakur ([@lakbychance](https://github.com/lakbychance))
+- Ryan ([@rnwolfe](https://github.com/rnwolfe))
+
+---
+
 # v5.1.1 (Wed Oct 08 2025)
 
 #### 🐛 Bug Fix
