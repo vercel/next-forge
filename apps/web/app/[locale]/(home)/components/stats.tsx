@@ -1,5 +1,5 @@
-import type { Dictionary } from '@repo/internationalization';
-import { MoveDownLeft, MoveUpRight } from 'lucide-react';
+import type { Dictionary } from "@repo/internationalization";
+import { MoveDownLeft, MoveUpRight } from "lucide-react";
 
 type StatsProps = {
   dictionary: Dictionary;
@@ -32,12 +32,12 @@ export const Stats = ({ dictionary }: StatsProps) => (
                   <MoveDownLeft className="mb-10 h-4 w-4 text-destructive" />
                 )}
                 <h2 className="flex max-w-xl flex-row items-end gap-4 text-left font-regular text-4xl tracking-tighter">
-                  {item.type === 'currency' && '$'}
+                  {item.type === "currency" && "$"}
                   {new Intl.NumberFormat().format(
                     Number.parseFloat(item.metric)
                   )}
                   <span className="text-muted-foreground text-sm tracking-normal">
-                    {Number.parseFloat(item.delta) > 0 ? '+' : ''}
+                    {Number.parseFloat(item.delta) > 0 ? "+" : ""}
                     {item.delta}%
                   </span>
                 </h2>

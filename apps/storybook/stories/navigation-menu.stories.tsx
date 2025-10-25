@@ -1,5 +1,3 @@
-import type { Meta, StoryObj } from '@storybook/react';
-
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -8,15 +6,16 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
   navigationMenuTriggerStyle,
-} from '@repo/design-system/components/ui/navigation-menu';
+} from "@repo/design-system/components/ui/navigation-menu";
+import type { Meta, StoryObj } from "@storybook/react";
 
 /**
  * A collection of links for navigating websites.
  */
 const meta = {
-  title: 'ui/NavigationMenu',
+  title: "ui/NavigationMenu",
   component: NavigationMenu,
-  tags: ['autodocs'],
+  tags: ["autodocs"],
   argTypes: {},
   render: (args) => (
     <NavigationMenu {...args}>
@@ -65,7 +64,7 @@ const meta = {
     </NavigationMenu>
   ),
   parameters: {
-    layout: 'centered',
+    layout: "centered",
   },
 } satisfies Meta<typeof NavigationMenu>;
 

@@ -1,5 +1,3 @@
-import type { Meta, StoryObj } from '@storybook/react';
-
 import {
   Pagination,
   PaginationContent,
@@ -8,15 +6,16 @@ import {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
-} from '@repo/design-system/components/ui/pagination';
+} from "@repo/design-system/components/ui/pagination";
+import type { Meta, StoryObj } from "@storybook/react";
 
 /**
  * Pagination with page navigation, next and previous links.
  */
 const meta = {
-  title: 'ui/Pagination',
+  title: "ui/Pagination",
   component: Pagination,
-  tags: ['autodocs'],
+  tags: ["autodocs"],
   argTypes: {},
   render: (args) => (
     <Pagination {...args}>
@@ -43,7 +42,7 @@ const meta = {
     </Pagination>
   ),
   parameters: {
-    layout: 'centered',
+    layout: "centered",
   },
 } satisfies Meta<typeof Pagination>;
 

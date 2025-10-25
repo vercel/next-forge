@@ -1,13 +1,13 @@
-import { blog } from '@repo/cms';
-import { Feed } from '@repo/cms/components/feed';
-import { Image } from '@repo/cms/components/image';
-import { cn } from '@repo/design-system/lib/utils';
-import { getDictionary } from '@repo/internationalization';
-import type { Blog, WithContext } from '@repo/seo/json-ld';
-import { JsonLd } from '@repo/seo/json-ld';
-import { createMetadata } from '@repo/seo/metadata';
-import type { Metadata } from 'next';
-import Link from 'next/link';
+import { blog } from "@repo/cms";
+import { Feed } from "@repo/cms/components/feed";
+import { Image } from "@repo/cms/components/image";
+import { cn } from "@repo/design-system/lib/utils";
+import { getDictionary } from "@repo/internationalization";
+import type { Blog, WithContext } from "@repo/seo/json-ld";
+import { JsonLd } from "@repo/seo/json-ld";
+import { createMetadata } from "@repo/seo/metadata";
+import type { Metadata } from "next";
+import Link from "next/link";
 
 type BlogProps = {
   params: Promise<{
@@ -29,8 +29,8 @@ const BlogIndex = async ({ params }: BlogProps) => {
   const dictionary = await getDictionary(locale);
 
   const jsonLd: WithContext<Blog> = {
-    '@type': 'Blog',
-    '@context': 'https://schema.org',
+    "@type": "Blog",
+    "@context": "https://schema.org",
   };
 
   return (
@@ -46,7 +46,7 @@ const BlogIndex = async ({ params }: BlogProps) => {
           <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
             <Feed queries={[blog.postsQuery]}>
               {async ([data]) => {
-                'use server';
+                "use server";
 
                 if (!data.blog.posts.items.length) {
                   return null;
@@ -54,25 +54,25 @@ const BlogIndex = async ({ params }: BlogProps) => {
 
                 return data.blog.posts.items.map((post, index) => (
                   <Link
-                    href={`/blog/${post._slug}`}
                     className={cn(
-                      'flex cursor-pointer flex-col gap-4 hover:opacity-75',
-                      !index && 'md:col-span-2'
+                      "flex cursor-pointer flex-col gap-4 hover:opacity-75",
+                      !index && "md:col-span-2"
                     )}
+                    href={`/blog/${post._slug}`}
                     key={post._slug}
                   >
                     <Image
-                      src={post.image.url}
-                      alt={post.image.alt ?? ''}
-                      width={post.image.width}
+                      alt={post.image.alt ?? ""}
                       height={post.image.height}
+                      src={post.image.url}
+                      width={post.image.width}
                     />
                     <div className="flex flex-row items-center gap-4">
                       <p className="text-muted-foreground text-sm">
-                        {new Date(post.date).toLocaleDateString('en-US', {
-                          month: 'long',
-                          day: 'numeric',
-                          year: 'numeric',
+                        {new Date(post.date).toLocaleDateString("en-US", {
+                          month: "long",
+                          day: "numeric",
+                          year: "numeric",
                         })}
                       </p>
                     </div>

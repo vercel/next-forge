@@ -8,7 +8,7 @@ description: How to change the database provider to Supabase.
 `next-forge` uses Neon as the database provider with Prisma as the ORM as well as Clerk for authentication. This guide will provide the steps you need to switch the database provider from Neon to Supabase. This guide is based on a few existing resources, including [Supabase's guide](https://supabase.com/partners/integrations/prisma) and [Prisma's guide](https://www.prisma.io/docs/orm/overview/databases/supabase).
 
 <Note>
- For authentication, another guide will be provided to switch to Supabase Auth with feature parity to Clerk like organization management, user roles, and more (coming soon).
+ For authentication, see the [Supabase Auth migration guide](/migrations/authentication/supabase) to switch from Clerk to Supabase Auth with organization management, user roles, and more.
 </Note>
 
 Here's how to switch from Neon to [Supabase](https://supabase.com) for your `next-forge` project.
@@ -88,3 +88,186 @@ Now you can run the migration from the root of your `next-forge` project:
 ```sh title="Terminal"
 pnpm run migrate
 ```
+
+## 7. Set up Row Level Security (RLS)
+
+Row Level Security (RLS) is a powerful PostgreSQL feature that allows you to control access to database rows based on the authenticated user. This is essential for multi-tenant applications where users should only see their own data.
+
+<Note>
+RLS policies use `auth.uid()` to get the authenticated user's ID from Supabase Auth. Make sure you've completed the [Supabase Auth migration](/migrations/authentication/supabase) first.
+</Note>
+
+### Enable RLS on your tables
+
+First, enable RLS on the tables you want to protect. You can do this via the Supabase dashboard or by running SQL migrations:
+
+```sql title="Enable RLS"
+-- Enable RLS on organizations table
+ALTER TABLE organizations ENABLE ROW LEVEL SECURITY;
+
+-- Enable RLS on organization_members table
+ALTER TABLE organization_members ENABLE ROW LEVEL SECURITY;
+
+-- Enable RLS on any other tables that need protection
+ALTER TABLE your_table ENABLE ROW LEVEL SECURITY;
+```
+
+### Create RLS policies
+
+Once RLS is enabled, create policies that define who can access what data:
+
+#### Organization policies
+
+```sql title="Organization RLS Policies"
+-- Policy: Users can only view organizations they're members of
+CREATE POLICY "Users can view their organizations"
+ON organizations FOR SELECT
+USING (
+  id IN (
+    SELECT organization_id
+    FROM organization_members
+    WHERE user_id = auth.uid()
+  )
+);
+
+-- Policy: Only organization owners can update organizations
+CREATE POLICY "Owners can update their organizations"
+ON organizations FOR UPDATE
+USING (
+  id IN (
+    SELECT organization_id
+    FROM organization_members
+    WHERE user_id = auth.uid() AND role = 'owner'
+  )
+);
+
+-- Policy: Only organization owners can delete organizations
+CREATE POLICY "Owners can delete their organizations"
+ON organizations FOR DELETE
+USING (
+  id IN (
+    SELECT organization_id
+    FROM organization_members
+    WHERE user_id = auth.uid() AND role = 'owner'
+  )
+);
+
+-- Policy: Any authenticated user can create an organization
+CREATE POLICY "Authenticated users can create organizations"
+ON organizations FOR INSERT
+WITH CHECK (auth.uid() IS NOT NULL);
+```
+
+#### Organization member policies
+
+```sql title="Organization Member RLS Policies"
+-- Policy: Users can view members of their organizations
+CREATE POLICY "Users can view organization members"
+ON organization_members FOR SELECT
+USING (
+  organization_id IN (
+    SELECT organization_id
+    FROM organization_members
+    WHERE user_id = auth.uid()
+  )
+);
+
+-- Policy: Owners and admins can add members
+CREATE POLICY "Owners and admins can add members"
+ON organization_members FOR INSERT
+WITH CHECK (
+  organization_id IN (
+    SELECT organization_id
+    FROM organization_members
+    WHERE user_id = auth.uid() AND role IN ('owner', 'admin')
+  )
+);
+
+-- Policy: Owners and admins can update member roles
+CREATE POLICY "Owners and admins can update members"
+ON organization_members FOR UPDATE
+USING (
+  organization_id IN (
+    SELECT organization_id
+    FROM organization_members
+    WHERE user_id = auth.uid() AND role IN ('owner', 'admin')
+  )
+);
+
+-- Policy: Owners and admins can remove members
+CREATE POLICY "Owners and admins can remove members"
+ON organization_members FOR DELETE
+USING (
+  organization_id IN (
+    SELECT organization_id
+    FROM organization_members
+    WHERE user_id = auth.uid() AND role IN ('owner', 'admin')
+  )
+);
+```
+
+### Testing RLS policies
+
+You can test your RLS policies using the Supabase SQL Editor with the following pattern:
+
+```sql title="Test RLS as a specific user"
+-- Set the user ID for testing
+SELECT auth.uid(); -- This will be NULL initially
+
+-- To test as a specific user, you would typically:
+-- 1. Make requests through your application with that user's session
+-- 2. Or use Supabase's testing tools in the dashboard
+
+-- Check what organizations a user can see
+SELECT * FROM organizations;
+
+-- This query will automatically be filtered by your RLS policies
+```
+
+### Common RLS patterns
+
+#### User-owned data
+
+For data that belongs directly to a user (like user profiles or settings):
+
+```sql
+CREATE POLICY "Users can only access their own data"
+ON user_data FOR ALL
+USING (user_id = auth.uid());
+```
+
+#### Tenant isolation
+
+For multi-tenant data where access is determined by an organization or tenant ID:
+
+```sql
+CREATE POLICY "Users can only access their tenant's data"
+ON tenant_data FOR ALL
+USING (
+  tenant_id IN (
+    SELECT tenant_id FROM user_tenants WHERE user_id = auth.uid()
+  )
+);
+```
+
+#### Public read, authenticated write
+
+For data that everyone can read but only authenticated users can modify:
+
+```sql
+-- Read policy (no authentication required)
+CREATE POLICY "Anyone can read"
+ON public_data FOR SELECT
+USING (true);
+
+-- Write policy (authentication required)
+CREATE POLICY "Authenticated users can write"
+ON public_data FOR INSERT
+WITH CHECK (auth.uid() IS NOT NULL);
+```
+
+<Warning>
+When RLS is enabled on a table, all access is denied by default. You must create policies to allow access. Make sure to test thoroughly to avoid accidentally blocking legitimate access.
+</Warning>
+
+For more information, see the [Supabase Row Level Security guide](https://supabase.com/docs/guides/auth/row-level-security).

@@ -1,8 +1,8 @@
-import { TerminalIcon } from 'lucide-react';
-import { Video } from './video';
+import { TerminalIcon } from "lucide-react";
+import { Video } from "./video";
 
 export const Demo = () => (
-  <section id="demo" className="grid grid-cols-3">
+  <section className="grid grid-cols-3" id="demo">
     <div className="flex flex-col gap-4 p-8">
       <div className="flex items-center gap-2 text-muted-foreground">
         <TerminalIcon size={14} />
@@ -17,12 +17,12 @@ export const Demo = () => (
     </div>
     <div className="col-span-2">
       <Video
-        controls={false}
-        playing
-        muted
-        loop
-        url="https://youtu.be/4LRXL6l-FS4"
         aspectRatio="3440 / 2160"
+        controls={false}
+        loop
+        muted
+        playing
+        src="https://youtu.be/4LRXL6l-FS4"
       />
     </div>
   </section>

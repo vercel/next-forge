@@ -22,9 +22,9 @@ pnpm add -D @content-collections/cli @content-collections/core @content-collecti
 
 ## 2. Update the `.gitignore` file
 
-Add `.content-collections` to the `.gitignore` file:
+Add `.content-collections` to the root `.gitignore` file (in the root of your monorepo):
 
-```txt title="apps/web/.gitignore {1-2}"
+```txt title=".gitignore"
 # content-collections
 .content-collections
 ```
@@ -49,11 +49,19 @@ Now we need to modify the CMS package scripts to replace the `basehub` commands 
 
 ## 4. Modify the relevant CMS package files
 
-### Next.js Config
+<Note>
+  You may see TypeScript errors during this step. These will be resolved after you create your collections configuration and run the first build in step 6.
+</Note>
+
+### Next.js Config (CMS Package)
+
+Update the CMS package's Next.js config to export the Content Collections wrapper:
 
 ```ts title="packages/cms/next-config.ts"
 export { withContentCollections as withCMS } from '@content-collections/next';
 ```
+
+This replaces the previous BaseHub configuration and maintains compatibility with your existing `next.config.ts` in the web app.
 
 ### Collections
 
@@ -100,7 +108,9 @@ export const Body = ({ content, ...props }: BodyProperties) => (
 
 ### TypeScript Config
 
-```ts title="packages/cms/typescript-config.json"
+Update your `tsconfig.json` in the `apps/web` directory to add the path mapping:
+
+```json title="apps/web/tsconfig.json"
 {
   "compilerOptions": {
     "paths": {
@@ -109,6 +119,10 @@ export const Body = ({ content, ...props }: BodyProperties) => (
   }
 }
 ```
+
+<Note>
+  Make sure to merge this with your existing `compilerOptions.paths` if you have any.
+</Note>
 
 ### Toolbar
 
@@ -178,11 +192,11 @@ const legals = fs
 
 ## 6. Create your collections
 
-Create a new content collections file in the `cms` package, then import the collections in the `web` package.
+Create a new content collections configuration file in the `cms` package, then create a re-export file in the `web` app.
 
 <Note>We're remapping the `title` field to `_title` and the `_meta.path` field to `_slug` to match the default next-forge CMS.</Note>
 
-### CMS
+### CMS Package
 
 ```ts title="packages/cms/collections.ts"
 import { defineCollection, defineConfig } from '@content-collections/core';
@@ -190,7 +204,7 @@ import { compileMDX } from '@content-collections/mdx';
 
 const posts = defineCollection({
   name: 'posts',
-  directory: 'content/blog',
+  directory: 'content/blog', // relative to apps/web
   include: '**/*.mdx',
   schema: (z) => ({
     title: z.string(),
@@ -215,8 +229,8 @@ const posts = defineCollection({
 });
 
 const legals = defineCollection({
-  name: 'legal',
-  directory: 'content/legal',
+  name: 'legals',
+  directory: 'content/legal', // relative to apps/web
   include: '**/*.mdx',
   schema: (z) => ({
     title: z.string(),
@@ -242,13 +256,23 @@ export default defineConfig({
 });
 ```
 
-### Web
+### Web App
 
-```ts title="packages/web/content-collections.ts"
+Create a configuration file in the root of your `web` app:
+
+```ts title="apps/web/content-collections.ts"
 export { default } from '@repo/cms/collections';
 ```
 
+<Note>
+  After creating these files, you'll need to run `pnpm build` in the `packages/cms` directory to generate the types. TypeScript errors about missing `content-collections` module will resolve after the first build.
+</Note>
+
 ## 7. Create your content
+
+Create the content directories if they don't exist:
+- `apps/web/content/blog` for blog posts
+- `apps/web/content/legal` for legal pages
 
 To create a new blog post, add a new MDX file to the `apps/web/content/blog` directory. The file name will be used as the slug for the blog post and the frontmatter will be used to generate the blog post page. For example:
 

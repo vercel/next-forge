@@ -1,9 +1,9 @@
-import { database } from '@repo/database';
+import { database } from "@repo/database";
 
 export const GET = async () => {
   const newPage = await database.page.create({
     data: {
-      name: 'cron-temp',
+      name: "cron-temp",
     },
   });
 
@@ -13,5 +13,5 @@ export const GET = async () => {
     },
   });
 
-  return new Response('OK', { status: 200 });
+  return new Response("OK", { status: 200 });
 };

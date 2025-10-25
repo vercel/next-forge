@@ -1,7 +1,7 @@
-import { MessageCircleIcon } from 'lucide-react';
-import Image from 'next/image';
-import rauchg from './rauchg.jpg';
-import vercel from './vercel.jpg';
+import { MessageCircleIcon } from "lucide-react";
+import Image from "next/image";
+import rauchg from "./rauchg.jpg";
+import vercel from "./vercel.jpg";
 
 export const Review = () => (
   <section className="flex flex-col gap-8 p-8">
@@ -19,18 +19,18 @@ export const Review = () => (
       <div className="flex items-center gap-2">
         <div className="-space-x-1 flex items-center">
           <Image
-            src={rauchg}
             alt=""
-            width={24}
-            height={24}
             className="rounded-full ring-2 ring-background"
+            height={24}
+            src={rauchg}
+            width={24}
           />
           <Image
-            src={vercel}
             alt=""
-            width={24}
-            height={24}
             className="rounded-full ring-2 ring-background"
+            height={24}
+            src={vercel}
+            width={24}
           />
         </div>
         <p className="text-muted-foreground text-sm">
@@ -39,8 +39,8 @@ export const Review = () => (
       </div>
       <a
         href="https://x.com/rauchg/status/1853171412766466119"
-        target="_blank"
         rel="noopener noreferrer"
+        target="_blank"
       >
         <svg
           fill="none"

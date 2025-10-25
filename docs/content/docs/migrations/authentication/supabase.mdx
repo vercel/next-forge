@@ -1,0 +1,548 @@
+---
+title: Switch to Supabase Auth
+description: How to change the authentication provider to Supabase Auth.
+---
+
+[Supabase Auth](https://supabase.com/docs/guides/auth) is a comprehensive authentication system that integrates seamlessly with Supabase's Postgres database. It provides email/password, magic link, OAuth, and phone authentication, along with user management and session handling.
+
+`next-forge` uses Clerk as the authentication provider. This guide will help you switch from Clerk to Supabase Auth. Since Supabase doesn't provide built-in organization management like Clerk, this guide includes a multi-tenancy schema pattern to implement team/organization features with role-based access control.
+
+<Note>
+This guide assumes you've already [migrated to Supabase](/migrations/database/supabase) for your database. If you haven't done so yet, complete that migration first.
+</Note>
+
+## 1. Replace the `auth` package dependencies
+
+Uninstall the existing Clerk dependencies from the `auth` package...
+
+```sh title="Terminal"
+pnpm remove @clerk/nextjs @clerk/themes @clerk/types --filter @repo/auth
+```
+
+...and install the Supabase Auth dependencies:
+
+```sh title="Terminal"
+pnpm add @supabase/supabase-js @supabase/ssr --filter @repo/auth
+```
+
+Additionally, add `@repo/database` to the `auth` package dependencies to enable organization/team management.
+
+## 2. Update environment variables
+
+Add the following environment variables to your `.env.local` file in each Next.js application (`app`, `web`, and `api`). You can find these values in your Supabase project's Settings → API page:
+
+```bash title=".env.local"
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+```
+
+<Note>
+The anon key is safe to use in client-side code as it respects your Row Level Security (RLS) policies.
+</Note>
+
+## 3. Set up the database schema for organizations
+
+Since Supabase doesn't provide built-in organization management, you'll need to create a multi-tenancy schema. Add the following to your Prisma schema:
+
+```prisma title="packages/database/prisma/schema.prisma"
+model Organization {
+  id        String   @id @default(cuid())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  members OrganizationMember[]
+  @@map("organizations")
+}
+
+model OrganizationMember {
+  id             String   @id @default(cuid())
+  userId         String
+  organizationId String
+  role           String   @default("member") // owner, admin, member
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, organizationId])
+  @@index([userId])
+  @@index([organizationId])
+  @@map("organization_members")
+}
+```
+
+Then run the migration:
+
+```sh title="Terminal"
+pnpm run migrate
+```
+
+## 4. Create Supabase client utilities
+
+Create utility functions to initialize Supabase clients for different contexts:
+
+### Server Client
+
+```ts title="packages/auth/server.ts"
+import 'server-only';
+import { createServerClient } from '@supabase/ssr';
+import { cookies } from 'next/headers';
+
+export const createClient = async () => {
+  const cookieStore = await cookies();
+
+  return createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return cookieStore.getAll();
+        },
+        setAll(cookiesToSet) {
+          try {
+            cookiesToSet.forEach(({ name, value, options }) =>
+              cookieStore.set(name, value, options)
+            );
+          } catch {
+            // The `setAll` method was called from a Server Component.
+            // This can be ignored if you have middleware refreshing
+            // user sessions.
+          }
+        },
+      },
+    }
+  );
+};
+
+// Helper function to get the current user
+export const currentUser = async () => {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  return user;
+};
+
+// Helper function to get the current user's active organization
+export const auth = async () => {
+  const user = await currentUser();
+
+  if (!user) {
+    return { userId: null, orgId: null };
+  }
+
+  // Get active organization from user metadata
+  const orgId = user.user_metadata?.activeOrganizationId as string | null;
+
+  return {
+    userId: user.id,
+    orgId,
+  };
+};
+```
+
+### Client Component Client
+
+```ts title="packages/auth/client.ts"
+'use client';
+import { createBrowserClient } from '@supabase/ssr';
+
+export const createClient = () => {
+  return createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
+};
+```
+
+## 5. Update the middleware
+
+Update the `middleware.ts` file to handle Supabase session refresh:
+
+```ts title="packages/auth/middleware.ts"
+import 'server-only';
+import { createServerClient } from '@supabase/ssr';
+import { NextResponse, type NextRequest } from 'next/server';
+
+export const authMiddleware = async (request: NextRequest) => {
+  let supabaseResponse = NextResponse.next({
+    request,
+  });
+
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return request.cookies.getAll();
+        },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value, options }) =>
+            request.cookies.set(name, value)
+          );
+          supabaseResponse = NextResponse.next({
+            request,
+          });
+          cookiesToSet.forEach(({ name, value, options }) =>
+            supabaseResponse.cookies.set(name, value, options)
+          );
+        },
+      },
+    }
+  );
+
+  // Refreshing the auth token
+  const { data: { user } } = await supabase.auth.getUser();
+
+  // Redirect to sign-in if accessing protected route without authentication
+  if (!user && request.nextUrl.pathname.startsWith('/dashboard')) {
+    const url = request.nextUrl.clone();
+    url.pathname = '/sign-in';
+    return NextResponse.redirect(url);
+  }
+
+  return supabaseResponse;
+};
+```
+
+## 6. Update the auth components
+
+Update both the `sign-in.tsx` and `sign-up.tsx` components to use Supabase Auth:
+
+### Sign In
+
+```tsx title="packages/auth/components/sign-in.tsx"
+'use client';
+
+import { createClient } from '../client';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+
+export const SignIn = () => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
+  const supabase = createClient();
+
+  const handleSignIn = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (error) {
+      setError(error.message);
+      setLoading(false);
+    } else {
+      router.push('/dashboard');
+      router.refresh();
+    }
+  };
+
+  return (
+    <form onSubmit={handleSignIn}>
+      {error && <div className="text-red-500">{error}</div>}
+      <input
+        type="email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        placeholder="Email"
+        required
+      />
+      <input
+        type="password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        placeholder="Password"
+        required
+      />
+      <button type="submit" disabled={loading}>
+        {loading ? 'Signing in...' : 'Sign in'}
+      </button>
+    </form>
+  );
+};
+```
+
+### Sign Up
+
+```tsx title="packages/auth/components/sign-up.tsx"
+'use client';
+
+import { createClient } from '../client';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+
+export const SignUp = () => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [name, setName] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
+  const supabase = createClient();
+
+  const handleSignUp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          name,
+        },
+      },
+    });
+
+    if (error) {
+      setError(error.message);
+      setLoading(false);
+    } else {
+      router.push('/verify-email');
+      router.refresh();
+    }
+  };
+
+  return (
+    <form onSubmit={handleSignUp}>
+      {error && <div className="text-red-500">{error}</div>}
+      <input
+        type="text"
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+        placeholder="Name"
+        required
+      />
+      <input
+        type="email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        placeholder="Email"
+        required
+      />
+      <input
+        type="password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        placeholder="Password"
+        required
+        minLength={6}
+      />
+      <button type="submit" disabled={loading}>
+        {loading ? 'Signing up...' : 'Sign up'}
+      </button>
+    </form>
+  );
+};
+```
+
+## 7. Update the Provider file
+
+Supabase Auth doesn't require a Provider component for basic functionality, so replace it with a stub:
+
+```tsx title="packages/auth/provider.tsx"
+import type { ReactNode } from 'react';
+
+type AuthProviderProps = {
+  children: ReactNode;
+};
+
+export const AuthProvider = ({ children }: AuthProviderProps) => children;
+```
+
+## 8. Implement organization management
+
+Create helper functions to manage organizations in your application. Add these to a new file:
+
+```ts title="packages/auth/organizations.ts"
+import 'server-only';
+import { database } from '@repo/database';
+import { createClient } from './server';
+
+export const createOrganization = async (name: string, userId: string) => {
+  const organization = await database.organization.create({
+    data: {
+      name,
+      members: {
+        create: {
+          userId,
+          role: 'owner',
+        },
+      },
+    },
+  });
+
+  // Set as active organization
+  const supabase = await createClient();
+  await supabase.auth.updateUser({
+    data: { activeOrganizationId: organization.id },
+  });
+
+  return organization;
+};
+
+export const getOrganizations = async (userId: string) => {
+  return await database.organization.findMany({
+    where: {
+      members: {
+        some: {
+          userId,
+        },
+      },
+    },
+    include: {
+      members: true,
+    },
+  });
+};
+
+export const switchOrganization = async (organizationId: string) => {
+  const supabase = await createClient();
+  await supabase.auth.updateUser({
+    data: { activeOrganizationId: organizationId },
+  });
+};
+
+export const inviteToOrganization = async (
+  organizationId: string,
+  email: string,
+  role: string = 'member'
+) => {
+  // Implement your invitation logic here
+  // This could involve creating an invitation record and sending an email
+};
+```
+
+## 9. Set up auth callback route
+
+Create a callback route to handle authentication redirects:
+
+```ts title="apps/app/app/api/auth/callback/route.ts"
+import { createClient } from '@repo/auth/server';
+import { NextResponse } from 'next/server';
+
+export async function GET(request: Request) {
+  const { searchParams, origin } = new URL(request.url);
+  const code = searchParams.get('code');
+  const next = searchParams.get('next') ?? '/dashboard';
+
+  if (code) {
+    const supabase = await createClient();
+    const { error } = await supabase.auth.exchangeCodeForSession(code);
+
+    if (!error) {
+      return NextResponse.redirect(`${origin}${next}`);
+    }
+  }
+
+  // Return the user to an error page with instructions
+  return NextResponse.redirect(`${origin}/auth/auth-code-error`);
+}
+```
+
+## 10. Update your apps
+
+Replace any remaining Clerk implementations in your apps with Supabase Auth equivalents:
+
+### Server Components
+
+```tsx
+// Before (Clerk)
+const { userId, orgId } = await auth();
+const user = await currentUser();
+
+// After (Supabase)
+import { auth, currentUser } from '@repo/auth/server';
+
+const { userId, orgId } = await auth();
+const user = await currentUser();
+```
+
+### Client Components
+
+```tsx
+// Before (Clerk)
+import { useUser } from '@clerk/nextjs';
+const { user } = useUser();
+
+// After (Supabase)
+'use client';
+import { createClient } from '@repo/auth/client';
+import { useEffect, useState } from 'react';
+
+const supabase = createClient();
+const [user, setUser] = useState(null);
+
+useEffect(() => {
+  supabase.auth.getUser().then(({ data: { user } }) => setUser(user));
+
+  const { data: { subscription } } = supabase.auth.onAuthStateChange(
+    (_event, session) => setUser(session?.user ?? null)
+  );
+
+  return () => subscription.unsubscribe();
+}, []);
+```
+
+### Sign Out
+
+```tsx
+// Before (Clerk)
+import { SignOutButton } from '@clerk/nextjs';
+<SignOutButton />
+
+// After (Supabase)
+'use client';
+import { createClient } from '@repo/auth/client';
+
+const handleSignOut = async () => {
+  const supabase = createClient();
+  await supabase.auth.signOut();
+  router.push('/');
+  router.refresh();
+};
+
+<button onClick={handleSignOut}>Sign out</button>
+```
+
+## Additional features
+
+### Social Authentication
+
+To add OAuth providers, configure them in your Supabase project settings, then use:
+
+```ts
+const { error } = await supabase.auth.signInWithOAuth({
+  provider: 'github', // or 'google', 'apple', etc.
+  options: {
+    redirectTo: `${window.location.origin}/api/auth/callback`,
+  },
+});
+```
+
+### Magic Link Authentication
+
+```ts
+const { error } = await supabase.auth.signInWithOtp({
+  email,
+  options: {
+    emailRedirectTo: `${window.location.origin}/api/auth/callback`,
+  },
+});
+```
+
+<Note>
+To secure your database tables with Row Level Security (RLS) policies, see the [Supabase database migration guide](/migrations/database/supabase) for detailed setup instructions.
+</Note>
+
+For more information, see the [Supabase Auth documentation](https://supabase.com/docs/guides/auth).

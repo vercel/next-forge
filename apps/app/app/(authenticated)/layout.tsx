@@ -1,12 +1,11 @@
-import { env } from '@/env';
-import { auth, currentUser } from '@repo/auth/server';
-import { SidebarProvider } from '@repo/design-system/components/ui/sidebar';
-import { showBetaFeature } from '@repo/feature-flags';
-import { NotificationsProvider } from '@repo/notifications/components/provider';
-import { secure } from '@repo/security';
-import type { ReactNode } from 'react';
-import { PostHogIdentifier } from './components/posthog-identifier';
-import { GlobalSidebar } from './components/sidebar';
+import { auth, currentUser } from "@repo/auth/server";
+import { SidebarProvider } from "@repo/design-system/components/ui/sidebar";
+import { showBetaFeature } from "@repo/feature-flags";
+import { secure } from "@repo/security";
+import type { ReactNode } from "react";
+import { env } from "@/env";
+import { NotificationsProvider } from "./components/notifications-provider";
+import { GlobalSidebar } from "./components/sidebar";
 
 type AppLayoutProperties = {
   readonly children: ReactNode;
@@ -14,7 +13,7 @@ type AppLayoutProperties = {
 
 const AppLayout = async ({ children }: AppLayoutProperties) => {
   if (env.ARCJET_KEY) {
-    await secure(['CATEGORY:PREVIEW']);
+    await secure(["CATEGORY:PREVIEW"]);
   }
 
   const user = await currentUser();
@@ -36,7 +35,6 @@ const AppLayout = async ({ children }: AppLayoutProperties) => {
           )}
           {children}
         </GlobalSidebar>
-        <PostHogIdentifier />
       </SidebarProvider>
     </NotificationsProvider>
   );

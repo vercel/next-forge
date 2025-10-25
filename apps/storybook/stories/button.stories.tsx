@@ -1,27 +1,26 @@
-import type { Meta, StoryObj } from '@storybook/react';
-import { Loader2, Mail } from 'lucide-react';
-
-import { Button } from '@repo/design-system/components/ui/button';
+import { Button } from "@repo/design-system/components/ui/button";
+import type { Meta, StoryObj } from "@storybook/react";
+import { Loader2, Mail } from "lucide-react";
 
 /**
  * Displays a button or a component that looks like a button.
  */
 const meta = {
-  title: 'ui/Button',
+  title: "ui/Button",
   component: Button,
-  tags: ['autodocs'],
+  tags: ["autodocs"],
   argTypes: {
     children: {
-      control: 'text',
+      control: "text",
     },
   },
   parameters: {
-    layout: 'centered',
+    layout: "centered",
   },
   args: {
-    variant: 'default',
-    size: 'default',
-    children: 'Button',
+    variant: "default",
+    size: "default",
+    children: "Button",
   },
 } satisfies Meta<typeof Button>;
 
@@ -40,7 +39,7 @@ export const Default: Story = {};
  */
 export const Outline: Story = {
   args: {
-    variant: 'outline',
+    variant: "outline",
   },
 };
 
@@ -50,7 +49,7 @@ export const Outline: Story = {
  */
 export const Ghost: Story = {
   args: {
-    variant: 'ghost',
+    variant: "ghost",
   },
 };
 
@@ -60,7 +59,7 @@ export const Ghost: Story = {
  */
 export const Secondary: Story = {
   args: {
-    variant: 'secondary',
+    variant: "secondary",
   },
 };
 
@@ -70,7 +69,7 @@ export const Secondary: Story = {
  */
 export const Destructive: Story = {
   args: {
-    variant: 'destructive',
+    variant: "destructive",
   },
 };
 
@@ -80,7 +79,7 @@ export const Destructive: Story = {
  */
 export const Link: Story = {
   args: {
-    variant: 'link',
+    variant: "link",
   },
 };
 
@@ -122,7 +121,7 @@ export const WithIcon: Story = {
  */
 export const Small: Story = {
   args: {
-    size: 'sm',
+    size: "sm",
   },
 };
 
@@ -132,7 +131,7 @@ export const Small: Story = {
  */
 export const Large: Story = {
   args: {
-    size: 'lg',
+    size: "lg",
   },
 };
 
@@ -142,7 +141,7 @@ export const Large: Story = {
 export const Icon: Story = {
   args: {
     ...Secondary.args,
-    size: 'icon',
+    size: "icon",
     children: <Mail />,
   },
 };

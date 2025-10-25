@@ -75,7 +75,7 @@ Here's a simple example of how to add analytics to a `generateText` request usin
 
 ```ts title="generate.ts"
 import { generateText } from '@repo/ai';
-import { analytics } from '@repo/analytics/posthog/server';
+import { analytics } from '@repo/analytics/server';
 import { currentUser } from '@repo/auth/server';
 import { provider } from '@repo/ai/lib/provider';
 import { models } from '@repo/ai/lib/models';

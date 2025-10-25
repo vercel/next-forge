@@ -1,3 +1,108 @@
+# v5.1.1 (Wed Oct 08 2025)
+
+#### 🐛 Bug Fix
+
+- Update Analytics package [#640](https://github.com/vercel/next-forge/pull/640) ([@haydenbleasel](https://github.com/haydenbleasel))
+
+#### Authors: 1
+
+- Hayden Bleasel ([@haydenbleasel](https://github.com/haydenbleasel))
+
+---
+
+# v5.1.0 (Tue Oct 07 2025)
+
+#### 🚀 Enhancement
+
+- Update README.md [#639](https://github.com/vercel/next-forge/pull/639) ([@haydenbleasel](https://github.com/haydenbleasel))
+
+#### Authors: 1
+
+- Hayden Bleasel ([@haydenbleasel](https://github.com/haydenbleasel))
+
+---
+
+# v5.0.7 (Tue Oct 07 2025)
+
+#### 🐛 Bug Fix
+
+- 5.1 [#637](https://github.com/vercel/next-forge/pull/637) ([@haydenbleasel](https://github.com/haydenbleasel))
+
+#### Authors: 1
+
+- Hayden Bleasel ([@haydenbleasel](https://github.com/haydenbleasel))
+
+---
+
+# v5.0.6 (Mon Oct 06 2025)
+
+#### 🐛 Bug Fix
+
+- fix: knock provider theme [#566](https://github.com/vercel/next-forge/pull/566) ([@jpvalery](https://github.com/jpvalery) [@haydenbleasel](https://github.com/haydenbleasel))
+
+#### Authors: 2
+
+- Hayden Bleasel ([@haydenbleasel](https://github.com/haydenbleasel))
+- Jp ([@jpvalery](https://github.com/jpvalery))
+
+---
+
+# v5.0.5 (Mon Oct 06 2025)
+
+:tada: This release contains work from a new contributor! :tada:
+
+Thank you, null[@jonathanagustin](https://github.com/jonathanagustin), for all your work!
+
+#### 🐛 Bug Fix
+
+- fix: better dark/light support on unauthenticated [#567](https://github.com/vercel/next-forge/pull/567) ([@jpvalery](https://github.com/jpvalery))
+- Fix badge image in Metabase docs [#603](https://github.com/vercel/next-forge/pull/603) ([@matthewhefferon](https://github.com/matthewhefferon))
+- fix: add missing --dir flag to email build and export scripts [#620](https://github.com/vercel/next-forge/pull/620) ([@jonathanagustin](https://github.com/jonathanagustin))
+- upgrade basehub to v9 [#606](https://github.com/vercel/next-forge/pull/606) ([@julianbenegas](https://github.com/julianbenegas))
+
+#### Authors: 4
+
+- [@jonathanagustin](https://github.com/jonathanagustin)
+- Jp ([@jpvalery](https://github.com/jpvalery))
+- Julian Benegas ([@julianbenegas](https://github.com/julianbenegas))
+- Matthew Hefferon ([@matthewhefferon](https://github.com/matthewhefferon))
+
+---
+
+# v5.0.4 (Tue Jul 15 2025)
+
+#### 🐛 Bug Fix
+
+- Improve Metabase integration instructions [#601](https://github.com/vercel/next-forge/pull/601) ([@matthewhefferon](https://github.com/matthewhefferon))
+
+#### Authors: 1
+
+- Matthew Hefferon ([@matthewhefferon](https://github.com/matthewhefferon))
+
+---
+
+# v5.0.3 (Mon Jul 14 2025)
+
+:tada: This release contains work from new contributors! :tada:
+
+Thanks for all your work!
+
+:heart: Karel Vuong ([@karelvuong](https://github.com/karelvuong))
+
+:heart: Choco ([@chocochu](https://github.com/chocochu))
+
+#### 🐛 Bug Fix
+
+- fix: correct google analytics env [#600](https://github.com/vercel/next-forge/pull/600) ([@karelvuong](https://github.com/karelvuong))
+- add mobile menu [#574](https://github.com/vercel/next-forge/pull/574) ([@chocochu](https://github.com/chocochu))
+
+#### Authors: 2
+
+- Choco ([@chocochu](https://github.com/chocochu))
+- Karel Vuong ([@karelvuong](https://github.com/karelvuong))
+
+---
+
 # v5.0.2 (Thu Jun 05 2025)
 
 #### ⚠️ Pushed to `main`

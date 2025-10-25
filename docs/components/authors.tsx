@@ -1,4 +1,4 @@
-import Image from 'next/image';
+import Image from "next/image";
 
 type Author = {
   company: {
@@ -17,26 +17,26 @@ export const Authors = ({ data }: { data: Author[] }) => (
     <div className="flex flex-wrap items-center gap-2">
       {data.map((author) => (
         <div
-          key={author.user.id}
           className="relative inline-flex items-center gap-3 rounded-xl border bg-secondary p-2 pr-4 font-normal"
+          key={author.user.id}
         >
           <div className="relative">
             <div className="h-8 w-8 overflow-hidden rounded-full border">
               <Image
-                className="m-0 h-full w-full object-cover"
-                src={`/images/authors/${author.company.id}/${author.user.id}.jpg`}
                 alt=""
-                width={32}
+                className="m-0 h-full w-full object-cover"
                 height={32}
+                src={`/images/authors/${author.company.id}/${author.user.id}.jpg`}
+                width={32}
               />
             </div>
             <div className="-bottom-1 -right-1 absolute h-4 w-4 overflow-hidden rounded-full border object-cover">
               <Image
-                className="m-0 h-full w-full object-cover"
-                src={`/images/authors/${author.company.id}/logo.jpg`}
                 alt=""
-                width={16}
+                className="m-0 h-full w-full object-cover"
                 height={16}
+                src={`/images/authors/${author.company.id}/logo.jpg`}
+                width={16}
               />
             </div>
           </div>

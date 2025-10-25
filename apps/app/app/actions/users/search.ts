@@ -1,11 +1,11 @@
-'use server';
+"use server";
 
 import {
-  type OrganizationMembership,
   auth,
   clerkClient,
-} from '@repo/auth/server';
-import Fuse from 'fuse.js';
+  type OrganizationMembership,
+} from "@repo/auth/server";
+import Fuse from "fuse.js";
 
 const getName = (user: OrganizationMembership): string | undefined => {
   let name = user.publicUserData?.firstName;
@@ -33,7 +33,7 @@ export const searchUsers = async (
     const { orgId } = await auth();
 
     if (!orgId) {
-      throw new Error('Not logged in');
+      throw new Error("Not logged in");
     }
 
     const clerk = await clerkClient();
@@ -50,7 +50,7 @@ export const searchUsers = async (
     }));
 
     const fuse = new Fuse(users, {
-      keys: ['name'],
+      keys: ["name"],
       minMatchCharLength: 1,
       threshold: 0.3,
     });

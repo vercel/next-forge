@@ -1,19 +1,19 @@
-'use client';
+"use client";
 
 import {
   Avatar,
   AvatarFallback,
   AvatarImage,
-} from '@repo/design-system/components/ui/avatar';
+} from "@repo/design-system/components/ui/avatar";
 import {
   Carousel,
   type CarouselApi,
   CarouselContent,
   CarouselItem,
-} from '@repo/design-system/components/ui/carousel';
-import type { Dictionary } from '@repo/internationalization';
-import { User } from 'lucide-react';
-import { useEffect, useState } from 'react';
+} from "@repo/design-system/components/ui/carousel";
+import type { Dictionary } from "@repo/internationalization";
+import { User } from "lucide-react";
+import { useEffect, useState } from "react";
 
 type TestimonialsProps = {
   dictionary: Dictionary;
@@ -46,7 +46,7 @@ export const Testimonials = ({ dictionary }: TestimonialsProps) => {
           <h2 className="text-left font-regular text-3xl tracking-tighter md:text-5xl lg:max-w-xl">
             {dictionary.web.home.testimonials.title}
           </h2>
-          <Carousel setApi={setApi} className="w-full">
+          <Carousel className="w-full" setApi={setApi}>
             <CarouselContent>
               {dictionary.web.home.testimonials.items.map((item, index) => (
                 <CarouselItem className="lg:basis-1/2" key={index}>

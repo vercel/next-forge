@@ -1,4 +1,3 @@
-import { cn } from '@/lib/utils';
 import {
   BookIcon,
   CurlyBracesIcon,
@@ -7,71 +6,72 @@ import {
   LaptopIcon,
   MailIcon,
   ServerIcon,
-} from 'lucide-react';
-import Image from 'next/image';
-import ApiImage from './api.png';
-import AppImage from './app.png';
-import DocsImage from './docs.png';
-import EmailImage from './email.png';
-import StorybookImage from './storybook.png';
-import StudioImage from './studio.png';
-import WebImage from './web.png';
+} from "lucide-react";
+import Image from "next/image";
+import { cn } from "@/lib/utils";
+import ApiImage from "./api.png";
+import AppImage from "./app.png";
+import DocsImage from "./docs.png";
+import EmailImage from "./email.png";
+import StorybookImage from "./storybook.png";
+import StudioImage from "./studio.png";
+import WebImage from "./web.png";
 
 const apps = [
   {
     icon: LaptopIcon,
-    name: 'app',
-    title: 'Lightning-fast app template',
+    name: "app",
+    title: "Lightning-fast app template",
     description:
       "Start building your app with a shadcn/ui template that's already set up with everything you need — Tailwind, Clerk and more.",
     image: AppImage,
   },
   {
     icon: ServerIcon,
-    name: 'api',
-    title: 'Cross-platform API',
+    name: "api",
+    title: "Cross-platform API",
     description:
-      'Create an API microservice for many different apps, with a type-safe database ORM and webhook handlers.',
+      "Create an API microservice for many different apps, with a type-safe database ORM and webhook handlers.",
     image: ApiImage,
   },
   {
     icon: MailIcon,
-    name: 'email',
-    title: 'React-based email templates',
+    name: "email",
+    title: "React-based email templates",
     description:
-      'Create and preview email templates with a React-based email library, then send them with a simple API powered by Resend.',
+      "Create and preview email templates with a React-based email library, then send them with a simple API powered by Resend.",
     image: EmailImage,
   },
   {
     icon: GlobeIcon,
-    name: 'web',
-    title: 'Robust, type-safe website',
+    name: "web",
+    title: "Robust, type-safe website",
     description:
-      'A twblocks website template with a type-safe blog, bulletproof SEO and legal pages, powered by BaseHub.',
+      "A twblocks website template with a type-safe blog, bulletproof SEO and legal pages, powered by BaseHub.",
     image: WebImage,
   },
   {
     icon: BookIcon,
-    name: 'docs',
-    title: 'Stunning documentation',
+    name: "docs",
+    title: "Stunning documentation",
     description:
-      'Simple, beautiful out of the box and easy to maintain documentation. Pages are automatically generated from your markdown files.',
+      "Simple, beautiful out of the box and easy to maintain documentation. Pages are automatically generated from your markdown files.",
     image: DocsImage,
   },
   {
     icon: DatabaseIcon,
-    name: 'studio',
-    title: 'Visual database editor',
+    name: "studio",
+    title: "Visual database editor",
     description:
-      'Use Prisma to generate a type-safe client for your database, and Prisma Studio to visualize and edit it.',
+      "Use Prisma to generate a type-safe client for your database, and Prisma Studio to visualize and edit it.",
     image: StudioImage,
   },
   {
     icon: CurlyBracesIcon,
-    name: 'storybook',
-    title: 'A frontend workshop',
+    name: "storybook",
+    title: "A frontend workshop",
     description:
-      'Built-in Storybook instance, allowing you to create reusable components and pages that can be tested and previewed in isolation.',
+      "Built-in Storybook instance, allowing you to create reusable components and pages that can be tested and previewed in isolation.",
     image: StorybookImage,
   },
 ];
@@ -93,8 +93,8 @@ const App = ({ app }: { app: (typeof apps)[number] }) => (
     <div className="h-48 overflow-hidden md:h-80">
       <Image
         alt=""
-        src={app.image}
         className="h-auto w-full overflow-hidden rounded-md border object-cover object-left shadow-sm"
+        src={app.image}
       />
     </div>
   </div>
@@ -105,9 +105,9 @@ export const Apps = () => (
     {apps.map((app, index) => (
       <div
         className={cn(
-          index % 2 && 'sm:border-l',
-          index > 0 && 'border-t sm:border-t-0',
-          index > 1 && '!border-t'
+          index % 2 && "sm:border-l",
+          index > 0 && "border-t sm:border-t-0",
+          index > 1 && "!border-t"
         )}
         key={index}
       >

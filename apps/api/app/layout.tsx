@@ -1,4 +1,5 @@
-import type { ReactNode } from 'react';
+import { AnalyticsProvider } from "@repo/analytics/provider";
+import type { ReactNode } from "react";
 
 type RootLayoutProperties = {
   readonly children: ReactNode;
@@ -6,7 +7,9 @@ type RootLayoutProperties = {
 
 const RootLayout = ({ children }: RootLayoutProperties) => (
   <html lang="en">
-    <body>{children}</body>
+    <body>
+      <AnalyticsProvider>{children}</AnalyticsProvider>
+    </body>
   </html>
 );
 

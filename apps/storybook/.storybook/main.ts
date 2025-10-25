@@ -1,6 +1,6 @@
-import { createRequire } from 'node:module';
-import { dirname, join } from 'node:path';
-import type { StorybookConfig } from '@storybook/nextjs';
+import { createRequire } from "node:module";
+import { dirname, join } from "node:path";
+import type { StorybookConfig } from "@storybook/nextjs";
 
 const require = createRequire(import.meta.url);
 
@@ -9,25 +9,25 @@ const require = createRequire(import.meta.url);
  * It is needed in projects that use Yarn PnP or are set up within a monorepo.
  */
 const getAbsolutePath = (value: string) =>
-  dirname(require.resolve(join(value, 'package.json')));
+  dirname(require.resolve(join(value, "package.json")));
 
 const config: StorybookConfig = {
   stories: [
-    '../stories/**/*.mdx',
-    '../stories/**/*.stories.@(js|jsx|mjs|ts|tsx)',
+    "../stories/**/*.mdx",
+    "../stories/**/*.stories.@(js|jsx|mjs|ts|tsx)",
   ],
   addons: [
-    getAbsolutePath('@storybook/addon-onboarding'),
-    getAbsolutePath('@storybook/addon-essentials'),
-    getAbsolutePath('@chromatic-com/storybook'),
-    getAbsolutePath('@storybook/addon-interactions'),
-    getAbsolutePath('@storybook/addon-themes'),
+    getAbsolutePath("@storybook/addon-onboarding"),
+    getAbsolutePath("@storybook/addon-essentials"),
+    getAbsolutePath("@chromatic-com/storybook"),
+    getAbsolutePath("@storybook/addon-interactions"),
+    getAbsolutePath("@storybook/addon-themes"),
   ],
   framework: {
-    name: getAbsolutePath('@storybook/nextjs'),
+    name: getAbsolutePath("@storybook/nextjs"),
     options: {},
   },
-  staticDirs: ['../public'],
+  staticDirs: ["../public"],
 };
 
 export default config;
