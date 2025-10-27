@@ -1,6 +1,6 @@
 {
   "name": "next-forge",
-  "version": "5.2.0",
+  "version": "5.2.1",
   "bin": {
     "next-forge": "dist/index.js"
   },
