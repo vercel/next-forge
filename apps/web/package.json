@@ -34,7 +34,7 @@
     "next": "16.0.0",
     "react": "19.2.0",
     "react-dom": "19.2.0",
-    "require-in-the-middle": "^8.0.1",
+    "require-in-the-middle": "7.5.2",
     "sharp": "^0.34.4",
     "shiki": "^3.14.0",
     "zod": "^4.1.12"
