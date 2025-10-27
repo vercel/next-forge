@@ -3,8 +3,8 @@
   "private": true,
   "scripts": {
     "dev": "concurrently \"npm:next\" \"npm:stripe\"",
-    "next": "next dev -p 3002 --turbopack",
-    "build": "next build --turbopack",
+    "next": "next dev -p 3002",
+    "build": "next build",
     "start": "next start",
     "analyze": "ANALYZE=true npm run build",
     "test": "NODE_ENV=test vitest run",

@@ -2,8 +2,8 @@
   "name": "web",
   "private": true,
   "scripts": {
-    "dev": "next dev -p 3001 --turbopack",
-    "build": "next build --turbopack",
+    "dev": "next dev -p 3001",
+    "build": "next build",
     "start": "next start",
     "analyze": "ANALYZE=true npm run build",
     "clean": "git clean -xdf .cache .turbo dist node_modules",
