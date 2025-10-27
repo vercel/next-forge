@@ -1,3 +1,15 @@
+# v5.2.1 (Mon Oct 27 2025)
+
+#### 🐛 Bug Fix
+
+- Bump deps [#648](https://github.com/vercel/next-forge/pull/648) ([@haydenbleasel](https://github.com/haydenbleasel))
+
+#### Authors: 1
+
+- Hayden Bleasel ([@haydenbleasel](https://github.com/haydenbleasel))
+
+---
+
 # v5.2.0 (Sat Oct 25 2025)
 
 :tada: This release contains work from new contributors! :tada:
