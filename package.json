@@ -16,30 +16,35 @@
     "analyze": "turbo analyze",
     "translate": "turbo translate",
     "boundaries": "turbo boundaries",
-    "bump-deps": "npx npm-check-updates --deep -u -x react-day-picker,recharts",
+    "bump-deps": "npx npm-check-updates --deep -u -x recharts && pnpm install",
     "bump-ui": "npx shadcn@latest add --all --overwrite -c packages/design-system",
     "migrate": "cd packages/database && npx prisma format && npx prisma generate && npx prisma db push",
     "clean": "git clean -xdf node_modules"
   },
   "devDependencies": {
     "@auto-it/first-time-contributor": "^11.3.0",
-    "@biomejs/biome": "2.2.5",
+    "@biomejs/biome": "2.3.1",
     "@repo/typescript-config": "workspace:*",
     "@turbo/gen": "^2.5.8",
-    "@types/node": "^24.7.0",
+    "@types/node": "^24.9.1",
     "tsup": "^8.5.0",
     "turbo": "^2.5.8",
     "typescript": "^5.9.3",
-    "ultracite": "5.5.1",
-    "vitest": "^3.2.4"
+    "ultracite": "6.0.3",
+    "vitest": "^4.0.3"
   },
   "engines": {
     "node": ">=18"
   },
-  "packageManager": "pnpm@10.18.1",
+  "packageManager": "pnpm@10.19.0",
   "dependencies": {
     "@clack/prompts": "^0.11.0",
-    "commander": "^14.0.1"
+    "commander": "^14.0.2"
+  },
+  "pnpm": {
+    "overrides": {
+      "parse5": "^7.2.1"
+    }
   },
   "type": "module"
 }

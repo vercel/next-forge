@@ -18,11 +18,11 @@
     "embla-carousel-react": "^8.6.0",
     "geist": "^1.5.1",
     "input-otp": "^1.4.2",
-    "lucide-react": "^0.545.0",
+    "lucide-react": "^0.548.0",
     "next-themes": "^0.4.6",
     "react": "19.2.0",
-    "react-day-picker": "^9.11.0",
-    "react-hook-form": "^7.64.0",
+    "react-day-picker": "^9.11.1",
+    "react-hook-form": "^7.65.0",
     "react-moveable": "^0.56.0",
     "react-resizable-panels": "^3.0.6",
     "recharts": "^2.15.4",
@@ -36,12 +36,12 @@
   },
   "devDependencies": {
     "@repo/typescript-config": "workspace:*",
-    "@tailwindcss/postcss": "^4.1.14",
+    "@tailwindcss/postcss": "^4.1.16",
     "@tailwindcss/typography": "^0.5.19",
-    "@types/node": "^24.7.0",
-    "@types/react": "^19.2.1",
+    "@types/node": "^24.9.1",
+    "@types/react": "^19.2.2",
     "postcss": "^8.5.6",
-    "tailwindcss": "^4.1.14",
+    "tailwindcss": "^4.1.16",
     "typescript": "^5.9.3"
   }
 }

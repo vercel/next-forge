@@ -87,7 +87,7 @@ const Page = async (props: PageProps) => {
         <div className="flex flex-row items-center gap-2 border-b pt-2 pb-6">
           <LLMCopyButton markdownUrl={`${page.url}.mdx`} />
           <ViewOptions
-            githubUrl={`https://github.com/haydenbleasel/next-forge/blob/main/docs/content/docs/${page.file.path}`}
+            githubUrl={`https://github.com/haydenbleasel/next-forge/blob/main/docs/content/docs/${page.path}`}
             markdownUrl={`${page.url}.mdx`}
           />
         </div>
