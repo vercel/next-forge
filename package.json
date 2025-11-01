@@ -25,7 +25,7 @@
     "@auto-it/first-time-contributor": "^11.3.0",
     "@biomejs/biome": "2.3.1",
     "@repo/typescript-config": "workspace:*",
-    "@turbo/gen": "^2.5.8",
+    "@turbo/gen": "^2.6.0",
     "@types/node": "^24.9.1",
     "tsup": "^8.5.0",
     "turbo": "^2.5.8",
