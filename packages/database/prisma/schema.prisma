@@ -13,9 +13,148 @@ datasource db {
   relationMode = "prisma"
 }
 
-// This is a stub model.
-// Delete it and add your own Prisma models.
-model Page {
-  id   Int    @id @default(autoincrement())
-  name String
+// Link model - Core URL shortener
+model Link {
+  id          String   @id @default(cuid())
+  slug        String              // Short code (e.g., "abc123")
+  destination String              // Target URL
+  domain      String   @default("localhost:3000")  // Custom domain support
+
+  // Metadata (auto-fetched from destination)
+  title       String?
+  description String?
+  favicon     String?
+
+  // Security & Access Control
+  password    String?             // Hashed password for protected links
+  expiresAt   DateTime?           // Link expiration
+  maxClicks   Int?                // Click limit
+  geoBlock    Json?               // Geographic restrictions
+
+  // Organization
+  userId      String              // Clerk user ID
+  orgId       String?             // Clerk organization ID
+  folderId    String?
+  folder      Folder?  @relation(fields: [folderId], references: [id], onDelete: SetNull)
+
+  // Relations
+  qrCodes     QRCode[]
+  clicks      Click[]
+
+  // Timestamps
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([slug, domain])
+  @@index([userId])
+  @@index([orgId])
+  @@index([createdAt])
+}
+
+// QR Code model - QR code generations for links
+model QRCode {
+  id          String   @id @default(cuid())
+  linkId      String
+  link        Link     @relation(fields: [linkId], references: [id], onDelete: Cascade)
+
+  // Design customization
+  format      String   @default("svg")        // svg, png, pdf
+  size        Int      @default(512)          // Pixels
+  errorLevel  String   @default("M")          // L, M, Q, H (error correction)
+
+  // Style
+  fgColor     String   @default("#000000")    // Foreground color
+  bgColor     String   @default("#FFFFFF")    // Background color
+  logo        String?                         // Logo URL (embedded in QR)
+  style       String   @default("square")     // square, dots, rounded
+
+  // Template support (WiFi, vCard, etc.)
+  templateType String?
+  templateData Json?
+
+  // Stats
+  scans       Int      @default(0)
+
+  createdAt   DateTime @default(now())
+
+  @@index([linkId])
+}
+
+// Click analytics - Track every click/scan
+model Click {
+  id         String   @id @default(cuid())
+  linkId     String
+  link       Link     @relation(fields: [linkId], references: [id], onDelete: Cascade)
+
+  // Location data
+  country    String?
+  city       String?
+  region     String?
+  latitude   Float?
+  longitude  Float?
+
+  // Device & Browser
+  device     String?              // Mobile, Desktop, Tablet
+  os         String?              // iOS, Android, Windows, macOS, Linux
+  browser    String?              // Chrome, Safari, Firefox, etc.
+
+  // Referrer & UTM
+  referer    String?
+  utmSource   String?
+  utmMedium   String?
+  utmCampaign String?
+  utmTerm     String?
+  utmContent  String?
+
+  // Technical
+  ip         String?              // Hashed for privacy
+  userAgent  String?
+  bot        Boolean  @default(false)
+
+  timestamp  DateTime @default(now())
+
+  @@index([linkId, timestamp])
+  @@index([timestamp])
+  @@index([country])
+}
+
+// Domain model - Custom domain management
+model Domain {
+  id          String   @id @default(cuid())
+  domain      String   @unique
+  verified    Boolean  @default(false)
+
+  // Ownership
+  userId      String
+  orgId       String?
+
+  // DNS configuration
+  dnsRecords  Json?                // TXT/CNAME records for verification
+
+  createdAt   DateTime @default(now())
+  verifiedAt  DateTime?
+
+  @@index([userId])
+  @@index([orgId])
+}
+
+// Folder model - Organize links into folders/campaigns
+model Folder {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  color       String?              // Hex color for UI
+
+  // Ownership
+  userId      String
+  orgId       String?
+
+  // Relations
+  links       Link[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([userId])
+  @@index([orgId])
 }

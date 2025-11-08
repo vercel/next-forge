@@ -37,15 +37,18 @@ import { cn } from "@repo/design-system/lib/utils";
 import { NotificationsTrigger } from "@repo/notifications/components/trigger";
 import {
   AnchorIcon,
+  BarChart3Icon,
   BookOpenIcon,
   BotIcon,
   ChevronRightIcon,
   FolderIcon,
   FrameIcon,
   LifeBuoyIcon,
+  Link2Icon,
   MapIcon,
   MoreHorizontalIcon,
   PieChartIcon,
+  QrCodeIcon,
   SendIcon,
   Settings2Icon,
   ShareIcon,
@@ -68,87 +71,75 @@ const data = {
   },
   navMain: [
     {
-      title: "Playground",
-      url: "#",
-      icon: SquareTerminalIcon,
+      title: "Links",
+      url: "/links",
+      icon: Link2Icon,
       isActive: true,
       items: [
         {
-          title: "History",
-          url: "#",
+          title: "All Links",
+          url: "/links",
         },
         {
-          title: "Starred",
-          url: "#",
-        },
-        {
-          title: "Settings",
-          url: "#",
+          title: "Create New",
+          url: "/links/new",
         },
       ],
     },
     {
-      title: "Models",
-      url: "#",
-      icon: BotIcon,
+      title: "Analytics",
+      url: "/analytics",
+      icon: BarChart3Icon,
       items: [
         {
-          title: "Genesis",
-          url: "#",
+          title: "Overview",
+          url: "/analytics",
         },
         {
-          title: "Explorer",
-          url: "#",
+          title: "Countries",
+          url: "/analytics/countries",
         },
         {
-          title: "Quantum",
-          url: "#",
+          title: "Devices",
+          url: "/analytics/devices",
         },
       ],
     },
     {
-      title: "Documentation",
-      url: "#",
-      icon: BookOpenIcon,
+      title: "QR Codes",
+      url: "/qr-codes",
+      icon: QrCodeIcon,
       items: [
         {
-          title: "Introduction",
-          url: "#",
+          title: "All QR Codes",
+          url: "/qr-codes",
         },
         {
-          title: "Get Started",
-          url: "#",
-        },
-        {
-          title: "Tutorials",
-          url: "#",
-        },
-        {
-          title: "Changelog",
-          url: "#",
+          title: "Templates",
+          url: "/qr-codes/templates",
         },
       ],
     },
     {
       title: "Settings",
-      url: "#",
+      url: "/settings",
       icon: Settings2Icon,
       items: [
         {
           title: "General",
-          url: "#",
+          url: "/settings",
         },
         {
-          title: "Team",
-          url: "#",
+          title: "Domains",
+          url: "/settings/domains",
         },
         {
           title: "Billing",
-          url: "#",
+          url: "/settings/billing",
         },
         {
-          title: "Limits",
-          url: "#",
+          title: "API Keys",
+          url: "/settings/api",
         },
       ],
     },
