@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "basehub dev",
-    "build": "basehub build",
+    "build": "[ \"$BASEHUB_TOKEN\" = \"not-used\" ] && echo 'Skipping CMS build (BASEHUB_TOKEN not configured)' && exit 0 || basehub build",
     "analyze": "basehub",
     "clean": "git clean -xdf .cache .turbo dist node_modules",
     "typecheck": "tsc --noEmit --emitDeclarationOnly false"
