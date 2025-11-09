@@ -1,7 +1,7 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "ignoreCommand": "node scripts/skip-ci.js",
-  "buildCommand": "cd ../.. && turbo build --filter=app...",
+  "buildCommand": "cd ../.. && turbo build --filter=app",
   "installCommand": "pnpm install --no-frozen-lockfile",
   "framework": "nextjs",
   "regions": ["iad1"]
