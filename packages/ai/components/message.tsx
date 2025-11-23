@@ -1,11 +1,11 @@
 import type { Message as MessageType } from "ai";
 import type { ComponentProps } from "react";
-import Markdown from "react-markdown";
+import { Streamdown } from "streamdown";
 import { twMerge } from "tailwind-merge";
 
 type MessageProps = {
   data: MessageType;
-  markdown?: ComponentProps<typeof Markdown>;
+  markdown?: ComponentProps<typeof Streamdown>;
 };
 
 export const Message = ({ data, markdown }: MessageProps) => (
@@ -17,6 +17,6 @@ export const Message = ({ data, markdown }: MessageProps) => (
         : "self-start bg-muted"
     )}
   >
-    <Markdown {...markdown}>{data.content}</Markdown>
+    <Streamdown {...markdown}>{data.content}</Streamdown>
   </div>
 );
