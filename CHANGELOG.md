@@ -1,3 +1,15 @@
+# v5.2.2 (Sun Nov 23 2025)
+
+#### ⚠️ Pushed to `main`
+
+- Migrate from React-Markdown to Streamdown ([@haydenbleasel](https://github.com/haydenbleasel))
+
+#### Authors: 1
+
+- Hayden Bleasel ([@haydenbleasel](https://github.com/haydenbleasel))
+
+---
+
 # v5.2.1 (Mon Oct 27 2025)
 
 #### 🐛 Bug Fix
