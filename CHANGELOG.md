@@ -1,3 +1,15 @@
+# v5.2.3 (Tue Nov 25 2025)
+
+#### 🐛 Bug Fix
+
+- fix: email pkg tsconfig to encompass .ts(x) files [#660](https://github.com/vercel/next-forge/pull/660) ([@karelvuong](https://github.com/karelvuong))
+
+#### Authors: 1
+
+- Karel Vuong ([@karelvuong](https://github.com/karelvuong))
+
+---
+
 # v5.2.2 (Sun Nov 23 2025)
 
 #### ⚠️ Pushed to `main`
