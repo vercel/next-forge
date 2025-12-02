@@ -202,31 +202,43 @@ export const AuthProvider = ({ children }: AuthProviderProps) => children;
 
 ## 7. Change Middleware
 
-Change the middleware in the `auth` package to the following:
+Change the middleware in the `auth` package to the following. The middleware checks for a session cookie and redirects unauthenticated users to the sign-in page. The optional `middlewareFn` parameter allows you to add custom logic before the authentication check:
 
 ```tsx title="packages/auth/middleware.ts"
+import { getSessionCookie } from "better-auth/cookies";
 import type { NextRequest } from "next/server";
-import { NextResponse } from 'next/server';
+import { NextResponse } from "next/server";
 
-const isProtectedRoute = (request: NextRequest) => {
-  return request.url.startsWith("/dashboard"); // change this to your protected route
-}
+export function authMiddleware(
+  middlewareFn?: (
+    _auth: { req: NextRequest; authorized: boolean },
+    request: NextRequest,
+  ) => Promise<Response> | Response,
+) {
+  return async function middleware(request: NextRequest) {
+    const sessionCookie = getSessionCookie(request);
+    const authorized = Boolean(sessionCookie);
 
-export const authMiddleware = async (request: NextRequest) => {
-  const url = new URL('/api/auth/get-session', request.nextUrl.origin);
-  const response = await fetch(url, {
-    headers: {
-      cookie: request.headers.get('cookie') || '',
-    },
-  });
+    if (middlewareFn) {
+      const response = await middlewareFn(
+        { req: request, authorized },
+        request,
+      );
+      if (
+        response &&
+        (!response.headers.get("x-middleware-next") ||
+          response.headers.get("Location"))
+      ) {
+        return response;
+      }
+    }
 
-  const session = await response.json();
-  
-  if (isProtectedRoute(request) && !session) {
-    return NextResponse.redirect(new URL("/sign-in", request.url));
-  }
-  
-  return NextResponse.next();
+    if (!sessionCookie) {
+      return NextResponse.redirect(new URL("/sign-in", request.url));
+    }
+
+    return NextResponse.next();
+  };
 }
 ```
 
