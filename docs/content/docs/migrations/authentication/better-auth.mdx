@@ -206,16 +206,17 @@ Change the middleware in the `auth` package to the following. The middleware che
 
 ```tsx title="packages/auth/middleware.ts"
 import { getSessionCookie } from "better-auth/cookies";
-import type { NextRequest } from "next/server";
+import type { NextFetchEvent, NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
 export function authMiddleware(
   middlewareFn?: (
     _auth: { req: NextRequest; authorized: boolean },
     request: NextRequest,
+    event: NextFetchEvent,
   ) => Promise<Response> | Response,
 ) {
-  return async function middleware(request: NextRequest) {
+  return async function middleware(request: NextRequest, event: NextFetchEvent) {
     const sessionCookie = getSessionCookie(request);
     const authorized = Boolean(sessionCookie);
 
@@ -223,6 +224,7 @@ export function authMiddleware(
       const response = await middlewareFn(
         { req: request, authorized },
         request,
+        event
       );
       if (
         response &&
