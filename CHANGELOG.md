@@ -1,3 +1,15 @@
+# v5.2.4 (Fri Dec 05 2025)
+
+#### 🐛 Bug Fix
+
+- Update packages for React Flight RCE advisory [#669](https://github.com/vercel/next-forge/pull/669) ([@vercel[bot]](https://github.com/vercel[bot]))
+
+#### Authors: 1
+
+- [@vercel[bot]](https://github.com/vercel[bot])
+
+---
+
 # v5.2.3 (Tue Nov 25 2025)
 
 #### 🐛 Bug Fix
