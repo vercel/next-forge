@@ -22,7 +22,7 @@
     "@repo/payments": "workspace:*",
     "@sentry/nextjs": "^10.22.0",
     "@t3-oss/env-nextjs": "^0.13.8",
-    "next": "16.0.0",
+    "next": "16.0.7",
     "react": "19.2.0",
     "react-dom": "19.2.0",
     "svix": "^1.80.0",
