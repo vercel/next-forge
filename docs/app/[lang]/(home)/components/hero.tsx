@@ -49,7 +49,7 @@ const TurborepoLogo = (props: ComponentProps<"svg">) => (
 );
 
 export const Hero = () => (
-  <section className="flex flex-col items-center justify-center gap-6 bg-dashed px-4 py-16 sm:px-16 sm:py-24">
+  <section className="flex flex-col items-center justify-center gap-6 px-4 py-16 sm:px-16 sm:py-24">
     <h1 className="max-w-3xl text-balance text-center font-semibold text-4xl leading-tight tracking-tighter! sm:text-5xl md:max-w-4xl md:text-6xl lg:leading-[1.1]">
       Production-grade{" "}
       <TurborepoLogo className="pointer-events-none mx-1.5 inline-block h-8 w-auto translate-y-0.5 select-none align-baseline sm:h-[38px] md:h-[48px] md:translate-y-1" />
