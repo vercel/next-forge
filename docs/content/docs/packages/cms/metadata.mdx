@@ -3,31 +3,6 @@ title: Metadata
 description: How the title, description, and Open Graph images are configured in the CMS.
 ---
 
-<Authors
-  data={[
-    {
-      user: {
-        name: "Hayden Bleasel",
-        id: "haydenbleasel",
-      },
-      company: {
-        name: "vercel",
-        id: "vercel",
-      },
-    },
-    {
-      user: {
-        name: "Julian Benegas",
-        id: "julianbenegas8",
-      },
-      company: {
-        name: "BaseHub",
-        id: "basehub",
-      },
-    },
-  ]}
-/>
-
 To generate metadata for a particular page or collection item, we can use the BaseHub SDK to query the metadata, then use Next.js' `generateMetadata` function to generate the metadata.
 
 For example, here's how we've wired up the metadata for the blog post page, using the `createMetadata` function from the [SEO](/packages/seo/metadata) package:

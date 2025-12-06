@@ -6,7 +6,6 @@ import * as TabsComponents from "fumadocs-ui/components/tabs";
 import { createRelativeLink } from "fumadocs-ui/mdx";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { Authors } from "@/components/authors";
 import { AskAI } from "@/components/geistdocs/ask-ai";
 import { CopyPage } from "@/components/geistdocs/copy-page";
 import {
@@ -64,7 +63,6 @@ const Page = async ({ params }: PageProps<"/[lang]/docs/[[...slug]]">) => {
             // Add your custom components here
             ...TabsComponents,
             ...StepsComponents,
-            Authors,
             VercelButton,
             Warning: ({ children }) => (
               <Callout type="warning">{children}</Callout>
