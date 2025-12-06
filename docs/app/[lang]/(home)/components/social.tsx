@@ -1,9 +1,8 @@
-import { Tweet } from 'react-tweet';
-import { clsx } from 'clsx';
+import { clsx } from "clsx";
+import { Tweet } from "react-tweet";
 
 const tweets = [
   "1853560800050651632",
-  "1853447982781239383",
   "1853242495540363750",
   "1853191842377941445",
   "1853201667480527032",
@@ -15,10 +14,8 @@ const tweets = [
   "1853202171350884569",
   "1853188496288100420",
   "1853183811195949065",
-  "1853174376696623129",
   "1853310553407762491",
   "1853556609030434979",
-  "1853734512024334340",
   "1853769403541639569",
   "1853436749650755708",
   "1853448825454592211",
@@ -72,7 +69,9 @@ export const Social = () => (
       </div>
     </div>
     <div className="columns-1 gap-4 p-8 sm:col-span-2 md:columns-2">
-    <style dangerouslySetInnerHTML={{__html: `
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `
     .tweet-customizer-wrapper .react-tweet-theme {
   --tweet-container-margin: 1.5rem 0;
   
@@ -164,9 +163,14 @@ export const Social = () => (
   --tweet-verified-blue-color: #fff;
 }
 
-    `}} />
+    `,
+        }}
+      />
       {tweets.map((tweet, index) => (
-        <div key={tweet} className={clsx(index ? '' : 'sm:-mt-6', 'tweet-customizer-wrapper')}>
+        <div
+          className={clsx(index ? "" : "sm:-mt-6", "tweet-customizer-wrapper")}
+          key={tweet}
+        >
           <Tweet id={tweet} />
         </div>
       ))}

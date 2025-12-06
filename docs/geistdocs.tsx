@@ -1,15 +1,10 @@
-import { BookHeartIcon } from "lucide-react";
-
 export const Logo = () => (
-  <div className="flex items-center gap-2">
-    <BookHeartIcon className="size-5" />
-    <p className="font-semibold text-xl tracking-tight">Geistdocs</p>
-  </div>
+  <p className="font-semibold text-xl tracking-tight">next-forge</p>
 );
 
 export const github = {
-  owner: undefined as string | undefined,
-  repo: undefined as string | undefined,
+  owner: "vercel",
+  repo: "next-forge",
 };
 
 export const nav = [
@@ -24,23 +19,19 @@ export const nav = [
 ];
 
 export const suggestions = [
-  "What is Vercel?",
-  "What can I deploy with Vercel?",
-  "What is Fluid Compute?",
-  "How much does Vercel cost?",
+  "What is next-forge?",
+  "What can I build with next-forge?",
+  "How do packages and apps work?",
+  "What is a monorepo?",
 ];
 
-export const title = "Geistdocs Documentation";
+export const title = "next-forge Documentation";
 
 export const prompt =
-  "You are a helpful assistant specializing in answering questions about Geistdocs, a modern documentation template built with Next.js and Fumadocs.";
+  "You are a helpful assistant specializing in answering questions about next-forge, a production-grade Turborepo template for Next.js apps";
 
 export const translations = {
   en: {
     displayName: "English",
-  },
-  cn: {
-    displayName: "Chinese",
-    search: "搜尋文檔",
   },
 };
