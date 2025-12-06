@@ -1,25 +1,20 @@
-import { authMiddleware } from "@repo/auth/middleware";
-import { internationalizationMiddleware } from "@repo/internationalization/middleware";
+import { authMiddleware } from "@repo/auth/proxy";
+import { internationalizationMiddleware } from "@repo/internationalization/proxy";
 import { parseError } from "@repo/observability/error";
 import { secure } from "@repo/security";
 import {
   noseconeOptions,
   noseconeOptionsWithToolbar,
   securityMiddleware,
-} from "@repo/security/middleware";
+} from "@repo/security/proxy";
 import { createNEMO } from "@rescale/nemo";
-import {
-  type NextMiddleware,
-  type NextRequest,
-  NextResponse,
-} from "next/server";
+import { type NextProxy, type NextRequest, NextResponse } from "next/server";
 import { env } from "@/env";
 
 export const config = {
   // matcher tells Next.js which routes to run the middleware on. This runs the
   // middleware on all routes except for static assets and Posthog ingest
   matcher: ["/((?!_next/static|_next/image|ingest|favicon.ico).*)"],
-  runtime: "nodejs",
 };
 
 const securityHeaders = env.FLAGS_SECRET
@@ -69,4 +64,4 @@ export default authMiddleware(async (_auth, request, event) => {
 
   // Return middleware response if it exists, otherwise headers response
   return middlewareResponse || headersResponse;
-}) as unknown as NextMiddleware;
+}) as unknown as NextProxy;
