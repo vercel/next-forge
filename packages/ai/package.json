@@ -9,7 +9,7 @@
   "dependencies": {
     "@ai-sdk/openai": "^2.0.53",
     "@t3-oss/env-nextjs": "^0.13.8",
-    "ai": "^5.0.80",
+    "ai": "^5.0.81",
     "react": "19.2.0",
     "streamdown": "^1.6.4",
     "tailwind-merge": "^3.3.1",
