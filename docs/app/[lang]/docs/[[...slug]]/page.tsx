@@ -1,12 +1,12 @@
 /** biome-ignore-all lint/performance/noNamespaceImport: "Required for Fumadocs" */
 
-import { Callout } from "fumadocs-ui/components/callout";
 import * as StepsComponents from "fumadocs-ui/components/steps";
 import * as TabsComponents from "fumadocs-ui/components/tabs";
 import { createRelativeLink } from "fumadocs-ui/mdx";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { AskAI } from "@/components/geistdocs/ask-ai";
+import { Callout } from "@/components/geistdocs/callout";
 import { CopyPage } from "@/components/geistdocs/copy-page";
 import {
   DocsBody,
