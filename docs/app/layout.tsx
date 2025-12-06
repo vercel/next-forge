@@ -1,6 +1,6 @@
 import "./global.css";
 import { Analytics as VercelAnalytics } from "@vercel/analytics/react";
-import { RootProvider } from "fumadocs-ui/provider";
+import { RootProvider } from "fumadocs-ui/provider/next";
 import {
   Geist_Mono as createMono,
   Geist as createSans,
