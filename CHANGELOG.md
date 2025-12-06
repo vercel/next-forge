@@ -1,3 +1,15 @@
+# v5.3.2 (Sat Dec 06 2025)
+
+#### ⚠️ Pushed to `main`
+
+- Update page.tsx ([@haydenbleasel](https://github.com/haydenbleasel))
+
+#### Authors: 1
+
+- Hayden Bleasel ([@haydenbleasel](https://github.com/haydenbleasel))
+
+---
+
 # v5.3.1 (Sat Dec 06 2025)
 
 #### ⚠️ Pushed to `main`
