@@ -44,6 +44,7 @@
     "react-hook-form": "^7.67.0",
     "react-player": "^3.4.0",
     "react-resizable-panels": "^3.0.6",
+    "react-tweet": "^3.2.2",
     "recharts": "2.15.4",
     "rehype-harden": "^1.1.6",
     "shiki": "^3.19.0",
