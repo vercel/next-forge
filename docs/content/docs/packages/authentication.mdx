@@ -3,8 +3,6 @@ title: Authentication
 description: We use Clerk to handle authentication, user and organization management.
 ---
 
-![/images/authentication.png](/images/authentication.png)
-
 next-forge manages authentication through the use of a `auth` package. By default, this package is a wrapper around [Clerk](https://clerk.com/) which provides a complete authentication and user management solution that integrates seamlessly with Next.js applications.
 
 ## In-App
@@ -12,8 +10,6 @@ next-forge manages authentication through the use of a `auth` package. By defaul
 The `@repo/auth` package exposes an `AuthProvider`, however you don't need to use this directly. The [`DesignSystemProvider`](/packages/design-system/provider) includes all relevant providers and higher-order components.
 
 From here, you can use all the pre-built components and hooks provided by Clerk. To demonstrate this, we've added the `<OrganizationSwitcher>` and `<UserButton>` components to the sidebar, as well as built out the Sign In and Sign Up pages.
-
-![/images/sign-in.png](/images/sign-in.png)
 
 ## Webhooks
 

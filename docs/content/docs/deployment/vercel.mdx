@@ -1,0 +1,23 @@
+---
+title: Deploying to Vercel
+description: How to deploy next-forge to Vercel.
+---
+
+To deploy next-forge on Vercel, you need to create 3 new projects for the `app`, `api` and `web` apps. After selecting your repository, change the Root Directory option to the app of choice e.g. `apps/app`. This should automatically detect the Next.js setup and as such, the build command and output directory.
+
+Then, add all your environment variables to the project.
+
+Finally, just hit "Deploy" and Vercel will take care of the rest!
+
+Want to see it in action? next-forge is featured on the [Vercel Marketplace](https://vercel.com/templates/Next.js/next-forge) - try deploying the `app`:
+
+<VercelButton />
+
+## Environment variables
+
+If you're deploying on Vercel, we recommend making use of the Team Environment Variables feature. Variables used by libraries need to exist in all packages and duplicating them can be a headache. Learn more about how [environment variables](/docs/setup/env) work in next-forge.
+
+## Integrations
+
+We also recommend installing the [BetterStack](https://vercel.com/integrations/betterstack) and [Sentry](https://vercel.com/integrations/sentry) integrations. This will take care of the relevant [environment variables](/docs/setup/env).
+

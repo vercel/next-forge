@@ -8,15 +8,15 @@
   },
   "dependencies": {
     "lodash.merge": "^4.6.2",
-    "react": "19.2.0",
+    "react": "19.2.1",
     "schema-dts": "^1.1.5"
   },
   "devDependencies": {
     "@repo/typescript-config": "workspace:*",
     "@types/lodash.merge": "^4.6.9",
-    "@types/node": "24.9.1",
-    "@types/react": "19.2.2",
-    "@types/react-dom": "19.2.2",
+    "@types/node": "24.10.1",
+    "@types/react": "19.2.7",
+    "@types/react-dom": "19.2.3",
     "next": "16.0.7"
   }
 }

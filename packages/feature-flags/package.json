@@ -12,18 +12,18 @@
     "@repo/design-system": "workspace:*",
     "@t3-oss/env-nextjs": "^0.13.8",
     "@vercel/toolbar": "^0.1.41",
-    "flags": "^4.0.1",
-    "react": "19.2.0",
-    "zod": "^4.1.12"
+    "flags": "^4.0.2",
+    "react": "19.2.1",
+    "zod": "^4.1.13"
   },
   "peerDependencies": {
-    "next": "15.5.7"
+    "next": "16.0.7"
   },
   "devDependencies": {
     "@repo/typescript-config": "workspace:*",
-    "@types/node": "24.9.1",
-    "@types/react": "19.2.2",
-    "@types/react-dom": "19.2.2",
+    "@types/node": "24.10.1",
+    "@types/react": "19.2.7",
+    "@types/react-dom": "19.2.3",
     "typescript": "^5.9.3"
   }
 }
