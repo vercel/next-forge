@@ -1,6 +1,12 @@
+/** biome-ignore-all lint/performance/noNamespaceImport: "Required for Fumadocs" */
+
+import { Callout } from "fumadocs-ui/components/callout";
+import * as StepsComponents from "fumadocs-ui/components/steps";
+import * as TabsComponents from "fumadocs-ui/components/tabs";
 import { createRelativeLink } from "fumadocs-ui/mdx";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { Authors } from "@/components/authors";
 import { AskAI } from "@/components/geistdocs/ask-ai";
 import { CopyPage } from "@/components/geistdocs/copy-page";
 import {
@@ -15,6 +21,7 @@ import { getMDXComponents } from "@/components/geistdocs/mdx-components";
 import { OpenInChat } from "@/components/geistdocs/open-in-chat";
 import { ScrollTop } from "@/components/geistdocs/scroll-top";
 import { Separator } from "@/components/ui/separator";
+import { VercelButton } from "@/components/vercel";
 import { getLLMText, getPageImage, source } from "@/lib/geistdocs/source";
 
 const Page = async ({ params }: PageProps<"/[lang]/docs/[[...slug]]">) => {
@@ -55,6 +62,16 @@ const Page = async ({ params }: PageProps<"/[lang]/docs/[[...slug]]">) => {
             a: createRelativeLink(source, page),
 
             // Add your custom components here
+            ...TabsComponents,
+            ...StepsComponents,
+            Authors,
+            VercelButton,
+            Warning: ({ children }) => (
+              <Callout type="warning">{children}</Callout>
+            ),
+            Tip: ({ children }) => <Callout type="info">{children}</Callout>,
+            Info: ({ children }) => <Callout type="info">{children}</Callout>,
+            Note: ({ children }) => <Callout type="info">{children}</Callout>,
           })}
         />
       </DocsBody>
