@@ -7,18 +7,18 @@
     "typecheck": "tsc --noEmit --emitDeclarationOnly false"
   },
   "dependencies": {
-    "@react-email/components": "0.5.7",
+    "@react-email/components": "1.0.1",
     "@t3-oss/env-nextjs": "^0.13.8",
-    "react": "19.2.0",
-    "react-dom": "19.2.0",
-    "resend": "^6.2.2",
-    "zod": "^4.1.12"
+    "react": "19.2.1",
+    "react-dom": "19.2.1",
+    "resend": "^6.5.2",
+    "zod": "^4.1.13"
   },
   "devDependencies": {
     "@repo/typescript-config": "workspace:*",
-    "@types/node": "24.9.1",
-    "@types/react": "19.2.2",
-    "@types/react-dom": "19.2.2",
+    "@types/node": "24.10.1",
+    "@types/react": "19.2.7",
+    "@types/react-dom": "19.2.3",
     "typescript": "^5.9.3"
   }
 }

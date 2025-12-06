@@ -16,9 +16,9 @@
   "devDependencies": {
     "@repo/typescript-config": "workspace:*",
     "@types/negotiator": "^0.6.4",
-    "@types/node": "24.9.1",
-    "@types/react": "19.2.2",
-    "@types/react-dom": "19.2.2",
+    "@types/node": "24.10.1",
+    "@types/react": "19.2.7",
+    "@types/react-dom": "19.2.3",
     "next": "16.0.7"
   }
 }

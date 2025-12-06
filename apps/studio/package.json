@@ -7,6 +7,6 @@
     "typecheck": "tsc --noEmit --emitDeclarationOnly false"
   },
   "devDependencies": {
-    "prisma": "6.18.0"
+    "prisma": "7.1.0"
   }
 }

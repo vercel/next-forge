@@ -22,21 +22,21 @@
     "clean": "git clean -xdf node_modules"
   },
   "devDependencies": {
-    "@auto-it/first-time-contributor": "^11.3.0",
-    "@biomejs/biome": "2.3.1",
+    "@auto-it/first-time-contributor": "^11.3.6",
+    "@biomejs/biome": "2.3.8",
     "@repo/typescript-config": "workspace:*",
-    "@turbo/gen": "^2.5.8",
-    "@types/node": "^24.9.1",
-    "tsup": "^8.5.0",
-    "turbo": "^2.5.8",
+    "@turbo/gen": "^2.6.3",
+    "@types/node": "^24.10.1",
+    "tsup": "^8.5.1",
+    "turbo": "^2.6.3",
     "typescript": "^5.9.3",
-    "ultracite": "6.0.3",
-    "vitest": "^4.0.3"
+    "ultracite": "6.3.9",
+    "vitest": "^4.0.15"
   },
   "engines": {
     "node": ">=18"
   },
-  "packageManager": "pnpm@10.19.0",
+  "packageManager": "pnpm@10.24.0",
   "dependencies": {
     "@clack/prompts": "^0.11.0",
     "commander": "^14.0.2"
