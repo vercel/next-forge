@@ -50,19 +50,6 @@ const TurborepoLogo = (props: ComponentProps<"svg">) => (
 
 export const Hero = () => (
   <section className="flex flex-col items-center justify-center gap-6 bg-dashed px-4 py-16 sm:px-16 sm:py-24">
-    <a
-      className="inline-flex w-full items-center gap-2 overflow-hidden rounded-full border bg-background py-1 pr-3 pl-1 text-foreground text-sm leading-6 shadow-xs sm:w-fit"
-      href="https://x.com/haydenbleasel/status/1929625673586598148"
-      rel="noreferrer"
-      target="_blank"
-    >
-      <span className="rounded-full bg-secondary px-2 font-semibold">
-        Update
-      </span>
-      <span className="truncate font-medium">
-        next-forge has been acquired by Vercel
-      </span>
-    </a>
     <h1 className="max-w-3xl text-balance text-center font-semibold text-4xl leading-tight tracking-tighter! sm:text-5xl md:max-w-4xl md:text-6xl lg:leading-[1.1]">
       Production-grade{" "}
       <TurborepoLogo className="pointer-events-none mx-1.5 inline-block h-8 w-auto translate-y-0.5 select-none align-baseline sm:h-[38px] md:h-[48px] md:translate-y-1" />
