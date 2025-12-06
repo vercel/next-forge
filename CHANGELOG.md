@@ -1,3 +1,25 @@
+# v5.3.0 (Sat Dec 06 2025)
+
+:tada: This release contains work from a new contributor! :tada:
+
+Thank you, Dmytro Pletenskyi ([@ph1losof](https://github.com/ph1losof)), for all your work!
+
+#### 🚀 Enhancement
+
+- Update dependencies [#670](https://github.com/vercel/next-forge/pull/670) ([@haydenbleasel](https://github.com/haydenbleasel))
+
+#### 🐛 Bug Fix
+
+- docs(migrations): fixes middleware configuration for better-auth [#667](https://github.com/vercel/next-forge/pull/667) ([@ph1losof](https://github.com/ph1losof) [@haydenbleasel](https://github.com/haydenbleasel))
+- fix: update prisma to 7.0.0 and use prisma-client generator [#663](https://github.com/vercel/next-forge/pull/663) ([@ph1losof](https://github.com/ph1losof))
+
+#### Authors: 2
+
+- Dmytro Pletenskyi ([@ph1losof](https://github.com/ph1losof))
+- Hayden Bleasel ([@haydenbleasel](https://github.com/haydenbleasel))
+
+---
+
 # v5.2.4 (Fri Dec 05 2025)
 
 #### 🐛 Bug Fix
