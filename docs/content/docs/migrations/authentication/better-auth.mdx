@@ -226,11 +226,7 @@ export function authMiddleware(
         request,
         event
       );
-      if (
-        response &&
-        (!response.headers.get("x-middleware-next") ||
-          response.headers.get("Location"))
-      ) {
+      if (response && response.headers.get("Location")) {
         return response;
       }
     }
