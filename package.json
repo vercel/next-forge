@@ -28,7 +28,7 @@
     "@turbo/gen": "^2.5.8",
     "@types/node": "^24.9.1",
     "tsup": "^8.5.0",
-    "turbo": "^2.5.8",
+    "turbo": "^2.6.1",
     "typescript": "^5.9.3",
     "ultracite": "6.0.3",
     "vitest": "^4.0.3"
