@@ -1,0 +1,93 @@
+name: Migrate Production Database
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - 'package.json'
+      - 'package-lock.json'
+      - 'yarn.lock'
+
+env:
+  NEON_DATABASE_USERNAME: ${{ secrets.NEON_DATABASE_USERNAME }}
+  NEON_API_KEY: ${{ secrets.NEON_API_KEY }}
+  NEON_PROJECT_ID: ${{ secrets.NEON_PROJECT_ID }}
+  NEON_BRANCH_ID: ${{ secrets.NEON_MAIN_BRANCH_ID }}
+
+jobs:
+  run-migrations:
+    permissions:
+      contents: write
+      pull-requests: write
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install pnpm
+        run: npm install -g pnpm
+
+      - name: Install Dependencies
+        run: pnpm install
+
+      - name: Get Main Branch Details
+        id: neon-main
+        run: |
+          # Get connection details for main branch
+          ENDPOINTS_RESPONSE=$(curl -s \
+            -H "Authorization: Bearer ${{ env.NEON_API_KEY }}" \
+            -H "Accept: application/json" \
+            "https://console.neon.tech/api/v2/projects/${{ env.NEON_PROJECT_ID }}/branches/${{ env.NEON_BRANCH_ID }}/endpoints")
+
+          HOST=$(echo $ENDPOINTS_RESPONSE | jq -r '.endpoints[0].host')
+
+          # Get password for the main branch
+          PASSWORD_RESPONSE=$(curl -s \
+            -H "Authorization: Bearer ${{ env.NEON_API_KEY }}" \
+            -H "Accept: application/json" \
+            "https://console.neon.tech/api/v2/projects/${{ env.NEON_PROJECT_ID }}/branches/${{ env.NEON_BRANCH_ID }}/roles/neondb_owner/reveal_password")
+
+          PASSWORD=$(echo $PASSWORD_RESPONSE | jq -r '.password')
+
+          # Construct database URLs using retrieved password
+          DB_URL="postgres://${{ env.NEON_DATABASE_USERNAME }}:${PASSWORD}@${HOST}/neondb"
+          POOLER_URL="postgres://${{ env.NEON_DATABASE_USERNAME }}:${PASSWORD}@${HOST}/neondb"
+
+          # Fix: Correct the GITHUB_OUTPUT variable name and add the migration step
+          echo "db_url=$DB_URL" >> $GITHUB_OUTPUT
+          echo "db_url_with_pooler=$POOLER_URL" >> $GITHUB_OUTPUT
+
+      - name: Run Migrations
+        run: |
+          touch .env
+          echo "DATABASE_URL=${{ steps.neon-main.outputs.db_url_with_pooler }}?pgbouncer=true&sslmode=require" >> .env
+          echo "DATABASE_URL_UNPOOLED=${{ steps.neon-main.outputs.db_url }}?sslmode=require" >> .env
+
+          # Basic setup without logging
+          npx prisma format --schema=packages/database/prisma/schema.prisma > /dev/null
+          npx prisma validate --schema=packages/database/prisma/schema.prisma > /dev/null
+          npx prisma generate --schema=packages/database/prisma/schema.prisma
+
+          # Only capture migration status for decision making
+          MIGRATION_STATUS=$(npx prisma migrate status --schema=packages/database/prisma/schema.prisma 2>&1) || true
+
+          if echo "$MIGRATION_STATUS" | grep -q "Database schema is up to date!"; then
+            echo "ℹ️ Database is up to date"
+          elif echo "$MIGRATION_STATUS" | grep -q "have not yet been applied"; then
+            echo "🏗️ Applying migrations..."
+            if ! npx prisma migrate deploy --schema=packages/database/prisma/schema.prisma; then
+              echo "❌ Migration failed:"
+              echo "$MIGRATION_STATUS"
+              exit 1
+            fi
+            echo "✅ Migrations applied successfully"
+          else
+            echo "❌ Unexpected migration status:"
+            echo "$MIGRATION_STATUS"
+            exit 1
+          fi
