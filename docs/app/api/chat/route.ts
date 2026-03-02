@@ -11,15 +11,15 @@ import { createSystemPrompt } from "./utils";
 
 export const maxDuration = 800;
 
-type RequestBody = {
-  messages: MyUIMessage[];
+interface RequestBody {
   currentRoute: string;
+  messages: MyUIMessage[];
   pageContext?: {
     title: string;
     url: string;
     content: string;
   };
-};
+}
 
 export async function POST(req: Request) {
   try {
@@ -84,19 +84,15 @@ User question: ${userQuestion}`,
       execute: ({ writer }) => {
         const result = streamText({
           model: "openai/gpt-4.1-mini",
-          providerOptions: {
-            openai: {
-              reasoningEffort: "minimal",
-              reasoningSummary: "auto",
-              textVerbosity: "medium",
-              serviceTier: "priority",
-            },
-          },
           messages: convertToModelMessages(processedMessages),
           stopWhen: stepCountIs(10),
           tools: createTools(writer),
           system: createSystemPrompt(currentRoute),
-          toolChoice: { type: "tool", toolName: "search_docs" },
+          prepareStep: ({ stepNumber }) => {
+            if (stepNumber === 0) {
+              return { toolChoice: { type: "tool", toolName: "search_docs" } };
+            }
+          },
         });
 
         writer.merge(result.toUIMessageStream());

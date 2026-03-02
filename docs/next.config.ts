@@ -4,23 +4,8 @@ import type { NextConfig } from "next";
 const withMDX = createMDX();
 
 const config: NextConfig = {
-  reactStrictMode: true,
-
   experimental: {
     turbopackFileSystemCacheForDev: true,
-  },
-
-  async rewrites() {
-    return [
-      {
-        source: "/docs/:path*.mdx",
-        destination: "/llms.mdx/:path*",
-      },
-      {
-        source: "/docs/:path*.md",
-        destination: "/llms.mdx/:path*",
-      },
-    ];
   },
 
   images: {

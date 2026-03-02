@@ -2,6 +2,7 @@ import "../global.css";
 import { Footer } from "@/components/geistdocs/footer";
 import { Navbar } from "@/components/geistdocs/navbar";
 import { GeistdocsProvider } from "@/components/geistdocs/provider";
+import { basePath } from "@/geistdocs";
 import { mono, sans } from "@/lib/geistdocs/fonts";
 import { cn } from "@/lib/utils";
 
@@ -15,7 +16,7 @@ const Layout = async ({ children, params }: LayoutProps<"/[lang]">) => {
       suppressHydrationWarning
     >
       <body>
-        <GeistdocsProvider lang={lang}>
+        <GeistdocsProvider basePath={basePath} lang={lang}>
           <Navbar />
           {children}
           <Footer />

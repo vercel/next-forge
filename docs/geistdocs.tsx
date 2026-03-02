@@ -1,10 +1,15 @@
+import { BookHeartIcon } from "lucide-react";
+
 export const Logo = () => (
-  <p className="font-semibold text-xl tracking-tight">next-forge</p>
+  <div className="flex items-center gap-2">
+    <BookHeartIcon className="size-5" />
+    <p className="font-semibold text-xl tracking-tight">Geistdocs</p>
+  </div>
 );
 
 export const github = {
   owner: "vercel",
-  repo: "next-forge",
+  repo: "geistdocs",
 };
 
 export const nav = [
@@ -19,19 +24,31 @@ export const nav = [
 ];
 
 export const suggestions = [
-  "What is next-forge?",
-  "What can I build with next-forge?",
-  "How do packages and apps work?",
-  "What is a monorepo?",
+  "What is Geistdocs?",
+  "What can I make with Geistdocs?",
+  "What syntax does Geistdocs support?",
+  "How do I deploy my Geistdocs site?",
 ];
 
-export const title = "next-forge Documentation";
+export const title = "Geistdocs Documentation";
 
 export const prompt =
-  "You are a helpful assistant specializing in answering questions about next-forge, a production-grade Turborepo template for Next.js apps";
+  "You are a helpful assistant specializing in answering questions about Geistdocs, a modern documentation template built with Next.js and Fumadocs.";
 
 export const translations = {
   en: {
     displayName: "English",
   },
+  cn: {
+    displayName: "Chinese",
+    search: "搜尋文檔",
+  },
 };
+
+export const basePath: string | undefined = undefined;
+
+/**
+ * Unique identifier for this site, used in markdown request tracking analytics.
+ * Each site using geistdocs should set this to a unique value (e.g. "ai-sdk-docs", "next-docs").
+ */
+export const siteId: string | undefined = undefined;

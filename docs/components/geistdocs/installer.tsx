@@ -14,10 +14,10 @@ import {
 
 const COPY_TIMEOUT = 2000;
 
-type InstallerProps = {
-  command: string;
+interface InstallerProps {
   className?: string;
-};
+  command: string;
+}
 
 export const Installer = ({ command, className = "w-48" }: InstallerProps) => {
   const [copied, setCopied] = useState(false);
