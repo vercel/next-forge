@@ -7,6 +7,7 @@
       "dependencies": {
         "@clack/prompts": "^1.1.0",
         "commander": "^14.0.3",
+        "nypm": "^0.6.5",
       },
       "devDependencies": {
         "@biomejs/biome": "2.4.6",

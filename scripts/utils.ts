@@ -55,8 +55,6 @@ export const semver = /^\d+\.\d+\.\d+$/;
 
 export const tempDirName = "next-forge-update";
 
-export const supportedPackageManagers = ["bun", "npm", "yarn", "pnpm"];
-
 export const getAvailableVersions = async (): Promise<string[]> => {
   const changelog = await readFile("CHANGELOG.md", "utf-8");
   const versionRegex = /# v(\d+\.\d+\.\d+)/g;

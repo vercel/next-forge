@@ -11,14 +11,25 @@ import {
   text,
 } from "@clack/prompts";
 import {
+  detectPackageManager,
+  installDependencies as nypmInstallDependencies,
+  type PackageManagerName,
+} from "nypm";
+import {
   internalContentDirs,
   internalContentFiles,
   run,
-  supportedPackageManagers,
   url,
 } from "./utils.js";
 
-const cloneNextForge = (name: string, packageManager: string) => {
+const supportedPackageManagers: PackageManagerName[] = [
+  "bun",
+  "npm",
+  "yarn",
+  "pnpm",
+];
+
+const cloneNextForge = (name: string, packageManager: PackageManagerName) => {
   run("npx", [
     "create-next-app@latest",
     name,
@@ -40,11 +51,11 @@ const deleteInternalContent = async () => {
   }
 };
 
-const installDependencies = (packageManager: string) => {
-  const args =
-    packageManager === "npm" ? ["install", "--force"] : ["install"];
-
-  run(packageManager, args);
+const installDependencies = async (packageManager: PackageManagerName) => {
+  await nypmInstallDependencies({
+    packageManager: { name: packageManager, command: packageManager },
+    silent: true,
+  });
 };
 
 const initializeGit = () => {
@@ -68,7 +79,7 @@ const setupEnvironmentVariables = async () => {
   }
 };
 
-const setupOrm = (packageManager: string) => {
+const setupOrm = (packageManager: PackageManagerName) => {
   const filterCommand = packageManager === "npm" ? "--workspace" : "--filter";
 
   run(packageManager, ["run", "build", filterCommand, "@repo/database"]);
@@ -76,7 +87,7 @@ const setupOrm = (packageManager: string) => {
 
 const updatePackageManagerConfiguration = async (
   projectDir: string,
-  packageManager: string
+  packageManager: PackageManagerName
 ) => {
   const packageJsonPath = join(projectDir, "package.json");
   const packageJsonFile = await readFile(packageJsonPath, "utf8");
@@ -97,7 +108,7 @@ const updatePackageManagerConfiguration = async (
 
 const updateWorkspaceConfiguration = async (
   projectDir: string,
-  packageManager: string
+  packageManager: PackageManagerName
 ) => {
   const packageJsonPath = join(projectDir, "package.json");
   const packageJsonFile = await readFile(packageJsonPath, "utf8");
@@ -181,14 +192,20 @@ const getName = async () => {
   return value.toString();
 };
 
-const getPackageManager = async () => {
+const getPackageManager = async (): Promise<PackageManagerName> => {
+  const detected = await detectPackageManager(process.cwd());
+
+  if (detected) {
+    return detected.name;
+  }
+
   const value = await select({
     message: "Which package manager would you like to use?",
     options: supportedPackageManagers.map((choice) => ({
       value: choice,
       label: choice,
     })),
-    initialValue: "bun",
+    initialValue: "bun" as PackageManagerName,
   });
 
   if (isCancel(value)) {
@@ -196,12 +213,12 @@ const getPackageManager = async () => {
     process.exit(0);
   }
 
-  return value.toString() as (typeof supportedPackageManagers)[number];
+  return value as PackageManagerName;
 };
 
 export const initialize = async (options: {
   name?: string;
-  packageManager?: string;
+  packageManager?: PackageManagerName;
   disableGit?: boolean;
 }) => {
   try {
@@ -245,7 +262,7 @@ export const initialize = async (options: {
     await deleteInternalContent();
 
     s.message("Installing dependencies...");
-    installDependencies(packageManager);
+    await installDependencies(packageManager);
 
     s.message("Setting up ORM...");
     setupOrm(packageManager);
