@@ -25,7 +25,7 @@
     "release": "npm publish"
   },
   "devDependencies": {
-"@biomejs/biome": "2.4.6",
+    "@biomejs/biome": "2.4.6",
     "@repo/typescript-config": "workspace:*",
     "@turbo/gen": "^2.8.14",
     "@types/node": "^25.3.5",

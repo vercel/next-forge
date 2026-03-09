@@ -1,7 +1,5 @@
 import type { QueryGenqlSelection } from "basehub";
 import { basehub as basehubClient, fragmentOn } from "basehub";
-// ensures types are passed through to apps that use this package
-import type * as _types from "./basehub-types.d.ts";
 import { keys } from "./keys";
 import "./basehub.config";
 

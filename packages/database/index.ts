@@ -18,5 +18,4 @@ if (process.env.NODE_ENV !== "production") {
   globalForPrisma.prisma = database;
 }
 
-// biome-ignore lint/performance/noBarrelFile: re-exporting
 export * from "./generated/client";

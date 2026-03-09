@@ -4,6 +4,13 @@
   "javascript": {
     "globals": ["Liveblocks"]
   },
+  "linter": {
+    "rules": {
+      "performance": {
+        "noBarrelFile": "off"
+      }
+    }
+  },
   "files": {
     "includes": [
       "**/*",

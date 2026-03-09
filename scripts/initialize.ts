@@ -115,7 +115,7 @@ const updateWorkspaceConfiguration = async (
   const packageJson = JSON.parse(packageJsonFile);
 
   if (packageManager === "pnpm") {
-    delete packageJson.workspaces;
+    packageJson.workspaces = undefined;
     const pnpmWorkspace = "packages:\n  - 'apps/*'\n  - 'packages/*'\n";
     await writeFile(join(projectDir, "pnpm-workspace.yaml"), pnpmWorkspace);
   }
