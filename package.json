@@ -16,9 +16,9 @@
     "analyze": "turbo analyze",
     "translate": "turbo translate",
     "boundaries": "turbo boundaries",
-    "bump-deps": "npx npm-check-updates --deep -u -x recharts && bun install",
-    "bump-ui": "npx shadcn@latest add --all --overwrite -c packages/design-system",
-    "migrate": "cd packages/database && npx prisma format && npx prisma generate && npx prisma db push",
+    "bump-deps": "bunx npm-check-updates --deep -u && bun install",
+    "bump-ui": "bunx shadcn@latest add --all --overwrite -c packages/design-system",
+    "migrate": "cd packages/database && bunx prisma format && bunx prisma generate && bunx prisma db push",
     "clean": "git clean -xdf node_modules",
     "changeset": "changeset",
     "release": "changeset publish"
@@ -47,5 +47,8 @@
     "parse5": "^7.2.1"
   },
   "type": "module",
-  "workspaces": ["apps/*", "packages/*"]
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ]
 }
