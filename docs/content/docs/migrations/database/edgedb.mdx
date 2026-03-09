@@ -30,14 +30,14 @@ Create an account at [EdgeDB Cloud](https://cloud.edgedb.com/). Once done, creat
 
 Uninstall the existing dependencies...
 
-```sh title="Terminal"
-bun remove @prisma/adapter-neon @prisma/client prisma --filter @repo/database
+```package-install
+npm uninstall @prisma/adapter-neon @prisma/client prisma --filter @repo/database
 ```
 
 ... and install the new dependencies:
 
-```sh title="Terminal"
-bun add edgedb @edgedb/generate
+```package-install
+npm install edgedb @edgedb/generate
 ```
 
 ## 3. Setup EdgeDB in `@repo/database` package

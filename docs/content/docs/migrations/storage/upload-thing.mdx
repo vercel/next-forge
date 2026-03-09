@@ -13,14 +13,14 @@ prerequisites:
 
 First, uninstall the existing dependencies from the Storage package...
 
-```sh title="Terminal"
-bun remove @vercel/blob --filter @repo/storage
+```package-install
+npm uninstall @vercel/blob --filter @repo/storage
 ```
 
 ... and install the new dependencies...
 
-```sh title="Terminal"
-bun add uploadthing @uploadthing/react --filter @repo/storage
+```package-install
+npm install uploadthing @uploadthing/react --filter @repo/storage
 ```
 
 ## 2. Update the environment variables

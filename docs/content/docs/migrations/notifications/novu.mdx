@@ -13,14 +13,14 @@ prerequisites:
 
 First, uninstall the existing dependencies from the Notifications package...
 
-```sh title="Terminal"
-bun remove @knocklabs/node @knocklabs/react --filter @repo/notifications
+```package-install
+npm uninstall @knocklabs/node @knocklabs/react --filter @repo/notifications
 ```
 
 ... and install the new dependencies...
 
-```sh title="Terminal"
-bun add @novu/api @novu/react --filter @repo/notifications
+```package-install
+npm install @novu/api @novu/react --filter @repo/notifications
 ```
 
 ## 2. Update the Notification keys

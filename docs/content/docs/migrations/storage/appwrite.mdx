@@ -19,14 +19,14 @@ related:
 
 Uninstall the existing Vercel Blob dependency from the storage package...
 
-```sh title="Terminal"
-bun remove @vercel/blob --filter @repo/storage
+```package-install
+npm uninstall @vercel/blob --filter @repo/storage
 ```
 
 ...and install the Appwrite dependencies:
 
-```sh title="Terminal"
-bun add node-appwrite appwrite --filter @repo/storage
+```package-install
+npm install node-appwrite appwrite --filter @repo/storage
 ```
 
 ## 2. Update environment variables

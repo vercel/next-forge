@@ -23,14 +23,14 @@ Appwrite uses a document database model, not SQL. There is no Prisma ORM equival
 
 Uninstall the existing Neon and Prisma dependencies from the `database` package...
 
-```sh title="Terminal"
-bun remove @neondatabase/serverless @prisma/adapter-neon @prisma/client prisma ws @types/ws --filter @repo/database
+```package-install
+npm uninstall @neondatabase/serverless @prisma/adapter-neon @prisma/client prisma ws @types/ws --filter @repo/database
 ```
 
 ...and install the Appwrite dependency:
 
-```sh title="Terminal"
-bun add node-appwrite --filter @repo/database
+```package-install
+npm install node-appwrite --filter @repo/database
 ```
 
 ## 2. Update environment variables

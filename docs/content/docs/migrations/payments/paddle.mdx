@@ -20,14 +20,14 @@ related:
 
 First, uninstall the existing dependencies from the Payments package...
 
-```sh title="Terminal"
-bun remove stripe --filter @repo/payments
+```package-install
+npm uninstall stripe --filter @repo/payments
 ```
 
 ... and install the new dependencies...
 
-```sh title="Terminal"
-bun add @paddle/paddle-node-sdk --filter @repo/payments
+```package-install
+npm install @paddle/paddle-node-sdk --filter @repo/payments
 ```
 
 ## 2. Update the Payment keys
@@ -143,8 +143,8 @@ There's quite a lot you can do with Paddle, so check out the following resources
 
 Create a new file for `checkout` and install `paddle-js`:
 
-```sh title="Terminal"
-bun add @paddle/paddle-js --filter @repo/payments
+```package-install
+npm install @paddle/paddle-js --filter @repo/payments
 ```
 
 Then, create a new hook to initialize Paddle in the `packages/payments/checkout.tsx` file:

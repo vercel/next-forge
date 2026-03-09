@@ -20,14 +20,14 @@ Here's how to switch from Clerk to [Auth.js](https://authjs.dev/).
 
 Uninstall the existing Clerk dependencies from the `auth` package...
 
-```sh title="Terminal"
-bun remove @clerk/nextjs @clerk/themes @clerk/types --filter @repo/auth
+```package-install
+npm uninstall @clerk/nextjs @clerk/themes @clerk/types --filter @repo/auth
 ```
 
 ... and install the Auth.js dependencies.
 
-```sh title="Terminal"
-bun add next-auth@beta --filter @repo/auth
+```package-install
+npm install next-auth@beta --filter @repo/auth
 ```
 
 ## 2. Generate an Auth.js secret

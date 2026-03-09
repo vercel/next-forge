@@ -22,14 +22,14 @@ This guide assumes you've already [migrated to Supabase](/docs/migrations/databa
 
 Uninstall the existing Clerk dependencies from the `auth` package...
 
-```sh title="Terminal"
-bun remove @clerk/nextjs @clerk/themes @clerk/types --filter @repo/auth
+```package-install
+npm uninstall @clerk/nextjs @clerk/themes @clerk/types --filter @repo/auth
 ```
 
 ...and install the Supabase Auth dependencies:
 
-```sh title="Terminal"
-bun add @supabase/supabase-js @supabase/ssr --filter @repo/auth
+```package-install
+npm install @supabase/supabase-js @supabase/ssr --filter @repo/auth
 ```
 
 Additionally, add `@repo/database` to the `auth` package dependencies to enable organization/team management.

@@ -21,14 +21,14 @@ related:
 
 Uninstall the existing Clerk dependencies from the `auth` package...
 
-```sh title="Terminal"
-bun remove @clerk/nextjs @clerk/themes @clerk/types --filter @repo/auth
+```package-install
+npm uninstall @clerk/nextjs @clerk/themes @clerk/types --filter @repo/auth
 ```
 
 ...and install the Appwrite dependencies:
 
-```sh title="Terminal"
-bun add appwrite node-appwrite --filter @repo/auth
+```package-install
+npm install appwrite node-appwrite --filter @repo/auth
 ```
 
 ## 2. Update environment variables

@@ -13,15 +13,15 @@ It's possible to switch to [Content Collections](https://www.content-collections
 
 Remove the existing dependencies...
 
-```sh title="Terminal"
-bun remove basehub --filter @repo/cms
+```package-install
+npm uninstall basehub --filter @repo/cms
 ```
 
 ... and install the new dependencies...
 
-```sh title="Terminal"
-bun add @content-collections/mdx fumadocs-core --filter @repo/cms
-bun add -D @content-collections/cli @content-collections/core @content-collections/next --filter @repo/cms
+```package-install
+npm install @content-collections/mdx fumadocs-core --filter @repo/cms
+npm install -D @content-collections/cli @content-collections/core @content-collections/next --filter @repo/cms
 ```
 
 ## 2. Update the `.gitignore` file

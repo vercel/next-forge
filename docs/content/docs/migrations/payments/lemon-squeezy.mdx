@@ -19,14 +19,14 @@ Lemon Squeezy was acquired by Stripe in July 2024. New signups are being transit
 
 First, uninstall the existing dependencies from the Payments package...
 
-```sh title="Terminal"
-bun remove stripe --filter @repo/payments
+```package-install
+npm uninstall stripe --filter @repo/payments
 ```
 
 ... and install the new dependencies...
 
-```sh title="Terminal"
-bun add @lemonsqueezy/lemonsqueezy.js --filter @repo/payments
+```package-install
+npm install @lemonsqueezy/lemonsqueezy.js --filter @repo/payments
 ```
 
 ## 2. Update the environment variables

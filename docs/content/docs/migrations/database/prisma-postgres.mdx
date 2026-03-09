@@ -31,14 +31,14 @@ DATABASE_URL="prisma+postgres://accelerate.prisma-data.net/?api_key=ey...."
 
 Uninstall the existing dependencies...
 
-```sh title="Terminal"
-bun remove @neondatabase/serverless @prisma/adapter-neon ws @types/ws
+```package-install
+npm uninstall @neondatabase/serverless @prisma/adapter-neon ws @types/ws
 ```
 
 ... and install the new dependencies:
 
-```sh title="Terminal"
-bun add @prisma/extension-accelerate
+```package-install
+npm install @prisma/extension-accelerate
 ```
 
 ## 4. Update the database connection code
@@ -87,8 +87,8 @@ Prisma Pulse (`@prisma/extension-pulse`) has been paused and may be deprecated. 
 
 To stream database change events from your database, you first need to install the Pulse extension:
 
-```sh title="Terminal"
-bun add @prisma/extension-pulse
+```package-install
+npm install @prisma/extension-pulse
 ```
 
 Next, you need to add your Pulse API key as an environment variable:
