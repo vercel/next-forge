@@ -54,19 +54,35 @@ model Post {
 }
 ```
 
-### Deploying changes
+### Creating migrations
 
-To deploy your schema changes, run the following command:
+When you make changes to your schema during development, run:
 
 ```sh title="Terminal"
 bun run migrate
 ```
 
-This runs the following commands:
+This will format the schema, regenerate the Prisma client, and create a new migration file in `packages/database/prisma/migrations/`. You'll be prompted to name the migration.
 
-- `npx prisma format` to format the schema file
-- `npx prisma generate` to generate the Prisma client
-- `npx prisma db push` to push the schema changes to the database
+### Deploying migrations
+
+To apply pending migrations in CI or production (without creating new ones), run:
+
+```sh title="Terminal"
+bun run migrate:deploy
+```
+
+This runs `prisma migrate deploy`, which is safe for production environments — it only applies existing migration files and never modifies the schema.
+
+### Prototyping
+
+If you're rapidly iterating on your schema and don't need migration history yet, you can use:
+
+```sh title="Terminal"
+bun run db:push
+```
+
+This uses `prisma db push` to push schema changes directly to the database without creating migration files. This is useful for early prototyping but should not be used in production, as it can cause data loss and doesn't maintain a migration history.
 
 ## Visual database editor
 
