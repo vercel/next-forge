@@ -18,10 +18,10 @@ import { cn } from "@/lib/utils";
 import { Button } from "../ui/button";
 import { Kbd } from "../ui/kbd";
 
-type SearchButtonProps = {
+interface SearchButtonProps {
   className?: string;
   onClick?: () => void;
-};
+}
 
 export const SearchDialog = (props: SharedProps) => {
   const { locale } = useI18n();

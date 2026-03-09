@@ -1,3 +1,4 @@
+// biome-ignore lint/performance/noNamespaceImport: Sentry SDK convention
 import * as Sentry from "@sentry/nextjs";
 import { log } from "./log";
 
@@ -16,7 +17,6 @@ export const parseError = (error: unknown): string => {
     Sentry.captureException(error);
     log.error(`Parsing error: ${message}`);
   } catch (newError) {
-    // biome-ignore lint/suspicious/noConsole: Need console here
     console.error("Error parsing error:", newError);
   }
 

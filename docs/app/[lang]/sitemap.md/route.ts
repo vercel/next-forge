@@ -5,6 +5,7 @@ import { source } from "@/lib/geistdocs/source";
 export const revalidate = false;
 export const dynamic = "error";
 
+// biome-ignore lint/suspicious/useAwait: Next.js convention
 export const generateStaticParams = async () => {
   const langs = Object.keys(translations);
   return langs.map((lang) => ({ lang }));
@@ -13,17 +14,17 @@ export const generateStaticParams = async () => {
 const DOCS_PREFIX_PATTERN = /^\/docs\/?/;
 const WHITESPACE_PATTERN = /\s+/;
 
-type PageNode = {
-  title: string;
+interface PageNode {
+  children: PageNode[];
   description: string;
-  url: string;
-  type?: string;
-  summary?: string;
+  lastmod?: string;
   prerequisites?: string[];
   product?: string;
-  lastmod?: string;
-  children: PageNode[];
-};
+  summary?: string;
+  title: string;
+  type?: string;
+  url: string;
+}
 
 function buildTree(
   pages: Array<{

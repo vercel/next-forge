@@ -1,8 +1,8 @@
 import type { Thing, WithContext } from "schema-dts";
 
-type JsonLdProps = {
+interface JsonLdProps {
   code: WithContext<Thing>;
-};
+}
 
 const escapeJsonForHtml = (json: string): string =>
   json
@@ -14,12 +14,13 @@ const escapeJsonForHtml = (json: string): string =>
 
 export const JsonLd = ({ code }: JsonLdProps) => (
   <script
+    // biome-ignore lint/security/noDangerouslySetInnerHtml: JSON-LD script with escaped content
     dangerouslySetInnerHTML={{
       __html: escapeJsonForHtml(JSON.stringify(code)),
     }}
-    // biome-ignore lint/security/noDangerouslySetInnerHtml: "This is a JSON-LD script with properly escaped content."
     type="application/ld+json"
   />
 );
 
+// biome-ignore lint/performance/noBarrelFile: re-export for package consumers
 export * from "schema-dts";

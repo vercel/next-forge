@@ -70,6 +70,7 @@ export const Social = () => (
     </div>
     <div className="columns-1 gap-4 p-8 sm:col-span-2 md:columns-2">
       <style
+        // biome-ignore lint/security/noDangerouslySetInnerHtml: inline CSS for tweet styling
         dangerouslySetInnerHTML={{
           __html: `
     .tweet-customizer-wrapper .react-tweet-theme {

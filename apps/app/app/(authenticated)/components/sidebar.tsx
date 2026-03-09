@@ -56,9 +56,9 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { Search } from "./search";
 
-type GlobalSidebarProperties = {
+interface GlobalSidebarProperties {
   readonly children: ReactNode;
-};
+}
 
 const data = {
   user: {

@@ -10,11 +10,11 @@ import { Separator } from "@repo/design-system/components/ui/separator";
 import { SidebarTrigger } from "@repo/design-system/components/ui/sidebar";
 import { Fragment, type ReactNode } from "react";
 
-type HeaderProps = {
-  pages: string[];
-  page: string;
+interface HeaderProps {
   children?: ReactNode;
-};
+  page: string;
+  pages: string[];
+}
 
 export const Header = ({ pages, page, children }: HeaderProps) => (
   <header className="flex h-16 shrink-0 items-center justify-between gap-2">

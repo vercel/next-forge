@@ -4,6 +4,7 @@
  * https://docs.sentry.io/platforms/javascript/guides/nextjs/
  */
 
+// biome-ignore lint/performance/noNamespaceImport: Sentry SDK convention
 import * as Sentry from "@sentry/nextjs";
 import { keys } from "./keys";
 

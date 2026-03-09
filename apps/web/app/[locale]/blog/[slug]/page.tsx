@@ -18,11 +18,11 @@ const protocol = env.VERCEL_PROJECT_PRODUCTION_URL?.startsWith("https")
   : "http";
 const url = new URL(`${protocol}://${env.VERCEL_PROJECT_PRODUCTION_URL}`);
 
-type BlogPostProperties = {
+interface BlogPostProperties {
   readonly params: Promise<{
     slug: string;
   }>;
-};
+}
 
 export const generateMetadata = async ({
   params,
@@ -52,7 +52,6 @@ const BlogPost = async ({ params }: BlogPostProperties) => {
 
   return (
     <Feed queries={[blog.postQuery(slug)]}>
-      {/* biome-ignore lint/suspicious/useAwait: "Server Actions must be async" */}
       {async ([data]) => {
         "use server";
 

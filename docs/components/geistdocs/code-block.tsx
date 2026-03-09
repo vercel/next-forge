@@ -13,14 +13,14 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
-type CodeBlockProps = {
+interface CodeBlockProps {
   children: ReactNode;
   className?: string;
   icon?: ReactNode;
   style?: CSSProperties;
   tabIndex?: number;
   title?: string;
-};
+}
 
 export const CodeBlock = ({
   children,

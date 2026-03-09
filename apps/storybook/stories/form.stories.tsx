@@ -8,10 +8,10 @@ import {
   FormLabel,
   FormMessage,
 } from "@repo/design-system/components/ui/form";
-import { action } from "storybook/actions";
 import type { Meta, StoryObj } from "@storybook/react";
 import { useForm } from "react-hook-form";
-import * as z from "zod";
+import { action } from "storybook/actions";
+import { object, string, type infer as zInfer } from "zod";
 
 /**
  * Building forms with React Hook Form and Zod.
@@ -28,20 +28,20 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
-const formSchema = z.object({
-  username: z.string().min(2, {
+const formSchema = object({
+  username: string().min(2, {
     message: "Username must be at least 2 characters.",
   }),
 });
 
 const ProfileForm = (args: Story["args"]) => {
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<zInfer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       username: "",
     },
   });
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  function onSubmit(values: zInfer<typeof formSchema>) {
     action("onSubmit")(values);
   }
   return (

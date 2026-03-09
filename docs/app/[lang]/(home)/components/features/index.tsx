@@ -178,7 +178,7 @@ export const Features = () => (
       aria-hidden="true"
       className="relative h-full overflow-hidden bg-background py-24 ring-inset sm:py-32"
     >
-      <div className="-translate-x-1/2 -translate-y-1/2 absolute top-1/2 left-1/2 mx-auto w-full max-w-[90%] text-center">
+      <div className="absolute top-1/2 left-1/2 mx-auto w-full max-w-[90%] -translate-x-1/2 -translate-y-1/2 text-center">
         <div className="relative z-10">
           <p className="mx-auto mt-2 max-w-3xl text-pretty font-semibold text-4xl text-foreground/10 tracking-tight sm:text-5xl md:text-6xl">
             Built with the best tools for modern developers
@@ -187,10 +187,11 @@ export const Features = () => (
       </div>
       <div className="absolute inset-0 grid grid-cols-1 pt-0 [container-type:inline-size]">
         {rows.map((rowData, index) => (
+          // biome-ignore lint/suspicious/noArrayIndexKey: static list
           <div className="group relative" key={index}>
             <div className="absolute inset-x-0 top-1/2 h-0.5 bg-[length:12px_100%] bg-gradient-to-r from-[2px] from-background/15 to-[2px] dark:from-foreground/15" />
             <div className="absolute inset-x-0 bottom-0 h-0.5 bg-[length:12px_100%] bg-gradient-to-r from-[2px] from-background/5 to-[2px] group-last:hidden dark:from-foreground/5" />
-            {rowData.row.map((logo, _logoIndex) => (
+            {rowData.row.map((logo) => (
               <div
                 className={cn(
                   logo.className,

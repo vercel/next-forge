@@ -1,4 +1,4 @@
-export type BetterStackResponse = {
+export interface BetterStackResponse {
   data: {
     id: string;
     type: string;
@@ -59,4 +59,4 @@ export type BetterStackResponse = {
     prev: unknown;
     next: unknown;
   };
-};
+}

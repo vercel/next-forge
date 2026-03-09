@@ -6,9 +6,9 @@ import { MoveRight, PhoneCall } from "lucide-react";
 import Link from "next/link";
 import { env } from "@/env";
 
-type HeroProps = {
+interface HeroProps {
   dictionary: Dictionary;
-};
+}
 
 export const Hero = async ({ dictionary }: HeroProps) => (
   <div className="w-full">

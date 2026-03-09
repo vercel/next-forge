@@ -247,6 +247,7 @@ const ChatInner = () => {
               {message.parts
                 .filter((part) => part.type === "text")
                 .map((part, index) => (
+                  // biome-ignore lint/suspicious/noArrayIndexKey: parts have no stable id
                   <MessageContent key={`${message.id}-${part.type}-${index}`}>
                     <MessageResponse
                       className="text-wrap"

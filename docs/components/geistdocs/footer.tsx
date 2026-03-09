@@ -4,9 +4,9 @@ import { LanguageSelector } from "./language-selector";
 import { RSSButton } from "./rss-button";
 import { ThemeToggle } from "./theme-toggle";
 
-type FooterProps = {
+interface FooterProps {
   copyright?: string;
-};
+}
 
 export const Footer = ({
   copyright = `Copyright Vercel ${new Date().getFullYear()}. All rights reserved.`,

@@ -11,16 +11,15 @@ import {
   NavigationMenuTrigger,
 } from "@repo/design-system/components/ui/navigation-menu";
 import type { Dictionary } from "@repo/internationalization";
-import { CommandIcon, Menu, MoveRight, X } from "lucide-react";
-import Image from "next/image";
+import { Menu, MoveRight, X } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { env } from "@/env";
 import { LanguageSwitcher } from "./language-switcher";
 
-type HeaderProps = {
+interface HeaderProps {
   dictionary: Dictionary;
-};
+}
 
 export const Header = ({ dictionary }: HeaderProps) => {
   const navigationItems = [
@@ -90,11 +89,11 @@ export const Header = ({ dictionary }: HeaderProps) => {
                             </Button>
                           </div>
                           <div className="flex h-full flex-col justify-end text-sm">
-                            {item.items?.map((subItem, idx) => (
+                            {item.items?.map((subItem) => (
                               <NavigationMenuLink
                                 className="flex flex-row items-center justify-between rounded px-4 py-2 hover:bg-muted"
                                 href={subItem.href}
-                                key={idx}
+                                key={subItem.href}
                               >
                                 <span>{subItem.title}</span>
                                 <MoveRight className="h-4 w-4 text-muted-foreground" />
@@ -112,7 +111,7 @@ export const Header = ({ dictionary }: HeaderProps) => {
         </div>
         <div className="flex items-center gap-2 lg:justify-center">
           <svg
-            className="-translate-y-[0.5px] h-[18px] w-[18px] fill-current"
+            className="h-[18px] w-[18px] -translate-y-[0.5px] fill-current"
             fill="none"
             height="22"
             viewBox="0 0 235 203"

@@ -64,11 +64,15 @@ const Page = async ({ params }: PageProps<"/[lang]/docs/[[...slug]]">) => {
             ...TabsComponents,
             ...StepsComponents,
             VercelButton,
+            // biome-ignore lint/correctness/noNestedComponentDefinitions: MDX component overrides
             Warning: ({ children }) => (
               <Callout type="warning">{children}</Callout>
             ),
+            // biome-ignore lint/correctness/noNestedComponentDefinitions: MDX component overrides
             Tip: ({ children }) => <Callout type="info">{children}</Callout>,
+            // biome-ignore lint/correctness/noNestedComponentDefinitions: MDX component overrides
             Info: ({ children }) => <Callout type="info">{children}</Callout>,
+            // biome-ignore lint/correctness/noNestedComponentDefinitions: MDX component overrides
             Note: ({ children }) => <Callout type="info">{children}</Callout>,
           })}
         />

@@ -166,10 +166,9 @@
   }
 
   .line-numbers code .line::before {
-    @apply w-4 mr-6 inline-block text-right text-muted-foreground;
-
     content: counter(step);
     counter-increment: step;
+    @apply w-4 mr-6 inline-block text-right text-muted-foreground;
   }
 }
 

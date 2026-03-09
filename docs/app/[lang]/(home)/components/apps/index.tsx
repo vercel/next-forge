@@ -109,7 +109,7 @@ export const Apps = () => (
           index > 0 && "border-t sm:border-t-0",
           index > 1 && "!border-t"
         )}
-        key={index}
+        key={app.name}
       >
         <App app={app} />
       </div>

@@ -15,12 +15,12 @@ type MyDataParts = z.infer<typeof dataPartsSchema>;
 
 export type MyTools = InferUITools<ReturnType<typeof createTools>>;
 
-type MessageMetadata = {
+interface MessageMetadata {
   isPageContext?: boolean;
   pageContext?: {
     title: string;
     url: string;
   };
-};
+}
 
 export type MyUIMessage = UIMessage<MessageMetadata, MyDataParts, MyTools>;

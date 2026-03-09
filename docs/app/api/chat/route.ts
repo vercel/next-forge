@@ -11,15 +11,15 @@ import { createSystemPrompt } from "./utils";
 
 export const maxDuration = 800;
 
-type RequestBody = {
-  messages: MyUIMessage[];
+interface RequestBody {
   currentRoute: string;
+  messages: MyUIMessage[];
   pageContext?: {
     title: string;
     url: string;
     content: string;
   };
-};
+}
 
 export async function POST(req: Request) {
   try {

@@ -2,10 +2,10 @@ import { DocsLayout as FumadocsDocsLayout } from "fumadocs-ui/layouts/docs";
 import type { ComponentProps, ReactNode } from "react";
 import { i18n } from "@/lib/geistdocs/i18n";
 
-type HomeLayoutProps = {
-  tree: ComponentProps<typeof FumadocsDocsLayout>["tree"];
+interface HomeLayoutProps {
   children: ReactNode;
-};
+  tree: ComponentProps<typeof FumadocsDocsLayout>["tree"];
+}
 
 export const HomeLayout = ({ tree, children }: HomeLayoutProps) => (
   <FumadocsDocsLayout

@@ -15,9 +15,9 @@ import type { Dictionary } from "@repo/internationalization";
 import { User } from "lucide-react";
 import { useEffect, useState } from "react";
 
-type TestimonialsProps = {
+interface TestimonialsProps {
   dictionary: Dictionary;
-};
+}
 
 export const Testimonials = ({ dictionary }: TestimonialsProps) => {
   const [api, setApi] = useState<CarouselApi>();
@@ -48,8 +48,8 @@ export const Testimonials = ({ dictionary }: TestimonialsProps) => {
           </h2>
           <Carousel className="w-full" setApi={setApi}>
             <CarouselContent>
-              {dictionary.web.home.testimonials.items.map((item, index) => (
-                <CarouselItem className="lg:basis-1/2" key={index}>
+              {dictionary.web.home.testimonials.items.map((item) => (
+                <CarouselItem className="lg:basis-1/2" key={item.name}>
                   <div className="flex aspect-video h-full flex-col justify-between rounded-md bg-muted p-6 lg:col-span-2">
                     <User className="h-8 w-8 stroke-1" />
                     <div className="flex flex-col gap-4">

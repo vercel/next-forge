@@ -10,11 +10,11 @@ import { Hero } from "./components/hero";
 import { Stats } from "./components/stats";
 import { Testimonials } from "./components/testimonials";
 
-type HomeProps = {
+interface HomeProps {
   params: Promise<{
     locale: string;
   }>;
-};
+}
 
 export const generateMetadata = async ({
   params,

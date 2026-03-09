@@ -12,9 +12,9 @@ import {
   TooltipTrigger,
 } from "@repo/design-system/components/ui/tooltip";
 
-type PresenceAvatarProps = {
+interface PresenceAvatarProps {
   info?: Liveblocks["UserMeta"]["info"];
-};
+}
 
 const PresenceAvatar = ({ info }: PresenceAvatarProps) => (
   <Tooltip delayDuration={0}>
@@ -38,7 +38,7 @@ export const AvatarStack = () => {
   const hasMoreUsers = others.length > 3;
 
   return (
-    <div className="-space-x-1 flex items-center px-4">
+    <div className="flex items-center -space-x-1 px-4">
       {others.slice(0, 3).map(({ connectionId, info }) => (
         <PresenceAvatar info={info} key={connectionId} />
       ))}
