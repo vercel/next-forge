@@ -96,9 +96,12 @@ export const blog = {
       return [];
     }
 
-    const data = await basehub.query(blog.postsQuery);
-
-    return data.blog.posts.items;
+    try {
+      const data = await basehub.query(blog.postsQuery);
+      return data.blog.posts.items;
+    } catch {
+      return [];
+    }
   },
 
   getLatestPost: async (): Promise<Post | null> => {
@@ -106,9 +109,12 @@ export const blog = {
       return null;
     }
 
-    const data = await basehub.query(blog.latestPostQuery);
-
-    return data.blog.posts.item;
+    try {
+      const data = await basehub.query(blog.latestPostQuery);
+      return data.blog.posts.item;
+    } catch {
+      return null;
+    }
   },
 
   getPost: async (slug: string): Promise<Post | null> => {
@@ -116,10 +122,13 @@ export const blog = {
       return null;
     }
 
-    const query = blog.postQuery(slug);
-    const data = await basehub.query(query);
-
-    return data.blog.posts.item;
+    try {
+      const query = blog.postQuery(slug);
+      const data = await basehub.query(query);
+      return data.blog.posts.item;
+    } catch {
+      return null;
+    }
   },
 };
 
@@ -180,9 +189,12 @@ export const legal = {
       return [];
     }
 
-    const data = await basehub.query(legal.postsQuery);
-
-    return data.legalPages.items;
+    try {
+      const data = await basehub.query(legal.postsQuery);
+      return data.legalPages.items;
+    } catch {
+      return [];
+    }
   },
 
   getLatestPost: async (): Promise<LegalPost | null> => {
@@ -190,9 +202,12 @@ export const legal = {
       return null;
     }
 
-    const data = await basehub.query(legal.latestPostQuery);
-
-    return data.legalPages.item;
+    try {
+      const data = await basehub.query(legal.latestPostQuery);
+      return data.legalPages.item;
+    } catch {
+      return null;
+    }
   },
 
   getPost: async (slug: string): Promise<LegalPost | null> => {
@@ -200,9 +215,12 @@ export const legal = {
       return null;
     }
 
-    const query = legal.postQuery(slug);
-    const data = await basehub.query(query);
-
-    return data.legalPages.item;
+    try {
+      const query = legal.postQuery(slug);
+      const data = await basehub.query(query);
+      return data.legalPages.item;
+    } catch {
+      return null;
+    }
   },
 };
