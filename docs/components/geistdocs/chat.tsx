@@ -2,13 +2,12 @@
 
 import type { UIMessage } from "@ai-sdk/react";
 import { useChat } from "@ai-sdk/react";
+import { DefaultChatTransport } from "ai";
 import { useLiveQuery } from "dexie-react-hooks";
 import { ChevronRightIcon, MessagesSquareIcon, Trash } from "lucide-react";
 import { Portal } from "radix-ui";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { harden } from "rehype-harden";
 import { toast } from "sonner";
-import { defaultRehypePlugins } from "streamdown";
 import type { MyUIMessage } from "@/app/api/chat/types";
 import {
   Conversation,
@@ -22,8 +21,6 @@ import {
 } from "@/components/ai-elements/message";
 import {
   PromptInput,
-  PromptInputAttachment,
-  PromptInputAttachments,
   PromptInputBody,
   PromptInputFooter,
   type PromptInputProps,
@@ -34,7 +31,6 @@ import {
 import { Suggestion, Suggestions } from "@/components/ai-elements/suggestion";
 import { Button } from "@/components/ui/button";
 import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
-import { suggestions } from "@/geistdocs";
 import { useChatContext } from "@/hooks/geistdocs/use-chat";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { db } from "@/lib/geistdocs/db";
@@ -46,6 +42,17 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 import { CopyChat } from "./copy-chat";
 import { MessageMetadata } from "./message-metadata";
 
+const isFromPreviousDay = (timestamp: number): boolean => {
+  const messageDate = new Date(timestamp);
+  const today = new Date();
+
+  return (
+    messageDate.getFullYear() !== today.getFullYear() ||
+    messageDate.getMonth() !== today.getMonth() ||
+    messageDate.getDate() !== today.getDate()
+  );
+};
+
 export const useChatPersistence = () => {
   const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(
     undefined
@@ -56,8 +63,23 @@ export const useChatPersistence = () => {
     db.messages.orderBy("sequence").toArray()
   );
 
+  // Clear messages if they're from a previous day
+  useEffect(() => {
+    if (storedMessages && storedMessages.length > 0) {
+      const firstMessage = storedMessages[0];
+      if (firstMessage && isFromPreviousDay(firstMessage.timestamp)) {
+        db.messages.clear();
+      }
+    }
+  }, [storedMessages]);
+
+  // Filter out stale messages from previous days
+  const freshMessages = storedMessages?.filter(
+    (msg) => !isFromPreviousDay(msg.timestamp)
+  );
+
   const initialMessages =
-    storedMessages?.map(({ timestamp, sequence, ...message }) => message) ?? [];
+    freshMessages?.map(({ timestamp, sequence, ...message }) => message) ?? [];
 
   const isLoading = storedMessages === undefined;
 
@@ -113,7 +135,17 @@ export const useChatPersistence = () => {
   };
 };
 
-const ChatInner = () => {
+interface ChatProps {
+  basePath: string | undefined;
+  suggestions: string[];
+}
+
+type ChatInnerProps = ChatProps & {
+  isOpen: boolean;
+};
+
+const ChatInner = ({ basePath, suggestions, isOpen }: ChatInnerProps) => {
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [isInitialized, setIsInitialized] = useState(false);
   const [localPrompt, setLocalPrompt] = useState("");
   const [providerKey, setProviderKey] = useState(0);
@@ -121,7 +153,10 @@ const ChatInner = () => {
   const { initialMessages, isLoading, saveMessages, clearMessages } =
     useChatPersistence();
 
-  const { messages, sendMessage, status, setMessages } = useChat({
+  const { messages, sendMessage, status, setMessages, stop } = useChat({
+    transport: new DefaultChatTransport({
+      api: basePath ? `${basePath}/api/chat` : "/api/chat",
+    }),
     onError: (error) => {
       toast.error(error.message, {
         description: error.message,
@@ -155,14 +190,32 @@ const ChatInner = () => {
     }
   }, [messages, saveMessages, isInitialized]);
 
-  const handleSuggestionClick = async (suggestion: string) => {
-    await sendMessage({ text: suggestion });
+  // Focus textarea when chat opens
+  useEffect(() => {
+    if (isOpen) {
+      // Small delay to ensure the panel/drawer animation has started
+      const timer = setTimeout(() => {
+        textareaRef.current?.focus();
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen]);
+
+  const handleSuggestionClick = async (text: string) => {
+    if (status === "streaming" || status === "submitted") {
+      return;
+    }
     setLocalPrompt("");
     setPrompt("");
+    await sendMessage({ text });
   };
 
   const handleSubmit: PromptInputProps["onSubmit"] = async (message, event) => {
     event.preventDefault();
+
+    if (status === "streaming" || status === "submitted") {
+      return;
+    }
 
     const { text } = message;
 
@@ -170,9 +223,9 @@ const ChatInner = () => {
       return;
     }
 
-    await sendMessage({ text });
     setLocalPrompt("");
     setPrompt("");
+    await sendMessage({ text });
   };
 
   const handleClearChat = async () => {
@@ -241,29 +294,14 @@ const ChatInner = () => {
               key={message.id}
             >
               <MessageMetadata
-                inProgress={status === "submitted"}
+                inProgress={status === "submitted" || status === "streaming"}
                 parts={message.parts as MyUIMessage["parts"]}
               />
               {message.parts
                 .filter((part) => part.type === "text")
                 .map((part, index) => (
-                  // biome-ignore lint/suspicious/noArrayIndexKey: parts have no stable id
                   <MessageContent key={`${message.id}-${part.type}-${index}`}>
-                    <MessageResponse
-                      className="text-wrap"
-                      rehypePlugins={[
-                        defaultRehypePlugins.raw,
-                        defaultRehypePlugins.katex,
-                        [
-                          harden,
-                          {
-                            defaultOrigin:
-                              process.env
-                                .NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL,
-                          },
-                        ],
-                      ]}
-                    >
+                    <MessageResponse className="text-wrap">
                       {part.text}
                     </MessageResponse>
                   </MessageContent>
@@ -303,10 +341,7 @@ const ChatInner = () => {
           </>
         )}
         <PromptInputProvider initialInput={localPrompt} key={providerKey}>
-          <PromptInput globalDrop multiple onSubmit={handleSubmit}>
-            <PromptInputAttachments>
-              {(attachment) => <PromptInputAttachment data={attachment} />}
-            </PromptInputAttachments>
+          <PromptInput onSubmit={handleSubmit}>
             <PromptInputBody>
               <PromptInputTextarea
                 maxLength={1000}
@@ -314,13 +349,24 @@ const ChatInner = () => {
                   setLocalPrompt(e.target.value);
                   setPrompt(e.target.value);
                 }}
+                ref={textareaRef}
               />
             </PromptInputBody>
             <PromptInputFooter>
               <p className="text-muted-foreground text-xs">
                 {localPrompt.length} / 1000
               </p>
-              <PromptInputSubmit status={status} />
+              <PromptInputSubmit
+                onClick={
+                  status === "streaming"
+                    ? (e) => {
+                        e.preventDefault();
+                        stop();
+                      }
+                    : undefined
+                }
+                status={status}
+              />
             </PromptInputFooter>
           </PromptInput>
         </PromptInputProvider>
@@ -329,7 +375,7 @@ const ChatInner = () => {
   );
 };
 
-export const Chat = () => {
+export const Chat = ({ basePath, suggestions }: ChatProps) => {
   const { isOpen, setIsOpen } = useChatContext();
   const isMobile = useIsMobile();
 
@@ -376,7 +422,11 @@ export const Chat = () => {
           )}
           data-state={isOpen ? "open" : "closed"}
         >
-          <ChatInner />
+          <ChatInner
+            basePath={basePath}
+            isOpen={isOpen}
+            suggestions={suggestions}
+          />
         </div>
       </Portal.Root>
       <div className="md:hidden">
@@ -391,7 +441,11 @@ export const Chat = () => {
             </Button>
           </DrawerTrigger>
           <DrawerContent className="h-[80dvh]">
-            <ChatInner />
+            <ChatInner
+              basePath={basePath}
+              isOpen={isOpen}
+              suggestions={suggestions}
+            />
           </DrawerContent>
         </Drawer>
       </div>

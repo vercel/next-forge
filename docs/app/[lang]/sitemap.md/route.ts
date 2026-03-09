@@ -1,30 +1,22 @@
 import type { NextRequest } from "next/server";
-import { translations } from "@/geistdocs";
 import { source } from "@/lib/geistdocs/source";
 
 export const revalidate = false;
-export const dynamic = "error";
-
-// biome-ignore lint/suspicious/useAwait: Next.js convention
-export const generateStaticParams = async () => {
-  const langs = Object.keys(translations);
-  return langs.map((lang) => ({ lang }));
-};
 
 const DOCS_PREFIX_PATTERN = /^\/docs\/?/;
 const WHITESPACE_PATTERN = /\s+/;
 
-interface PageNode {
-  children: PageNode[];
+type PageNode = {
+  title: string;
   description: string;
-  lastmod?: string;
+  url: string;
+  type?: string;
+  summary?: string;
   prerequisites?: string[];
   product?: string;
-  summary?: string;
-  title: string;
-  type?: string;
-  url: string;
-}
+  lastmod?: string;
+  children: PageNode[];
+};
 
 function buildTree(
   pages: Array<{

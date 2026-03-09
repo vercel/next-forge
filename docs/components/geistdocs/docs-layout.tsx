@@ -1,5 +1,5 @@
 import { DocsLayout as FumadocsDocsLayout } from "fumadocs-ui/layouts/docs";
-import type { ComponentProps, ReactNode } from "react";
+import type { ComponentProps, CSSProperties, ReactNode } from "react";
 import {
   Folder,
   Item,
@@ -15,6 +15,11 @@ interface DocsLayoutProps {
 
 export const DocsLayout = ({ tree, children }: DocsLayoutProps) => (
   <FumadocsDocsLayout
+    containerProps={{
+      style: {
+        "--fd-docs-row-1": "4rem",
+      } as CSSProperties,
+    }}
     i18n={i18n}
     nav={{
       enabled: false,

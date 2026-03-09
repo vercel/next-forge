@@ -81,22 +81,18 @@ User question: ${userQuestion}`,
 
     const stream = createUIMessageStream({
       originalMessages: messages,
-      execute: async ({ writer }) => {
+      execute: ({ writer }) => {
         const result = streamText({
           model: "openai/gpt-4.1-mini",
-          providerOptions: {
-            openai: {
-              reasoningEffort: "minimal",
-              reasoningSummary: "auto",
-              textVerbosity: "medium",
-              serviceTier: "priority",
-            },
-          },
-          messages: await convertToModelMessages(processedMessages),
+          messages: convertToModelMessages(processedMessages),
           stopWhen: stepCountIs(10),
           tools: createTools(writer),
           system: createSystemPrompt(currentRoute),
-          toolChoice: { type: "tool", toolName: "search_docs" },
+          prepareStep: ({ stepNumber }) => {
+            if (stepNumber === 0) {
+              return { toolChoice: { type: "tool", toolName: "search_docs" } };
+            }
+          },
         });
 
         writer.merge(result.toUIMessageStream());

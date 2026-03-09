@@ -2,8 +2,9 @@
 
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import type { SharedProps } from "fumadocs-ui/contexts/search";
 import { RootProvider } from "fumadocs-ui/provider/next";
-import type { ComponentProps } from "react";
+import { type ComponentProps, useCallback } from "react";
 import { Toaster } from "@/components/ui/sonner";
 import { useChatContext } from "@/hooks/geistdocs/use-chat";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -13,11 +14,13 @@ import { TooltipProvider } from "../ui/tooltip";
 import { SearchDialog } from "./search";
 
 type GeistdocsProviderProps = ComponentProps<typeof RootProvider> & {
+  basePath: string | undefined;
   className?: string;
   lang?: string;
 };
 
 export const GeistdocsProvider = ({
+  basePath,
   search,
   className,
   lang = i18n.defaultLanguage,
@@ -25,12 +28,18 @@ export const GeistdocsProvider = ({
 }: GeistdocsProviderProps) => {
   const { isOpen } = useChatContext();
   const isMobile = useIsMobile();
+  const isSidebarVisible = isOpen && !isMobile;
+
+  const SearchDialogComponent = useCallback(
+    (sdProps: SharedProps) => <SearchDialog basePath={basePath} {...sdProps} />,
+    [basePath]
+  );
 
   return (
     <div
       className={cn(
         "transition-all",
-        isOpen && !isMobile && "pr-96!",
+        isSidebarVisible ? "pr-96!" : null,
         className
       )}
     >
@@ -38,7 +47,7 @@ export const GeistdocsProvider = ({
         <RootProvider
           i18n={i18nProvider(lang)}
           search={{
-            SearchDialog,
+            SearchDialog: SearchDialogComponent,
             ...search,
           }}
           {...props}

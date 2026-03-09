@@ -46,14 +46,7 @@ const search_docs = (writer: UIMessageStreamWriter) =>
         log(`Found ${results.length} results`);
 
         if (results.length === 0) {
-          return {
-            content: [
-              {
-                type: "text",
-                text: `No documentation found for query: "${query}"`,
-              },
-            ],
-          };
+          return `No documentation found for query: "${query}"`;
         }
 
         log(`Processing ${results.length} results...`);
@@ -174,14 +167,7 @@ const get_doc_page = tool({
     const doc = pages.find((d) => d.url === slug || d.url.endsWith(slug));
 
     if (!doc) {
-      return {
-        content: [
-          {
-            type: "text",
-            text: `Documentation page not found: "${slug}"`,
-          },
-        ],
-      };
+      return `Documentation page not found: "${slug}"`;
     }
 
     return `# ${doc.data.title}\n\n${

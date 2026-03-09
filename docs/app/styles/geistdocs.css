@@ -3,6 +3,8 @@
 @import "fumadocs-ui/css/preset.css";
 @import "tw-animate-css";
 
+@source "../../node_modules/streamdown/dist/*.js";
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
@@ -168,7 +170,7 @@
   .line-numbers code .line::before {
     content: counter(step);
     counter-increment: step;
-    @apply w-4 mr-6 inline-block text-right text-muted-foreground;
+    @apply mr-6 inline-block w-6 text-right tabular-nums text-muted-foreground;
   }
 }
 

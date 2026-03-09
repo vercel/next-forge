@@ -39,6 +39,7 @@
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
     "react-player": "^3.4.0",
+    "react-tweet": "^3.3.0",
     "shiki": "^3.22.0",
     "sonner": "^2.0.7",
     "streamdown": "^2.1.0",

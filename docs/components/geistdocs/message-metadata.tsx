@@ -8,7 +8,6 @@ import {
   SourcesContent,
   SourcesTrigger,
 } from "../ai-elements/sources";
-import { Spinner } from "../ui/spinner";
 
 interface MessageMetadataProps {
   inProgress: boolean;
@@ -24,18 +23,12 @@ export const MessageMetadata = ({
     .filter((part) => part.type === "text" || isToolUIPart(part))
     .at(-1);
 
-  const reasoning = parts.at(-1)?.type === "reasoning";
-
   if (!lastPart) {
-    return (
-      <div className="flex items-center gap-2">
-        <Spinner />{" "}
-        {reasoning ? <Shimmer className="text-xs">Thinking...</Shimmer> : ""}
-      </div>
-    );
+    return <Shimmer className="text-xs">Thinking...</Shimmer>;
   }
 
   const tool = isToolUIPart(lastPart) ? lastPart : null;
+  const hasTextPart = parts.some((part) => part.type === "text");
 
   const sources = Array.from(
     new Map(
@@ -44,6 +37,11 @@ export const MessageMetadata = ({
         .map((part) => [part.url, part])
     ).values()
   );
+
+  // Show loading state when sources exist but text hasn't arrived yet
+  if (sources.length > 0 && !hasTextPart && inProgress) {
+    return <Shimmer className="text-xs">Searching sources...</Shimmer>;
+  }
 
   if (sources.length > 0 && !(tool && inProgress)) {
     return (
@@ -64,15 +62,6 @@ export const MessageMetadata = ({
           </ul>
         </SourcesContent>
       </Sources>
-    );
-  }
-
-  if (tool && inProgress) {
-    return (
-      <div className="flex items-center gap-2">
-        <Spinner />
-        <Shimmer>{tool.type}</Shimmer>
-      </div>
     );
   }
 

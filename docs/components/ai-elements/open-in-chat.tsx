@@ -1,11 +1,5 @@
 "use client";
 
-import {
-  ChevronDownIcon,
-  ExternalLinkIcon,
-  MessageCircleIcon,
-} from "lucide-react";
-import { type ComponentProps, createContext, useContext } from "react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -16,6 +10,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
+import {
+  ChevronDownIcon,
+  ExternalLinkIcon,
+  MessageCircleIcon,
+} from "lucide-react";
+import { type ComponentProps, createContext, useContext } from "react";
 
 const providers = {
   github: {
