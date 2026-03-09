@@ -8,7 +8,7 @@ description: How to change the database provider to Supabase.
 `next-forge` uses Neon as the database provider with Prisma as the ORM as well as Clerk for authentication. This guide will provide the steps you need to switch the database provider from Neon to Supabase. This guide is based on a few existing resources, including [Supabase's guide](https://supabase.com/partners/integrations/prisma) and [Prisma's guide](https://www.prisma.io/docs/orm/overview/databases/supabase).
 
 <Note>
- For authentication, see the [Supabase Auth migration guide](/migrations/authentication/supabase) to switch from Clerk to Supabase Auth with organization management, user roles, and more.
+ For authentication, see the [Supabase Auth migration guide](/docs/migrations/authentication/supabase) to switch from Clerk to Supabase Auth with organization management, user roles, and more.
 </Note>
 
 Here's how to switch from Neon to [Supabase](https://supabase.com) for your `next-forge` project.
@@ -94,7 +94,7 @@ pnpm run migrate
 Row Level Security (RLS) is a powerful PostgreSQL feature that allows you to control access to database rows based on the authenticated user. This is essential for multi-tenant applications where users should only see their own data.
 
 <Note>
-RLS policies use `auth.uid()` to get the authenticated user's ID from Supabase Auth. Make sure you've completed the [Supabase Auth migration](/migrations/authentication/supabase) first.
+RLS policies use `auth.uid()` to get the authenticated user's ID from Supabase Auth. Make sure you've completed the [Supabase Auth migration](/docs/migrations/authentication/supabase) first.
 </Note>
 
 ### Enable RLS on your tables
