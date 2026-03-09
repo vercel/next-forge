@@ -53,7 +53,7 @@ function CollaborativeInput() {
   const inputValue = useStorage((root) => root.inputValue);
   
   // Set the input's value
-  const setValue = useMutation(({ storage }), newValue) => {
+  const setValue = useMutation(({ storage }, newValue) => {
     storage.set("inputValue", newValue);
   }, []);
   

@@ -13,7 +13,7 @@ To generate metadata for a particular page or collection item, we can use the Ba
 
 For example, here's how we've wired up the metadata for the blog post page, using the `createMetadata` function from the [SEO](/docs/packages/seo/metadata) package:
 
-```tsx apps/web/app/blog/[slug]/page.tsx
+```tsx apps/web/app/[locale]/blog/[slug]/page.tsx
 import { blog } from '@repo/cms';
 
 type BlogPostProperties = {
@@ -80,7 +80,7 @@ export const blog = {
             _sys_slug: { eq: slug },
           },
         },
-        items: postFragment,
+        item: postFragment,
       },
     },
   }),
@@ -89,7 +89,7 @@ export const blog = {
     const query = blog.postQuery(slug);
     const data = await basehub().query(query);
 
-    return data.blog.posts.items.at(0);
+    return data.blog.posts.item;
   },
 };
 ```

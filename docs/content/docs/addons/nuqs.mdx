@@ -18,29 +18,25 @@ npm install nuqs
 Here is an example of how to use NUQS for URL search parameter state management:
 
 ```tsx title="my-component.tsx"
-import { useSearchParams } from 'nuqs';
+import { useQueryState, parseAsString } from 'nuqs';
 
 function MyComponent() {
-  const [searchParams, setSearchParams] = useSearchParams();
-
-  const handleInputChange = (event) => {
-    setSearchParams({ query: event.target.value });
-  };
+  const [query, setQuery] = useQueryState('query', parseAsString.withDefault(''));
 
   return (
     <div>
       <input
         type="text"
-        value={searchParams.query || ''}
-        onChange={handleInputChange}
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
       />
-      <p>Search Query: {searchParams.query}</p>
+      <p>Search Query: {query}</p>
     </div>
   );
 }
 ```
 
-In this example, the `useSearchParams` hook from NUQS is used to manage the state of the search query through URL search parameters. The `setSearchParams` function updates the URL search parameters whenever the input value changes.
+In this example, the `useQueryState` hook from nuqs is used to manage a single URL search parameter with type-safe parsing. The `setQuery` function updates the `query` URL parameter whenever the input value changes.
 
 ### Benefits
 

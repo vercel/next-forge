@@ -103,8 +103,13 @@ The internationalization package also includes a middleware component that autom
 
 This has already been configured for the `web` package, so you don't need to worry about it.
 
-```tsx title="apps/web/middleware.ts"
+```tsx title="apps/web/proxy.ts"
+import { createNEMO } from '@rescale/nemo';
 import { internationalizationMiddleware } from '@repo/internationalization';
 
-export default internationalizationMiddleware;
+// The i18n middleware is composed into the middleware chain
+// alongside auth and security middleware using createNEMO:
+const composed = createNEMO([...], {
+  before: [internationalizationMiddleware, arcjetMiddleware],
+});
 ```
