@@ -21,6 +21,9 @@ export const initializeSentry = (): ReturnType<typeof Sentry.init> =>
     // Setting this option to true will print useful information to the console while you're setting up Sentry.
     debug: false,
 
+    // Capture local variables in stack traces for better debugging
+    includeLocalVariables: true,
+
     // Integrations for console logging
     integrations: [
       // Send console.log, console.error, and console.warn calls as logs to Sentry
