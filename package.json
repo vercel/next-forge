@@ -19,10 +19,12 @@
     "bump-deps": "npx npm-check-updates --deep -u -x recharts && pnpm install",
     "bump-ui": "npx shadcn@latest add --all --overwrite -c packages/design-system",
     "migrate": "cd packages/database && npx prisma format && npx prisma generate && npx prisma db push",
-    "clean": "git clean -xdf node_modules"
+    "clean": "git clean -xdf node_modules",
+    "changeset": "changeset",
+    "release": "changeset publish"
   },
   "devDependencies": {
-    "@auto-it/first-time-contributor": "^11.3.6",
+    "@changesets/cli": "^2.29.4",
     "@biomejs/biome": "2.4.6",
     "@repo/typescript-config": "workspace:*",
     "@turbo/gen": "^2.8.14",
