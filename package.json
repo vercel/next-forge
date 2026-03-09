@@ -22,12 +22,10 @@
     "migrate:deploy": "cd packages/database && bunx prisma generate && bunx prisma migrate deploy",
     "db:push": "cd packages/database && bunx prisma format && bunx prisma generate && bunx prisma db push",
     "clean": "git clean -xdf node_modules",
-    "changeset": "changeset",
-    "release": "changeset publish"
+    "release": "npm publish"
   },
   "devDependencies": {
-    "@changesets/cli": "^2.30.0",
-    "@biomejs/biome": "2.4.6",
+"@biomejs/biome": "2.4.6",
     "@repo/typescript-config": "workspace:*",
     "@turbo/gen": "^2.8.14",
     "@types/node": "^25.3.5",
