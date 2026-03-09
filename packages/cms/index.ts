@@ -1,4 +1,7 @@
+import type { QueryGenqlSelection } from "basehub";
 import { basehub as basehubClient, fragmentOn } from "basehub";
+// ensures types are passed through to apps that use this package
+import type * as _types from "./basehub-types.d.ts";
 import { keys } from "./keys";
 import "./basehub.config";
 
@@ -54,24 +57,24 @@ export type PostMeta = fragmentOn.infer<typeof postMetaFragment>;
 export type Post = fragmentOn.infer<typeof postFragment>;
 
 export const blog = {
-  postsQuery: fragmentOn("Query", {
+  postsQuery: {
     blog: {
       posts: {
         items: postMetaFragment,
       },
     },
-  }),
+  } satisfies QueryGenqlSelection,
 
-  latestPostQuery: fragmentOn("Query", {
+  latestPostQuery: {
     blog: {
       posts: {
         __args: {
-          orderBy: "_sys_createdAt__DESC",
+          orderBy: "_sys_createdAt__DESC" as const,
         },
         item: postFragment,
       },
     },
-  }),
+  } satisfies QueryGenqlSelection,
 
   postQuery: (slug: string) => ({
     blog: {
@@ -132,32 +135,31 @@ export type LegalPostMeta = fragmentOn.infer<typeof legalPostMetaFragment>;
 export type LegalPost = fragmentOn.infer<typeof legalPostFragment>;
 
 export const legal = {
-  postsQuery: fragmentOn("Query", {
+  postsQuery: {
     legalPages: {
       items: legalPostFragment,
     },
-  }),
+  } satisfies QueryGenqlSelection,
 
-  latestPostQuery: fragmentOn("Query", {
+  latestPostQuery: {
     legalPages: {
       __args: {
-        orderBy: "_sys_createdAt__DESC",
+        orderBy: "_sys_createdAt__DESC" as const,
+      },
+      item: legalPostFragment,
+    },
+  } satisfies QueryGenqlSelection,
+
+  postQuery: (slug: string) => ({
+    legalPages: {
+      __args: {
+        filter: {
+          _sys_slug: { eq: slug },
+        },
       },
       item: legalPostFragment,
     },
   }),
-
-  postQuery: (slug: string) =>
-    fragmentOn("Query", {
-      legalPages: {
-        __args: {
-          filter: {
-            _sys_slug: { eq: slug },
-          },
-        },
-        item: legalPostFragment,
-      },
-    }),
 
   getPosts: async (): Promise<LegalPost[]> => {
     const data = await basehub.query(legal.postsQuery);

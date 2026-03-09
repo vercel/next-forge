@@ -2,8 +2,8 @@
   "name": "api",
   "private": true,
   "scripts": {
-    "dev": "concurrently \"npm:next\" \"npm:stripe\"",
-    "next": "bun --bun next dev -p 3002",
+    "dev": "concurrently \"npm:next-dev\" \"npm:stripe\"",
+    "next-dev": "bun --bun next dev -p 3002",
     "build": "bun --bun next build",
     "start": "bun --bun next start",
     "analyze": "ANALYZE=true npm run build",
