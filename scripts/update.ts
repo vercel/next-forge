@@ -12,8 +12,8 @@ import {
 import {
   allInternalContent,
   cleanFileName,
-  exec,
   getAvailableVersions,
+  run,
   tempDirName,
   url,
 } from "./utils.js";
@@ -38,14 +38,15 @@ const createTemporaryDirectory = async (name: string) => {
   await mkdir(tempDir, { recursive: true });
 };
 
-const cloneRepository = async (name: string) =>
-  await exec(`git clone ${url} ${name}`);
+const cloneRepository = (name: string) => {
+  run("git", ["clone", url, name]);
+};
 
-const getFiles = async (version: string) => {
-  await exec(`git checkout ${version}`);
+const getFiles = (version: string) => {
+  run("git", ["checkout", version]);
 
-  const response = await exec("git ls-files");
-  const files = response.stdout.toString().trim().split("\n");
+  const result = run("git", ["ls-files"], { stdio: "pipe" });
+  const files = result.stdout.toString().trim().split("\n");
 
   return files;
 };
@@ -58,7 +59,6 @@ const updateFiles = async (files: string[]) => {
     const sourcePath = join(tempDir, file);
     const destPath = join(cwd, file);
 
-    // Ensure destination directory exists
     await mkdir(dirname(destPath), { recursive: true });
 
     await copyFile(sourcePath, destPath);
@@ -96,28 +96,29 @@ const selectVersion = async (
   return version.toString();
 };
 
-const getDiff = async (
+const getDiff = (
   from: { version: string; files: string[] },
   to: { version: string; files: string[] }
 ) => {
   const filesToUpdate: string[] = [];
 
   for (const file of to.files) {
-    // Skip internal content that is meant to be deleted during init
     if (allInternalContent.some((ic) => file.startsWith(ic))) {
       continue;
     }
 
-    const hasChanged =
-      !from.files.includes(file) ||
-      (
-        await exec(
-          `git diff ${from.version} ${to.version} -- "${cleanFileName(file)}"`,
-          { maxBuffer: 1024 * 1024 * 1024 }
-        )
-      )
-        .toString()
-        .trim() !== "";
+    if (!from.files.includes(file)) {
+      filesToUpdate.push(file);
+      continue;
+    }
+
+    const result = run(
+      "git",
+      ["diff", from.version, to.version, "--", cleanFileName(file)],
+      { stdio: "pipe", maxBuffer: 1024 * 1024 * 1024 }
+    );
+
+    const hasChanged = result.stdout.toString().trim() !== "";
 
     if (hasChanged) {
       filesToUpdate.push(file);
@@ -135,7 +136,6 @@ export const update = async (options: { from?: string; to?: string }) => {
     const availableVersions = await getAvailableVersions();
     let currentVersion = await getCurrentVersion();
 
-    // Ditch the project version if it is not in the available versions
     if (currentVersion && !availableVersions.includes(currentVersion)) {
       currentVersion = undefined;
     }
@@ -170,19 +170,19 @@ export const update = async (options: { from?: string; to?: string }) => {
     await createTemporaryDirectory(tempDirName);
 
     s.message("Cloning next-forge...");
-    await cloneRepository(tempDirName);
+    cloneRepository(tempDirName);
 
     s.message("Moving into repository...");
     process.chdir(tempDirName);
 
     s.message(`Getting files from version ${from}...`);
-    const fromFiles = await getFiles(from);
+    const fromFiles = getFiles(from);
 
     s.message(`Getting files from version ${to}...`);
-    const toFiles = await getFiles(to);
+    const toFiles = getFiles(to);
 
     s.message(`Computing diff between versions ${from} and ${to}...`);
-    const diff = await getDiff(
+    const diff = getDiff(
       {
         version: from,
         files: fromFiles,

@@ -11,26 +11,23 @@ import {
   text,
 } from "@clack/prompts";
 import {
-  exec,
-  execSyncOpts,
   internalContentDirs,
   internalContentFiles,
+  run,
   supportedPackageManagers,
   url,
 } from "./utils.js";
 
-const cloneNextForge = async (name: string, packageManager: string) => {
-  const command = [
-    "npx create-next-app@latest",
+const cloneNextForge = (name: string, packageManager: string) => {
+  run("npx", [
+    "create-next-app@latest",
     name,
     "--example",
     url,
     "--disable-git",
     "--skip-install",
     `--use-${packageManager}`,
-  ];
-
-  await exec(command.join(" "), execSyncOpts);
+  ]);
 };
 
 const deleteInternalContent = async () => {
@@ -43,16 +40,17 @@ const deleteInternalContent = async () => {
   }
 };
 
-const installDependencies = async (packageManager: string) => {
-  const suffix = packageManager === "npm" ? "--force" : "";
+const installDependencies = (packageManager: string) => {
+  const args =
+    packageManager === "npm" ? ["install", "--force"] : ["install"];
 
-  await exec(`${packageManager} install ${suffix}`, execSyncOpts);
+  run(packageManager, args);
 };
 
-const initializeGit = async () => {
-  await exec("git init", execSyncOpts);
-  await exec("git add .", execSyncOpts);
-  await exec('git commit -m "✨ Initial commit"', execSyncOpts);
+const initializeGit = () => {
+  run("git", ["init"]);
+  run("git", ["add", "."]);
+  run("git", ["commit", "-m", "✨ Initial commit"]);
 };
 
 const setupEnvironmentVariables = async () => {
@@ -70,18 +68,10 @@ const setupEnvironmentVariables = async () => {
   }
 };
 
-const setupOrm = async (packageManager: string) => {
+const setupOrm = (packageManager: string) => {
   const filterCommand = packageManager === "npm" ? "--workspace" : "--filter";
 
-  const command = [
-    packageManager,
-    "run",
-    "build",
-    filterCommand,
-    "@repo/database",
-  ].join(" ");
-
-  await exec(command, execSyncOpts);
+  run(packageManager, ["run", "build", filterCommand, "@repo/database"]);
 };
 
 const updatePackageManagerConfiguration = async (
@@ -131,7 +121,6 @@ const updateInternalPackageDependencies = async (path: string) => {
   const pkgJson = JSON.parse(pkgJsonFile);
 
   if (pkgJson.dependencies) {
-    // Update dependencies
     const entries = Object.entries(pkgJson.dependencies);
 
     for (const [dep, version] of entries) {
@@ -142,7 +131,6 @@ const updateInternalPackageDependencies = async (path: string) => {
   }
 
   if (pkgJson.devDependencies) {
-    // Update devDependencies
     const entries = Object.entries(pkgJson.devDependencies);
 
     for (const [dep, version] of entries) {
@@ -232,7 +220,7 @@ export const initialize = async (options: {
     const projectDir = join(cwd, name);
 
     s.start("Cloning next-forge...");
-    await cloneNextForge(name, packageManager);
+    cloneNextForge(name, packageManager);
 
     s.message("Moving into repository...");
     process.chdir(projectDir);
@@ -257,14 +245,14 @@ export const initialize = async (options: {
     await deleteInternalContent();
 
     s.message("Installing dependencies...");
-    await installDependencies(packageManager);
+    installDependencies(packageManager);
 
     s.message("Setting up ORM...");
-    await setupOrm(packageManager);
+    setupOrm(packageManager);
 
     if (!options.disableGit) {
       s.message("Initializing Git repository...");
-      await initializeGit();
+      initializeGit();
     }
 
     s.stop("Project initialized successfully!");
