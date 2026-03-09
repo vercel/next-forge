@@ -158,6 +158,12 @@ export type LegalPostMeta = fragmentOn.infer<typeof legalPostMetaFragment>;
 export type LegalPost = fragmentOn.infer<typeof legalPostFragment>;
 
 export const legal = {
+  postsMetaQuery: {
+    legalPages: {
+      items: legalPostMetaFragment,
+    },
+  } satisfies QueryGenqlSelection,
+
   postsQuery: {
     legalPages: {
       items: legalPostFragment,
@@ -183,6 +189,19 @@ export const legal = {
       item: legalPostFragment,
     },
   }),
+
+  getPostsMeta: async (): Promise<LegalPostMeta[]> => {
+    if (!basehub) {
+      return [];
+    }
+
+    try {
+      const data = await basehub.query(legal.postsMetaQuery);
+      return data.legalPages.items;
+    } catch {
+      return [];
+    }
+  },
 
   getPosts: async (): Promise<LegalPost[]> => {
     if (!basehub) {
