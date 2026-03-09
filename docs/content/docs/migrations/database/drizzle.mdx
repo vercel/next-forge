@@ -15,14 +15,14 @@ Here, we'll assume you have a working Neon database and cover the second option.
 Uninstall the existing dependencies...
 
 ```sh title="Terminal"
-pnpm remove @prisma/adapter-neon @prisma/client prisma --filter @repo/database
+bun remove @prisma/adapter-neon @prisma/client prisma --filter @repo/database
 ```
 
 ...and install the new ones:
 
 ```sh title="Terminal"
-pnpm add drizzle-orm --filter @repo/database
-pnpm add -D drizzle-kit --filter @repo/database
+bun add drizzle-orm --filter @repo/database
+bun add -D drizzle-kit --filter @repo/database
 ```
 
 ## 2. Update the database connection code

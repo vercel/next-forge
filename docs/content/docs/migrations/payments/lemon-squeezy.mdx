@@ -10,13 +10,13 @@ description: How to change the default payment processor to Lemon Squeezy.
 First, uninstall the existing dependencies from the Payments package...
 
 ```sh title="Terminal"
-pnpm remove stripe --filter @repo/payments
+bun remove stripe --filter @repo/payments
 ```
 
 ... and install the new dependencies...
 
 ```sh title="Terminal"
-pnpm add @lemonsqueezy/lemonsqueezy.js --filter @repo/payments
+bun add @lemonsqueezy/lemonsqueezy.js --filter @repo/payments
 ```
 
 ## 2. Update the environment variables

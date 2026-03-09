@@ -16,7 +16,7 @@
     "analyze": "turbo analyze",
     "translate": "turbo translate",
     "boundaries": "turbo boundaries",
-    "bump-deps": "npx npm-check-updates --deep -u -x recharts && pnpm install",
+    "bump-deps": "npx npm-check-updates --deep -u -x recharts && bun install",
     "bump-ui": "npx shadcn@latest add --all --overwrite -c packages/design-system",
     "migrate": "cd packages/database && npx prisma format && npx prisma generate && npx prisma db push",
     "clean": "git clean -xdf node_modules",
@@ -38,15 +38,14 @@
   "engines": {
     "node": ">=18"
   },
-  "packageManager": "pnpm@10.31.0",
+  "packageManager": "bun@1.2.17",
   "dependencies": {
     "@clack/prompts": "^1.1.0",
     "commander": "^14.0.3"
   },
-  "pnpm": {
-    "overrides": {
-      "parse5": "^7.2.1"
-    }
+  "overrides": {
+    "parse5": "^7.2.1"
   },
-  "type": "module"
+  "type": "module",
+  "workspaces": ["apps/*", "packages/*"]
 }

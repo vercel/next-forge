@@ -10,7 +10,7 @@ program
   .option("--name <name>", "Name of the project")
   .option(
     "--package-manager <manager>",
-    "Package manager to use (npm, yarn, bun, pnpm)"
+    "Package manager to use (bun, npm, yarn, pnpm)"
   )
   .option("--disable-git", "Disable git initialization")
   .action(initialize);

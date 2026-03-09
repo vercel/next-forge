@@ -60,13 +60,13 @@ First, delete the `create-flag.ts` file.
 Then, uninstall the existing dependencies from the `feature-flags` package:
 
 ```sh title="Terminal"
-pnpm remove @repo/analytics --filter @repo/feature-flags
+bun remove @repo/analytics --filter @repo/feature-flags
 ```
 
 Then, install the new dependencies:
 
 ```sh title="Terminal"
-pnpm add hypertune server-only --filter @repo/feature-flags
+bun add hypertune server-only --filter @repo/feature-flags
 ```
 
 ## 5. Set up Hypertune code generation
@@ -85,7 +85,7 @@ Add `analyze` and `build` scripts to the `package.json` file for the `feature-fl
 Then run code generation with the following command:
 
 ```sh title="Terminal"
-pnpm build --filter @repo/feature-flags 
+bun run build --filter @repo/feature-flags 
 ```
 
 This will generate the following files:

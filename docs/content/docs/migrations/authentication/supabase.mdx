@@ -16,13 +16,13 @@ This guide assumes you've already [migrated to Supabase](/migrations/database/su
 Uninstall the existing Clerk dependencies from the `auth` package...
 
 ```sh title="Terminal"
-pnpm remove @clerk/nextjs @clerk/themes @clerk/types --filter @repo/auth
+bun remove @clerk/nextjs @clerk/themes @clerk/types --filter @repo/auth
 ```
 
 ...and install the Supabase Auth dependencies:
 
 ```sh title="Terminal"
-pnpm add @supabase/supabase-js @supabase/ssr --filter @repo/auth
+bun add @supabase/supabase-js @supabase/ssr --filter @repo/auth
 ```
 
 Additionally, add `@repo/database` to the `auth` package dependencies to enable organization/team management.
@@ -75,7 +75,7 @@ model OrganizationMember {
 Then run the migration:
 
 ```sh title="Terminal"
-pnpm run migrate
+bun run migrate
 ```
 
 ## 4. Create Supabase client utilities

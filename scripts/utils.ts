@@ -16,7 +16,7 @@ export const internalContentFiles = [
   join(".github", "CONTRIBUTING.md"),
   join(".github", "FUNDING.yml"),
   join(".github", "SECURITY.md"),
-  ".autorc",
+  ".changeset",
   "CHANGELOG.md",
   "license.md",
 ];
@@ -32,7 +32,7 @@ export const tempDirName = "next-forge-update";
 
 export const exec = promisify(execRaw);
 
-export const supportedPackageManagers = ["npm", "yarn", "bun", "pnpm"];
+export const supportedPackageManagers = ["bun", "npm", "yarn", "pnpm"];
 
 export const getAvailableVersions = async (): Promise<string[]> => {
   const changelog = await readFile("CHANGELOG.md", "utf-8");

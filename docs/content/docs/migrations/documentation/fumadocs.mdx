@@ -12,7 +12,7 @@ Fumadocs is similar to a set of libraries built on **Next.js App Router**, which
 To begin, you can use a command to initialize a Fumadocs app quicky:
 
 ```sh title="Terminal"
-pnpm create fumadocs-app
+bunx create-fumadocs-app
 ```
 
 Here we assume you have enabled Fumadocs MDX, Tailwind CSS, and without a default ESLint config.
@@ -27,7 +27,7 @@ Fumadocs is designed carefully to allow a custom content source, there's also ex
 
 ### Update your Tailwind CSS
 
-Start the app with `pnpm dev`.
+Start the app with `bun dev`.
 
 If some styles are missing, it could be due to your monorepo setup, you can change the `content` property in your Tailwind CSS config (`tailwind.config.mjs`) to ensure it works:
 
@@ -63,7 +63,7 @@ Code block titles are formatted with `title="Title"`.
 
 ````sh title="Mintlify"
 ```sh title="Name"
-pnpm i
+bun install
 ```
 ````
 
@@ -71,7 +71,7 @@ pnpm i
 
 ````sh title="Fumadocs"
 ```sh title="title="Name""
-pnpm i
+bun install
 ```
 ````
 

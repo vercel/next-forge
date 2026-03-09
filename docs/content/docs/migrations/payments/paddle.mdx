@@ -15,13 +15,13 @@ description: How to change the default payment processor to Paddle Billing.
 First, uninstall the existing dependencies from the Payments package...
 
 ```sh title="Terminal"
-pnpm remove stripe --filter @repo/payments
+bun remove stripe --filter @repo/payments
 ```
 
 ... and install the new dependencies...
 
 ```sh title="Terminal"
-pnpm add @paddle/paddle-node-sdk --filter @repo/payments
+bun add @paddle/paddle-node-sdk --filter @repo/payments
 ```
 
 ## 2. Update the Payment keys
@@ -136,7 +136,7 @@ There's quite a lot you can do with Paddle, so check out the following resources
 Create a new file for `checkout` and install `paddle-js`:
 
 ```sh title="Terminal"
-pnpm add @paddle/paddle-js --filter @repo/payments
+bun add @paddle/paddle-js --filter @repo/payments
 ```
 
 Then, create a new hook to initialize Paddle in the `packages/payments/checkout.tsx` file:

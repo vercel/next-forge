@@ -35,19 +35,19 @@ This will clone the latest version of next-forge into a temporary directory, app
 You can upgrade all the dependencies in all your `package.json` files and installs the new versions with the `bump-deps` command:
 
 ```sh title="Terminal"
-pnpm bump-deps
+bun run bump-deps
 ```
 
 This will update all the dependencies in your `package.json` files and install the new versions.
 
-<Tip>You should run a `pnpm build` after running `bump-deps` to ensure the project builds correctly. You should also run `pnpm dev` and ensure the project runs correctly in runtime.</Tip>
+<Tip>You should run a `bun run build` after running `bump-deps` to ensure the project builds correctly. You should also run `bun dev` and ensure the project runs correctly in runtime.</Tip>
 
 ## Upgrading shadcn/ui components
 
 You can upgrade all the shadcn/ui components in the [Design System](/packages/design-system/components) package with the `bump-ui` command:
 
 ```sh title="Terminal"
-pnpm bump-ui
+bun run bump-ui
 ```
 
 This will update all the shadcn/ui components, as well as the relevant dependencies in the Design System's `package.json` file.

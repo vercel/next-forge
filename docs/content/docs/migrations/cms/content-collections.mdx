@@ -10,14 +10,14 @@ It's possible to switch to [Content Collections](https://www.content-collections
 Remove the existing dependencies...
 
 ```sh title="Terminal"
-pnpm remove basehub --filter @repo/cms
+bun remove basehub --filter @repo/cms
 ```
 
 ... and install the new dependencies...
 
 ```sh title="Terminal"
-pnpm add @content-collections/mdx fumadocs-core --filter @repo/cms
-pnpm add -D @content-collections/cli @content-collections/core @content-collections/next --filter @repo/cms
+bun add @content-collections/mdx fumadocs-core --filter @repo/cms
+bun add -D @content-collections/cli @content-collections/core @content-collections/next --filter @repo/cms
 ```
 
 ## 2. Update the `.gitignore` file
@@ -265,7 +265,7 @@ export { default } from '@repo/cms/collections';
 ```
 
 <Note>
-  After creating these files, you'll need to run `pnpm build` in the `packages/cms` directory to generate the types. TypeScript errors about missing `content-collections` module will resolve after the first build.
+  After creating these files, you'll need to run `bun run build` in the `packages/cms` directory to generate the types. TypeScript errors about missing `content-collections` module will resolve after the first build.
 </Note>
 
 ## 7. Create your content

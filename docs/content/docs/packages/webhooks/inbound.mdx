@@ -9,7 +9,7 @@ next-forge has pre-built webhook handlers for several key services.
 
 [Payment events](/packages/payments) are handled in the `POST /webhooks/payments` route in the `api` app. This route constructs the event and then switches on the event type to determine how to process the event.
 
-<Info>To test webhooks locally, we've configured the Stripe CLI to forward webhooks to your local server. This will start automatically when you run `pnpm dev`.</Info>
+<Info>To test webhooks locally, we've configured the Stripe CLI to forward webhooks to your local server. This will start automatically when you run `bun dev`.</Info>
 
 ## Authentication Events
 

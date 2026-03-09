@@ -92,8 +92,8 @@ const updatePackageManagerConfiguration = async (
   const packageJsonFile = await readFile(packageJsonPath, "utf8");
   const packageJson = JSON.parse(packageJsonFile);
 
-  if (packageManager === "bun") {
-    packageJson.packageManager = "bun@1.1.43";
+  if (packageManager === "pnpm") {
+    packageJson.packageManager = "pnpm@10.31.0";
   } else if (packageManager === "npm") {
     packageJson.packageManager = "npm@10.8.1";
   } else if (packageManager === "yarn") {
@@ -105,19 +105,25 @@ const updatePackageManagerConfiguration = async (
   await writeFile(packageJsonPath, `${newPackageJson}\n`);
 };
 
-const updateWorkspaceConfiguration = async (projectDir: string) => {
+const updateWorkspaceConfiguration = async (
+  projectDir: string,
+  packageManager: string
+) => {
   const packageJsonPath = join(projectDir, "package.json");
   const packageJsonFile = await readFile(packageJsonPath, "utf8");
   const packageJson = JSON.parse(packageJsonFile);
 
-  packageJson.workspaces = ["apps/*", "packages/*"];
+  if (packageManager === "pnpm") {
+    delete packageJson.workspaces;
+    const pnpmWorkspace = "packages:\n  - 'apps/*'\n  - 'packages/*'\n";
+    await writeFile(join(projectDir, "pnpm-workspace.yaml"), pnpmWorkspace);
+  }
 
   const newPackageJson = JSON.stringify(packageJson, null, 2);
 
   await writeFile(packageJsonPath, `${newPackageJson}\n`);
 
-  await rm("pnpm-lock.yaml", { force: true });
-  await rm("pnpm-workspace.yaml", { force: true });
+  await rm("bun.lock", { force: true });
 };
 
 const updateInternalPackageDependencies = async (path: string) => {
@@ -194,7 +200,7 @@ const getPackageManager = async () => {
       value: choice,
       label: choice,
     })),
-    initialValue: "pnpm",
+    initialValue: "bun",
   });
 
   if (isCancel(value)) {
@@ -231,15 +237,17 @@ export const initialize = async (options: {
     s.message("Moving into repository...");
     process.chdir(projectDir);
 
-    if (packageManager !== "pnpm") {
+    if (packageManager !== "bun") {
       s.message("Updating package manager configuration...");
       await updatePackageManagerConfiguration(projectDir, packageManager);
 
       s.message("Updating workspace config...");
-      await updateWorkspaceConfiguration(projectDir);
+      await updateWorkspaceConfiguration(projectDir, packageManager);
 
-      s.message("Updating workspace dependencies...");
-      await updateInternalDependencies(projectDir);
+      if (packageManager !== "pnpm") {
+        s.message("Updating workspace dependencies...");
+        await updateInternalDependencies(projectDir);
+      }
     }
 
     s.message("Setting up environment variable files...");
