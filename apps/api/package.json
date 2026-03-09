@@ -20,24 +20,24 @@
     "@repo/next-config": "workspace:*",
     "@repo/observability": "workspace:*",
     "@repo/payments": "workspace:*",
-    "@sentry/nextjs": "^10.29.0",
-    "@t3-oss/env-nextjs": "^0.13.8",
-    "import-in-the-middle": "^2.0.0",
-    "next": "16.0.10",
-    "react": "19.2.1",
-    "react-dom": "19.2.1",
+    "@sentry/nextjs": "^10.42.0",
+    "@t3-oss/env-nextjs": "^0.13.10",
+    "import-in-the-middle": "^3.0.0",
+    "next": "16.1.6",
+    "react": "19.2.4",
+    "react-dom": "19.2.4",
     "require-in-the-middle": "8.0.1",
-    "svix": "^1.82.0",
-    "zod": "^4.1.13"
+    "svix": "^1.86.0",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@repo/typescript-config": "workspace:*",
-    "@types/node": "24.10.1",
-    "@types/react": "19.2.7",
+    "@types/node": "25.3.5",
+    "@types/react": "19.2.14",
     "@types/react-dom": "19.2.3",
-    "@vitejs/plugin-react": "^5.1.1",
+    "@vitejs/plugin-react": "^5.1.4",
     "concurrently": "^9.2.1",
     "typescript": "^5.9.3",
-    "vitest": "^4.0.15"
+    "vitest": "^4.0.18"
   }
 }

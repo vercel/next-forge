@@ -7,18 +7,18 @@
     "typecheck": "tsc --noEmit --emitDeclarationOnly false"
   },
   "dependencies": {
-    "@ai-sdk/openai": "^2.0.77",
-    "@t3-oss/env-nextjs": "^0.13.8",
-    "ai": "^5.0.107",
-    "react": "19.2.1",
-    "streamdown": "^1.6.10",
-    "tailwind-merge": "^3.4.0",
-    "zod": "^4.1.13"
+    "@ai-sdk/openai": "^3.0.41",
+    "@t3-oss/env-nextjs": "^0.13.10",
+    "ai": "^6.0.116",
+    "react": "19.2.4",
+    "streamdown": "^2.4.0",
+    "tailwind-merge": "^3.5.0",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@repo/typescript-config": "workspace:*",
-    "@types/node": "24.10.1",
-    "@types/react": "19.2.7",
+    "@types/node": "25.3.5",
+    "@types/react": "19.2.14",
     "@types/react-dom": "19.2.3"
   }
 }
