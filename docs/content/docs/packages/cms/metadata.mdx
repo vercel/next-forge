@@ -5,7 +5,7 @@ description: How the title, description, and Open Graph images are configured in
 
 To generate metadata for a particular page or collection item, we can use the BaseHub SDK to query the metadata, then use Next.js' `generateMetadata` function to generate the metadata.
 
-For example, here's how we've wired up the metadata for the blog post page, using the `createMetadata` function from the [SEO](/packages/seo/metadata) package:
+For example, here's how we've wired up the metadata for the blog post page, using the `createMetadata` function from the [SEO](/docs/packages/seo/metadata) package:
 
 ```tsx apps/web/app/blog/[slug]/page.tsx
 import { blog } from '@repo/cms';

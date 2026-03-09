@@ -8,7 +8,7 @@ description: How to change the authentication provider to Supabase Auth.
 `next-forge` uses Clerk as the authentication provider. This guide will help you switch from Clerk to Supabase Auth. Since Supabase doesn't provide built-in organization management like Clerk, this guide includes a multi-tenancy schema pattern to implement team/organization features with role-based access control.
 
 <Note>
-This guide assumes you've already [migrated to Supabase](/migrations/database/supabase) for your database. If you haven't done so yet, complete that migration first.
+This guide assumes you've already [migrated to Supabase](/docs/migrations/database/supabase) for your database. If you haven't done so yet, complete that migration first.
 </Note>
 
 ## 1. Replace the `auth` package dependencies
@@ -542,7 +542,7 @@ const { error } = await supabase.auth.signInWithOtp({
 ```
 
 <Note>
-To secure your database tables with Row Level Security (RLS) policies, see the [Supabase database migration guide](/migrations/database/supabase) for detailed setup instructions.
+To secure your database tables with Row Level Security (RLS) policies, see the [Supabase database migration guide](/docs/migrations/database/supabase) for detailed setup instructions.
 </Note>
 
 For more information, see the [Supabase Auth documentation](https://supabase.com/docs/guides/auth).

@@ -14,7 +14,7 @@ Feature flags (also known as feature toggles) allow you to control access to spe
 
 next-forge implements feature flags using Vercel's [Flags SDK](https://vercel.com/docs/workflow-collaboration/feature-flags/flags-pattern-nextjs), which is mostly an architectural pattern for working with feature flags. This setup exists in the `@repo/feature-flags` package, so you can import and use it in as many projects as you'd like.
 
-We've created an intelligent function called `createFlag` that you can use to create new flags, complete with authentication, PostHog integration and [Vercel Toolbar](/packages/toolbar) overrides without the hassle.
+We've created an intelligent function called `createFlag` that you can use to create new flags, complete with authentication, PostHog integration and [Vercel Toolbar](/docs/packages/toolbar) overrides without the hassle.
 
 <Tip>
   For `FLAGS_SECRET`, you can run `node -e "console.log(crypto.randomBytes(32).toString('base64url'))"` or `openssl rand -base64 32` in your terminal to generate a random value.
