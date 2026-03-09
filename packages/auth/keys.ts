@@ -12,10 +12,10 @@ export const keys = () =>
         .string()
         .startsWith("pk_")
         .optional(),
-      NEXT_PUBLIC_CLERK_SIGN_IN_URL: z.string().startsWith("/"),
-      NEXT_PUBLIC_CLERK_SIGN_UP_URL: z.string().startsWith("/"),
-      NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL: z.string().startsWith("/"),
-      NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL: z.string().startsWith("/"),
+      NEXT_PUBLIC_CLERK_SIGN_IN_URL: z.string().startsWith("/").optional(),
+      NEXT_PUBLIC_CLERK_SIGN_UP_URL: z.string().startsWith("/").optional(),
+      NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL: z.string().startsWith("/").optional(),
+      NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL: z.string().startsWith("/").optional(),
     },
     runtimeEnv: {
       CLERK_SECRET_KEY: process.env.CLERK_SECRET_KEY,

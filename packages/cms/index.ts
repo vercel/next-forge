@@ -5,9 +5,11 @@ import type * as _types from "./basehub-types.d.ts";
 import { keys } from "./keys";
 import "./basehub.config";
 
-const basehub = basehubClient({
-  token: keys().BASEHUB_TOKEN,
-});
+const { BASEHUB_TOKEN } = keys();
+
+const basehub = BASEHUB_TOKEN
+  ? basehubClient({ token: BASEHUB_TOKEN })
+  : undefined;
 
 /* -------------------------------------------------------------------------------------------------
  * Common Fragments
@@ -90,18 +92,30 @@ export const blog = {
   }),
 
   getPosts: async (): Promise<PostMeta[]> => {
+    if (!basehub) {
+      return [];
+    }
+
     const data = await basehub.query(blog.postsQuery);
 
     return data.blog.posts.items;
   },
 
   getLatestPost: async (): Promise<Post | null> => {
+    if (!basehub) {
+      return null;
+    }
+
     const data = await basehub.query(blog.latestPostQuery);
 
     return data.blog.posts.item;
   },
 
   getPost: async (slug: string): Promise<Post | null> => {
+    if (!basehub) {
+      return null;
+    }
+
     const query = blog.postQuery(slug);
     const data = await basehub.query(query);
 
@@ -162,18 +176,30 @@ export const legal = {
   }),
 
   getPosts: async (): Promise<LegalPost[]> => {
+    if (!basehub) {
+      return [];
+    }
+
     const data = await basehub.query(legal.postsQuery);
 
     return data.legalPages.items;
   },
 
   getLatestPost: async (): Promise<LegalPost | null> => {
+    if (!basehub) {
+      return null;
+    }
+
     const data = await basehub.query(legal.latestPostQuery);
 
     return data.legalPages.item;
   },
 
   getPost: async (slug: string): Promise<LegalPost | null> => {
+    if (!basehub) {
+      return null;
+    }
+
     const query = legal.postQuery(slug);
     const data = await basehub.query(query);
 

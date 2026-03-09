@@ -13,7 +13,7 @@ import { Webhook } from "svix";
 import { env } from "@/env";
 
 const handleUserCreated = (data: UserJSON) => {
-  analytics.identify({
+  analytics?.identify({
     distinctId: data.id,
     properties: {
       email: data.email_addresses.at(0)?.email_address,
@@ -25,7 +25,7 @@ const handleUserCreated = (data: UserJSON) => {
     },
   });
 
-  analytics.capture({
+  analytics?.capture({
     event: "User Created",
     distinctId: data.id,
   });
@@ -34,7 +34,7 @@ const handleUserCreated = (data: UserJSON) => {
 };
 
 const handleUserUpdated = (data: UserJSON) => {
-  analytics.identify({
+  analytics?.identify({
     distinctId: data.id,
     properties: {
       email: data.email_addresses.at(0)?.email_address,
@@ -46,7 +46,7 @@ const handleUserUpdated = (data: UserJSON) => {
     },
   });
 
-  analytics.capture({
+  analytics?.capture({
     event: "User Updated",
     distinctId: data.id,
   });
@@ -56,14 +56,14 @@ const handleUserUpdated = (data: UserJSON) => {
 
 const handleUserDeleted = (data: DeletedObjectJSON) => {
   if (data.id) {
-    analytics.identify({
+    analytics?.identify({
       distinctId: data.id,
       properties: {
         deleted: new Date(),
       },
     });
 
-    analytics.capture({
+    analytics?.capture({
       event: "User Deleted",
       distinctId: data.id,
     });
@@ -73,7 +73,7 @@ const handleUserDeleted = (data: DeletedObjectJSON) => {
 };
 
 const handleOrganizationCreated = (data: OrganizationJSON) => {
-  analytics.groupIdentify({
+  analytics?.groupIdentify({
     groupKey: data.id,
     groupType: "company",
     distinctId: data.created_by,
@@ -84,7 +84,7 @@ const handleOrganizationCreated = (data: OrganizationJSON) => {
   });
 
   if (data.created_by) {
-    analytics.capture({
+    analytics?.capture({
       event: "Organization Created",
       distinctId: data.created_by,
     });
@@ -94,7 +94,7 @@ const handleOrganizationCreated = (data: OrganizationJSON) => {
 };
 
 const handleOrganizationUpdated = (data: OrganizationJSON) => {
-  analytics.groupIdentify({
+  analytics?.groupIdentify({
     groupKey: data.id,
     groupType: "company",
     distinctId: data.created_by,
@@ -105,7 +105,7 @@ const handleOrganizationUpdated = (data: OrganizationJSON) => {
   });
 
   if (data.created_by) {
-    analytics.capture({
+    analytics?.capture({
       event: "Organization Updated",
       distinctId: data.created_by,
     });
@@ -117,13 +117,13 @@ const handleOrganizationUpdated = (data: OrganizationJSON) => {
 const handleOrganizationMembershipCreated = (
   data: OrganizationMembershipJSON
 ) => {
-  analytics.groupIdentify({
+  analytics?.groupIdentify({
     groupKey: data.organization.id,
     groupType: "company",
     distinctId: data.public_user_data.user_id,
   });
 
-  analytics.capture({
+  analytics?.capture({
     event: "Organization Member Created",
     distinctId: data.public_user_data.user_id,
   });
@@ -136,7 +136,7 @@ const handleOrganizationMembershipDeleted = (
 ) => {
   // Need to unlink the user from the group
 
-  analytics.capture({
+  analytics?.capture({
     event: "Organization Member Deleted",
     distinctId: data.public_user_data.user_id,
   });
@@ -227,7 +227,7 @@ export const POST = async (request: Request): Promise<Response> => {
     }
   }
 
-  await analytics.shutdown();
+  await analytics?.shutdown();
 
   return response;
 };

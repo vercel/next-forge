@@ -5,6 +5,8 @@ description: How next-forge handles payments and billing.
 
 next-forge uses [Stripe](https://stripe.com/) by default for payments and billing. Implementing Stripe in your project is straightforward.
 
+Stripe is an optional integration. If `STRIPE_SECRET_KEY` is not set, the `stripe` export will be `undefined` and payment webhooks will be skipped.
+
 ## In-App Purchases
 
 You can use Stripe anywhere in your app by importing the `stripe` object like so:
@@ -14,7 +16,7 @@ import { stripe } from '@repo/payments';
 
 // ...
 
-await stripe.prices.list();
+await stripe?.prices.list();
 ```
 
 ## Webhooks

@@ -5,6 +5,8 @@ description: How the CMS is configured in next-forge.
 
 next-forge has a dedicated CMS package that can be used to generate type-safe data collections from your content. This approach provides a structured way to manage your content while maintaining full type safety throughout your application. By default, next-forge uses [BaseHub](https://basehub.com) as the CMS.
 
+BaseHub is an optional integration. If `BASEHUB_TOKEN` is not set, CMS queries will return empty arrays or `null` instead of throwing errors.
+
 ## Setup
 
 Here's how to quickly get started with your new CMS.
