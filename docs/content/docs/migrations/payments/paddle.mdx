@@ -86,7 +86,7 @@ Initialize the payments client in the `packages/payments/index.ts` file with the
 
 ```ts title="packages/payments/index.ts"
 import 'server-only';
-import { type Environment, Paddle } from '@paddle/paddle-node-sdk';
+import { Paddle } from '@paddle/paddle-node-sdk';
 import { keys } from './keys';
 
 const { PADDLE_SECRET_KEY, PADDLE_ENV } = keys();
@@ -103,7 +103,7 @@ export * from '@paddle/paddle-node-sdk';
 Update the webhook handler for Paddle:
 
 ```ts title="apps/api/app/webhooks/payments/route.ts"
-import { env } from '@/env';
+import { keys } from '@repo/payments/keys';
 import { NextResponse } from 'next/server';
 import { headers } from 'next/headers';
 import { paddle } from '@repo/payments';
@@ -120,13 +120,15 @@ export const POST = async (request: Request) => {
 
     const event = await paddle.webhooks.unmarshal(
       body,
-      env.PADDLE_WEBHOOK_SECRET,
+      keys().PADDLE_WEBHOOK_SECRET,
       signature
     );
 
     switch (event.eventType) {}
 
     return NextResponse.json({ result: event, ok: true });
+  } catch (error) {
+    return NextResponse.json({ error: 'Webhook error' }, { status: 400 });
   }
 };
 ```

@@ -107,7 +107,7 @@ Add a `getHypertune.ts` file in the `feature-flags` package which defines a `get
 ```ts title="packages/feature-flags/lib/getHypertune.ts"
 import 'server-only';
 import { auth } from '@repo/auth/server';
-import { unstable_noStore as noStore } from 'next/cache';
+import { noStore } from 'next/cache';
 import type { ReadonlyHeaders } from 'next/dist/server/web/spec-extension/adapters/headers';
 import type { ReadonlyRequestCookies } from 'next/dist/server/web/spec-extension/adapters/request-cookies';
 import { createSource } from '../generated/hypertune';

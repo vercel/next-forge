@@ -44,7 +44,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 ```
 
 <Note>
-The anon key is safe to use in client-side code as it respects your Row Level Security (RLS) policies.
+The anon key is safe to use in client-side code as it respects your Row Level Security (RLS) policies. Supabase is transitioning `NEXT_PUBLIC_SUPABASE_ANON_KEY` to `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` — both work for now, but consider using the new name for new projects.
 </Note>
 
 ## 3. Set up the database schema for organizations

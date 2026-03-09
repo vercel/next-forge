@@ -83,9 +83,12 @@ datasource db {
   provider     = "postgresql"
   url          = env("DATABASE_URL")
   directUrl    = env("DIRECT_URL")
-  relationMode = "prisma"
 }
 ```
+
+<Note>
+You don't need `relationMode = "prisma"` here — Supabase is PostgreSQL and supports foreign keys natively. Only add it if you specifically need Prisma to emulate relations (e.g., for compatibility with databases that don't support foreign keys).
+</Note>
 
 Now you can run the migration from the root of your `next-forge` project:
 

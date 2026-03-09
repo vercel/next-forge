@@ -100,7 +100,7 @@ export const NotificationsProvider = ({
     <NovuProvider
       applicationIdentifier={novuAppId}
       subscriberId={userId}
-      appearance={{ colorScheme: theme }}
+      appearance={{ variables: { colorScheme: theme } }}
     >
       {children}
     </NovuProvider>

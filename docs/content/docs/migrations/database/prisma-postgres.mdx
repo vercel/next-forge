@@ -70,14 +70,20 @@ To cache a query with Prisma Client, you can add the [`swr`](https://www.prisma.
 
 ```ts title="page.tsx"
 const pages = await prisma.page.findMany({
-  swr: 60, // 60 seconds
-  ttl: 60  // 60 seconds
+  cacheStrategy: {
+    swr: 60, // 60 seconds
+    ttl: 60, // 60 seconds
+  },
 });
 ```
 
 Learn more in the [Accelerate documentation](https://www.prisma.io/docs/accelerate).
 
 ### Real-time database events
+
+<Warning>
+Prisma Pulse (`@prisma/extension-pulse`) has been paused and may be deprecated. Check the [Prisma Pulse documentation](https://www.prisma.io/docs/pulse) for the latest status before proceeding.
+</Warning>
 
 To stream database change events from your database, you first need to install the Pulse extension:
 
