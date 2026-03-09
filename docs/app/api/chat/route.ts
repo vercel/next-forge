@@ -81,7 +81,7 @@ User question: ${userQuestion}`,
 
     const stream = createUIMessageStream({
       originalMessages: messages,
-      execute: ({ writer }) => {
+      execute: async ({ writer }) => {
         const result = streamText({
           model: "openai/gpt-4.1-mini",
           providerOptions: {
