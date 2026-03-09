@@ -1,22 +1,25 @@
+# Name of our action
 name: Release
 
+# The event that will trigger the action
 on:
   push:
     branches: [main]
 
-concurrency: ${{ github.workflow }}-${{ github.ref }}
-
+# what the action will do
 jobs:
   release:
+    # The operating system it will run on
     runs-on: ubuntu-latest
+    # This check needs to be in place to prevent a publish loop with auto and github actions
+    if: "!contains(github.event.head_commit.message, 'ci skip') && !contains(github.event.head_commit.message, 'skip ci')"
+    # The list of steps that the action will go through
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Git User
-        run: |
-          git config --global user.email "next-forge[bot]@users.noreply.github.com"
-          git config --global user.name "next-forge[bot]"
+      - name: Prepare repository
+        run: git fetch --unshallow --tags
 
       - name: Install Node.js
         uses: actions/setup-node@v4
@@ -30,12 +33,8 @@ jobs:
       - name: Build CLI
         run: bunx tsup
 
-      - name: Create Release Pull Request or Publish to npm
-        id: changesets
-        uses: changesets/action@v1
-        with:
-          version: npm run changeset version
-          publish: npm run changeset publish
+      - name: Create Release
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: "" # Workaround for https://github.com/changesets/action/pull/545
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npx auto shipit
