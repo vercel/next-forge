@@ -1,5 +1,5 @@
 {
-  "plugins": ["npm", "first-time-contributor", "released"],
+  "plugins": [["npm", { "setRcToken": false }], "first-time-contributor", "released"],
   "owner": "vercel",
   "repo": "next-forge",
   "name": "Hayden Bleasel",
