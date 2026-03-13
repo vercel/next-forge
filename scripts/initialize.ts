@@ -29,12 +29,18 @@ const supportedPackageManagers: PackageManagerName[] = [
   "pnpm",
 ];
 
-const cloneNextForge = (name: string, packageManager: PackageManagerName) => {
+const cloneNextForge = (
+  name: string,
+  packageManager: PackageManagerName,
+  branch?: string
+) => {
+  const exampleUrl = branch ? `${url}/tree/${branch}` : url;
+
   run("npx", [
     "create-next-app@latest",
     name,
     "--example",
-    url,
+    exampleUrl,
     "--disable-git",
     "--skip-install",
     `--use-${packageManager}`,
@@ -220,6 +226,7 @@ export const initialize = async (options: {
   name?: string;
   packageManager?: PackageManagerName;
   disableGit?: boolean;
+  branch?: string;
 }) => {
   try {
     intro("Let's start a next-forge project!");
@@ -237,7 +244,7 @@ export const initialize = async (options: {
     const projectDir = join(cwd, name);
 
     s.start("Cloning next-forge...");
-    cloneNextForge(name, packageManager);
+    cloneNextForge(name, packageManager, options.branch);
 
     s.message("Moving into repository...");
     process.chdir(projectDir);
