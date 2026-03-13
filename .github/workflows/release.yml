@@ -24,6 +24,13 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: '22'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Update npm
+        run: npm install -g npm@latest
+
+      - name: Configure npm for OIDC
+        run: sed -i '/_authToken/d' ~/.npmrc
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
