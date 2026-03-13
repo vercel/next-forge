@@ -7,7 +7,7 @@
     "typecheck": "tsc --noEmit --emitDeclarationOnly false"
   },
   "dependencies": {
-    "@react-email/components": "1.0.8",
+    "@react-email/components": "1.0.9",
     "@t3-oss/env-nextjs": "^0.13.10",
     "react": "19.2.4",
     "react-dom": "19.2.4",
