@@ -1,3 +1,4 @@
+/// <reference path="./basehub-types.d.ts" />
 import type { QueryGenqlSelection } from "basehub";
 import { basehub as basehubClient, fragmentOn } from "basehub";
 import { keys } from "./keys";
