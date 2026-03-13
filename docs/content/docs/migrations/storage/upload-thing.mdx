@@ -1,6 +1,10 @@
 ---
 title: Switch to uploadthing
 description: How to change the default storage provider to uploadthing.
+type: integration
+summary: How to switch the storage provider to uploadthing.
+prerequisites:
+  - /docs/packages/storage
 ---
 
 [uploadthing](https://uploadthing.com) is a platform for storing files in the cloud. It's a great alternative to AWS S3 and it's free for small projects. Here's how to switch the default storage provider to uploadthing.
@@ -9,14 +13,14 @@ description: How to change the default storage provider to uploadthing.
 
 First, uninstall the existing dependencies from the Storage package...
 
-```sh title="Terminal"
-pnpm remove @vercel/blob --filter @repo/storage
+```package-install
+npm uninstall @vercel/blob --filter @repo/storage
 ```
 
 ... and install the new dependencies...
 
-```sh title="Terminal"
-pnpm add uploadthing @uploadthing/react --filter @repo/storage
+```package-install
+npm install uploadthing @uploadthing/react --filter @repo/storage
 ```
 
 ## 2. Update the environment variables
@@ -64,7 +68,7 @@ export { NextSSRPlugin as StorageSSRPlugin } from '@uploadthing/react/next-ssr-p
 
 ## 5. Create a file router in your app
 
-Create a new file in your app's `lib` directory to define the file router. This file will be used to define the file routes for your app, using your [Auth](/packages/authentication) package to get the current user.
+Create a new file in your app's `lib` directory to define the file router. This file will be used to define the file routes for your app, using your [Auth](/docs/packages/authentication) package to get the current user.
 
 ```ts title="apps/app/app/lib/upload.ts"
 import { currentUser } from '@repo/auth/server';

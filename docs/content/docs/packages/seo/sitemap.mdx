@@ -1,6 +1,12 @@
 ---
 title: Sitemap
 description: How we generate the sitemap for the website.
+type: reference
+product: SEO
+summary: How the sitemap is generated for the website.
+related:
+  - /docs/packages/seo/metadata
+  - /docs/packages/seo/json-ld
 ---
 
 next-forge automatically generates the sitemap for the website using Next.js's built-in sitemap generation functionality (`sitemap.ts`). The generation process scans different directories in the project and creates sitemap entries for various types of content:
@@ -17,20 +23,15 @@ The system first scans the `app` directory to collect all page routes:
 
 ## Content Collection
 
-The system then scans two content directories:
+The system fetches content from the CMS to include in the sitemap:
 
 ### Blog Posts
-- Reads all files in the `content/blog` directory
-- Filters out:
-  - Directory entries (only wants files)
-  - Files starting with underscore
-  - Files starting with parentheses
-- Removes the `.mdx` extension from filenames
+- Fetches all published blog posts via `blog.getPosts()` from `@repo/cms`
+- Extracts the `_slug` from each post to generate URLs under `/blog/`
 
 ### Legal Pages
-- Similarly scans the `content/legal` directory
-- Applies the same filtering rules as blog posts
-- Removes `.mdx` extensions
+- Fetches all legal pages via `legal.getPosts()` from `@repo/cms`
+- Extracts the `_slug` from each page to generate URLs under `/legal/`
 
 ## Sitemap Generation
 

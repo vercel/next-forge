@@ -1,6 +1,11 @@
 ---
 title: Database
 description: How the database and ORM are configured in next-forge.
+type: reference
+product: Database
+summary: How the database and ORM are configured.
+related:
+  - /docs/apps/studio
 ---
 
 next-forge aims to provide a robust, type-safe database client that makes it easy to work with your database while maintaining strong typing throughout your application. We aim to support tooling that:
@@ -14,8 +19,8 @@ next-forge aims to provide a robust, type-safe database client that makes it eas
 
 By default, next-forge uses [Neon](https://neon.tech) as its database provider and [Prisma](https://prisma.io) as its ORM. However, you can easily switch to other providers if you'd prefer, for example:
 
-- You can use other ORMs like [Drizzle](/migrations/database/drizzle), Kysely or any other type-safe ORM.
-- You can use other database providers like [PlanetScale](/migrations/database/planetscale), [Prisma Postgres](/migrations/database/prisma-postgres), [Supabase](/migrations/database/supabase), [EdgeDB](/migrations/database/edgedb), or any other PostgreSQL/MySQL provider.
+- You can use other ORMs like [Drizzle](/docs/migrations/database/drizzle), Kysely or any other type-safe ORM.
+- You can use other database providers like [PlanetScale](/docs/migrations/database/planetscale), [Prisma Postgres](/docs/migrations/database/prisma-postgres), [Supabase](/docs/migrations/database/supabase), [EdgeDB](/docs/migrations/database/edgedb), or any other PostgreSQL/MySQL provider.
 
 ## Usage
 
@@ -49,20 +54,36 @@ model Post {
 }
 ```
 
-### Deploying changes
+### Creating migrations
 
-To deploy your schema changes, run the following command:
+When you make changes to your schema during development, run:
 
 ```sh title="Terminal"
-pnpm migrate
+bun run migrate
 ```
 
-This runs the following commands:
+This will format the schema, regenerate the Prisma client, and create a new migration file in `packages/database/prisma/migrations/`. You'll be prompted to name the migration.
 
-- `npx prisma format` to format the schema file
-- `npx prisma generate` to generate the Prisma client
-- `npx prisma db push` to push the schema changes to the database
+### Deploying migrations
+
+To apply pending migrations in CI or production (without creating new ones), run:
+
+```sh title="Terminal"
+bun run migrate:deploy
+```
+
+This runs `prisma migrate deploy`, which is safe for production environments — it only applies existing migration files and never modifies the schema.
+
+### Prototyping
+
+If you're rapidly iterating on your schema and don't need migration history yet, you can use:
+
+```sh title="Terminal"
+bun run db:push
+```
+
+This uses `prisma db push` to push schema changes directly to the database without creating migration files. This is useful for early prototyping but should not be used in production, as it can cause data loss and doesn't maintain a migration history.
 
 ## Visual database editor
 
-next-forge includes a [visual database editor](/apps/studio) that allows you to view and edit your database records.
+next-forge includes a [visual database editor](/docs/apps/studio) that allows you to view and edit your database records.

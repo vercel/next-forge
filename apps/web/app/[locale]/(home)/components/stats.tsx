@@ -1,9 +1,9 @@
 import type { Dictionary } from "@repo/internationalization";
 import { MoveDownLeft, MoveUpRight } from "lucide-react";
 
-type StatsProps = {
+interface StatsProps {
   dictionary: Dictionary;
-};
+}
 
 export const Stats = ({ dictionary }: StatsProps) => (
   <div className="w-full py-20 lg:py-40">
@@ -21,10 +21,10 @@ export const Stats = ({ dictionary }: StatsProps) => (
         </div>
         <div className="flex items-center justify-center">
           <div className="grid w-full grid-cols-1 gap-2 text-left sm:grid-cols-2 lg:grid-cols-2">
-            {dictionary.web.home.stats.items.map((item, index) => (
+            {dictionary.web.home.stats.items.map((item) => (
               <div
                 className="flex flex-col justify-between gap-0 rounded-md border p-6"
-                key={index}
+                key={item.title}
               >
                 {Number.parseFloat(item.delta) > 0 ? (
                   <MoveUpRight className="mb-10 h-4 w-4 text-primary" />

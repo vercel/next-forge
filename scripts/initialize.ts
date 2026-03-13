@@ -11,26 +11,40 @@ import {
   text,
 } from "@clack/prompts";
 import {
-  exec,
-  execSyncOpts,
+  detectPackageManager,
+  installDependencies as nypmInstallDependencies,
+  type PackageManagerName,
+} from "nypm";
+import {
   internalContentDirs,
   internalContentFiles,
-  supportedPackageManagers,
+  run,
   url,
 } from "./utils.js";
 
-const cloneNextForge = async (name: string, packageManager: string) => {
-  const command = [
-    "npx create-next-app@latest",
+const supportedPackageManagers: PackageManagerName[] = [
+  "bun",
+  "npm",
+  "yarn",
+  "pnpm",
+];
+
+const cloneNextForge = (
+  name: string,
+  packageManager: PackageManagerName,
+  branch?: string
+) => {
+  const exampleUrl = branch ? `${url}/tree/${branch}` : url;
+
+  run("npx", [
+    "create-next-app@latest",
     name,
     "--example",
-    url,
+    exampleUrl,
     "--disable-git",
     "--skip-install",
     `--use-${packageManager}`,
-  ];
-
-  await exec(command.join(" "), execSyncOpts);
+  ]);
 };
 
 const deleteInternalContent = async () => {
@@ -43,16 +57,17 @@ const deleteInternalContent = async () => {
   }
 };
 
-const installDependencies = async (packageManager: string) => {
-  const suffix = packageManager === "npm" ? "--force" : "";
-
-  await exec(`${packageManager} install ${suffix}`, execSyncOpts);
+const installDependencies = async (packageManager: PackageManagerName) => {
+  await nypmInstallDependencies({
+    packageManager: { name: packageManager, command: packageManager },
+    silent: true,
+  });
 };
 
-const initializeGit = async () => {
-  await exec("git init", execSyncOpts);
-  await exec("git add .", execSyncOpts);
-  await exec('git commit -m "✨ Initial commit"', execSyncOpts);
+const initializeGit = () => {
+  run("git", ["init"]);
+  run("git", ["add", "."]);
+  run("git", ["commit", "-m", "✨ Initial commit"]);
 };
 
 const setupEnvironmentVariables = async () => {
@@ -70,30 +85,22 @@ const setupEnvironmentVariables = async () => {
   }
 };
 
-const setupOrm = async (packageManager: string) => {
+const setupOrm = (packageManager: PackageManagerName) => {
   const filterCommand = packageManager === "npm" ? "--workspace" : "--filter";
 
-  const command = [
-    packageManager,
-    "run",
-    "build",
-    filterCommand,
-    "@repo/database",
-  ].join(" ");
-
-  await exec(command, execSyncOpts);
+  run(packageManager, ["run", "build", filterCommand, "@repo/database"]);
 };
 
 const updatePackageManagerConfiguration = async (
   projectDir: string,
-  packageManager: string
+  packageManager: PackageManagerName
 ) => {
   const packageJsonPath = join(projectDir, "package.json");
   const packageJsonFile = await readFile(packageJsonPath, "utf8");
   const packageJson = JSON.parse(packageJsonFile);
 
-  if (packageManager === "bun") {
-    packageJson.packageManager = "bun@1.1.43";
+  if (packageManager === "pnpm") {
+    packageJson.packageManager = "pnpm@10.31.0";
   } else if (packageManager === "npm") {
     packageJson.packageManager = "npm@10.8.1";
   } else if (packageManager === "yarn") {
@@ -105,19 +112,25 @@ const updatePackageManagerConfiguration = async (
   await writeFile(packageJsonPath, `${newPackageJson}\n`);
 };
 
-const updateWorkspaceConfiguration = async (projectDir: string) => {
+const updateWorkspaceConfiguration = async (
+  projectDir: string,
+  packageManager: PackageManagerName
+) => {
   const packageJsonPath = join(projectDir, "package.json");
   const packageJsonFile = await readFile(packageJsonPath, "utf8");
   const packageJson = JSON.parse(packageJsonFile);
 
-  packageJson.workspaces = ["apps/*", "packages/*"];
+  if (packageManager === "pnpm") {
+    packageJson.workspaces = undefined;
+    const pnpmWorkspace = "packages:\n  - 'apps/*'\n  - 'packages/*'\n";
+    await writeFile(join(projectDir, "pnpm-workspace.yaml"), pnpmWorkspace);
+  }
 
   const newPackageJson = JSON.stringify(packageJson, null, 2);
 
   await writeFile(packageJsonPath, `${newPackageJson}\n`);
 
-  await rm("pnpm-lock.yaml", { force: true });
-  await rm("pnpm-workspace.yaml", { force: true });
+  await rm("bun.lock", { force: true });
 };
 
 const updateInternalPackageDependencies = async (path: string) => {
@@ -125,7 +138,6 @@ const updateInternalPackageDependencies = async (path: string) => {
   const pkgJson = JSON.parse(pkgJsonFile);
 
   if (pkgJson.dependencies) {
-    // Update dependencies
     const entries = Object.entries(pkgJson.dependencies);
 
     for (const [dep, version] of entries) {
@@ -136,7 +148,6 @@ const updateInternalPackageDependencies = async (path: string) => {
   }
 
   if (pkgJson.devDependencies) {
-    // Update devDependencies
     const entries = Object.entries(pkgJson.devDependencies);
 
     for (const [dep, version] of entries) {
@@ -187,14 +198,20 @@ const getName = async () => {
   return value.toString();
 };
 
-const getPackageManager = async () => {
+const getPackageManager = async (): Promise<PackageManagerName> => {
+  const detected = await detectPackageManager(process.cwd());
+
+  if (detected) {
+    return detected.name;
+  }
+
   const value = await select({
     message: "Which package manager would you like to use?",
     options: supportedPackageManagers.map((choice) => ({
       value: choice,
       label: choice,
     })),
-    initialValue: "pnpm",
+    initialValue: "bun" as PackageManagerName,
   });
 
   if (isCancel(value)) {
@@ -202,13 +219,14 @@ const getPackageManager = async () => {
     process.exit(0);
   }
 
-  return value.toString() as (typeof supportedPackageManagers)[number];
+  return value as PackageManagerName;
 };
 
 export const initialize = async (options: {
   name?: string;
-  packageManager?: string;
+  packageManager?: PackageManagerName;
   disableGit?: boolean;
+  branch?: string;
 }) => {
   try {
     intro("Let's start a next-forge project!");
@@ -226,20 +244,22 @@ export const initialize = async (options: {
     const projectDir = join(cwd, name);
 
     s.start("Cloning next-forge...");
-    await cloneNextForge(name, packageManager);
+    cloneNextForge(name, packageManager, options.branch);
 
     s.message("Moving into repository...");
     process.chdir(projectDir);
 
-    if (packageManager !== "pnpm") {
+    if (packageManager !== "bun") {
       s.message("Updating package manager configuration...");
       await updatePackageManagerConfiguration(projectDir, packageManager);
 
       s.message("Updating workspace config...");
-      await updateWorkspaceConfiguration(projectDir);
+      await updateWorkspaceConfiguration(projectDir, packageManager);
 
-      s.message("Updating workspace dependencies...");
-      await updateInternalDependencies(projectDir);
+      if (packageManager !== "pnpm") {
+        s.message("Updating workspace dependencies...");
+        await updateInternalDependencies(projectDir);
+      }
     }
 
     s.message("Setting up environment variable files...");
@@ -252,11 +272,11 @@ export const initialize = async (options: {
     await installDependencies(packageManager);
 
     s.message("Setting up ORM...");
-    await setupOrm(packageManager);
+    setupOrm(packageManager);
 
     if (!options.disableGit) {
       s.message("Initializing Git repository...");
-      await initializeGit();
+      initializeGit();
     }
 
     s.stop("Project initialized successfully!");

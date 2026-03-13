@@ -3,10 +3,10 @@ import type { ComponentProps } from "react";
 import { Streamdown } from "streamdown";
 import { twMerge } from "tailwind-merge";
 
-type MessageProps = {
+interface MessageProps {
   data: MessageType;
   markdown?: ComponentProps<typeof Streamdown>;
-};
+}
 
 export const Message = ({ data, markdown }: MessageProps) => (
   <div

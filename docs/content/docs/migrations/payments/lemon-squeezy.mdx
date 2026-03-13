@@ -1,22 +1,32 @@
 ---
 title: Switch to Lemon Squeezy
 description: How to change the default payment processor to Lemon Squeezy.
+type: integration
+summary: How to switch the payment processor to Lemon Squeezy.
+prerequisites:
+  - /docs/packages/payments
+related:
+  - /docs/migrations/payments/paddle
 ---
 
 [Lemon Squeezy](https://www.lemonsqueezy.com) is an all-in-one platform for running your SaaS business. It handles payments, subscriptions, global tax compliance, fraud prevention, multi-currency, and more. Here's how to switch the default payment processor from Stripe to Lemon Squeezy.
+
+<Warning>
+Lemon Squeezy was acquired by Stripe in July 2024. New signups are being transitioned to Stripe Managed Payments. If you're starting a new project, consider using Stripe directly. Existing Lemon Squeezy integrations continue to work.
+</Warning>
 
 ## 1. Swap out the required dependencies
 
 First, uninstall the existing dependencies from the Payments package...
 
-```sh title="Terminal"
-pnpm remove stripe --filter @repo/payments
+```package-install
+npm uninstall stripe --filter @repo/payments
 ```
 
 ... and install the new dependencies...
 
-```sh title="Terminal"
-pnpm add @lemonsqueezy/lemonsqueezy.js --filter @repo/payments
+```package-install
+npm install @lemonsqueezy/lemonsqueezy.js --filter @repo/payments
 ```
 
 ## 2. Update the environment variables
@@ -24,10 +34,14 @@ pnpm add @lemonsqueezy/lemonsqueezy.js --filter @repo/payments
 Next, update the environment variables across the project, for example:
 
 ```js title="apps/app/.env"
-NEXT_PUBLIC_LEMON_SQUEEZY_API_KEY=""
+LEMON_SQUEEZY_API_KEY=""
 ```
 
 Additionally, replace all instances of `STRIPE_SECRET_KEY` with `LEMON_SQUEEZY_API_KEY` in the `packages/env/index.ts` file.
+
+<Note>
+The API key should be a server-side environment variable (without the `NEXT_PUBLIC_` prefix), as it should not be exposed to the client.
+</Note>
 
 ## 3. Update the payments client
 
@@ -38,7 +52,7 @@ import { env } from '@repo/env';
 import { lemonSqueezySetup } from '@lemonsqueezy/lemonsqueezy.js';
 
 lemonSqueezySetup({
-  apiKey,
+  apiKey: env.LEMON_SQUEEZY_API_KEY,
   onError: (error) => console.error("Error!", error),
 });
 

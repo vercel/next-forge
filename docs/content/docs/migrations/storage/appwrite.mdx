@@ -1,0 +1,280 @@
+---
+title: Switch to Appwrite Storage
+description: How to change the default storage provider to Appwrite Storage.
+type: integration
+summary: How to switch the storage provider to Appwrite Storage.
+prerequisites:
+  - /docs/packages/storage
+related:
+  - /docs/migrations/storage/upload-thing
+  - /docs/migrations/authentication/appwrite
+  - /docs/migrations/database/appwrite
+---
+
+[Appwrite Storage](https://appwrite.io/docs/products/storage) is a file storage service that's part of the Appwrite platform. It provides file uploads, downloads, previews, and image transformations with built-in permission controls.
+
+`next-forge` uses Vercel Blob as the default storage provider. This guide will help you switch from Vercel Blob to Appwrite Storage.
+
+## 1. Replace the `storage` package dependencies
+
+Uninstall the existing Vercel Blob dependency from the storage package...
+
+```package-install
+npm uninstall @vercel/blob --filter @repo/storage
+```
+
+...and install the Appwrite dependencies:
+
+```package-install
+npm install node-appwrite appwrite --filter @repo/storage
+```
+
+## 2. Update environment variables
+
+Add the following environment variables to your `.env.local` file:
+
+```bash title=".env.local"
+NEXT_PUBLIC_APPWRITE_ENDPOINT=https://cloud.appwrite.io/v1
+NEXT_PUBLIC_APPWRITE_PROJECT_ID=your-project-id
+APPWRITE_API_KEY=your-api-key
+APPWRITE_BUCKET_ID=your-bucket-id
+```
+
+<Note>
+You'll need to create a storage bucket in the Appwrite Console first. Navigate to Storage → Create Bucket and note the bucket ID.
+</Note>
+
+## 3. Update the environment keys
+
+Update the `keys.ts` file to validate the new environment variables:
+
+```ts title="packages/storage/keys.ts"
+import { createEnv } from '@t3-oss/env-nextjs';
+import { z } from 'zod';
+
+export const keys = () =>
+  createEnv({
+    server: {
+      APPWRITE_API_KEY: z.string().min(1),
+      APPWRITE_BUCKET_ID: z.string().min(1),
+    },
+    client: {
+      NEXT_PUBLIC_APPWRITE_ENDPOINT: z.string().url(),
+      NEXT_PUBLIC_APPWRITE_PROJECT_ID: z.string().min(1),
+    },
+    runtimeEnv: {
+      APPWRITE_API_KEY: process.env.APPWRITE_API_KEY,
+      APPWRITE_BUCKET_ID: process.env.APPWRITE_BUCKET_ID,
+      NEXT_PUBLIC_APPWRITE_ENDPOINT:
+        process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT,
+      NEXT_PUBLIC_APPWRITE_PROJECT_ID:
+        process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID,
+    },
+  });
+```
+
+## 4. Update the server storage file
+
+Replace the contents of `index.ts` with a configured Appwrite Storage client:
+
+```ts title="packages/storage/index.ts"
+import 'server-only';
+import { Client, Storage, ID, Permission, Role, InputFile } from 'node-appwrite';
+
+const client = new Client()
+  .setEndpoint(process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT!)
+  .setProject(process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID!)
+  .setKey(process.env.APPWRITE_API_KEY!);
+
+export const storage = new Storage(client);
+export const bucketId = process.env.APPWRITE_BUCKET_ID!;
+
+export { ID, Permission, Role, InputFile };
+```
+
+## 5. Update the client storage file
+
+Update `client.ts` with client-side Appwrite Storage helpers:
+
+```ts title="packages/storage/client.ts"
+'use client';
+
+import { Client, Storage, ID } from 'appwrite';
+
+const client = new Client()
+  .setEndpoint(process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT!)
+  .setProject(process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID!);
+
+export const storage = new Storage(client);
+export { ID };
+```
+
+## 6. Create a storage bucket
+
+Create a storage bucket in the Appwrite Console:
+
+1. Go to your Appwrite project → **Storage**
+2. Click **Create Bucket**
+3. Give it a name (e.g., `uploads`)
+4. Configure allowed file extensions and maximum file size
+5. Set the bucket permissions (e.g., allow authenticated users to create files)
+6. Copy the bucket ID and set it as `APPWRITE_BUCKET_ID`
+
+You can also create a bucket programmatically:
+
+```ts title="Example: Creating a bucket"
+import { storage, Permission, Role } from '@repo/storage';
+
+await storage.createBucket(
+  'uploads',
+  'uploads',
+  [
+    Permission.read(Role.any()),
+    Permission.create(Role.users()),
+    Permission.update(Role.users()),
+    Permission.delete(Role.users()),
+  ],
+  false, // fileSecurity
+  true,  // enabled
+  10 * 1024 * 1024, // maximumFileSize (10MB)
+  ['jpg', 'jpeg', 'png', 'gif', 'webp', 'pdf'] // allowedFileExtensions
+);
+```
+
+## 7. File operations
+
+### Upload a file (server-side)
+
+```ts
+import { storage, bucketId, ID, InputFile } from '@repo/storage';
+
+const file = await storage.createFile(
+  bucketId,
+  ID.unique(),
+  InputFile.fromBuffer(buffer, 'image.png')
+);
+```
+
+### Upload a file (client-side)
+
+```ts
+import { storage, ID } from '@repo/storage/client';
+
+const bucketId = process.env.NEXT_PUBLIC_APPWRITE_BUCKET_ID!;
+
+const file = await storage.createFile(
+  bucketId,
+  ID.unique(),
+  document.getElementById('file-input').files[0]
+);
+```
+
+### Download a file
+
+```ts
+import { storage, bucketId } from '@repo/storage';
+
+const fileData = await storage.getFileDownload(bucketId, 'file-id');
+```
+
+### Delete a file
+
+```ts
+import { storage, bucketId } from '@repo/storage';
+
+await storage.deleteFile(bucketId, 'file-id');
+```
+
+### Get a file preview URL
+
+Appwrite provides built-in image transformations through the preview endpoint:
+
+```ts
+import { storage, bucketId } from '@repo/storage';
+
+// Get a preview with transformations
+const preview = storage.getFilePreview(
+  bucketId,
+  'file-id',
+  400,  // width
+  300,  // height
+  'center', // gravity
+  90    // quality
+);
+```
+
+### Get file metadata
+
+```ts
+import { storage, bucketId } from '@repo/storage';
+
+const file = await storage.getFile(bucketId, 'file-id');
+
+console.log(file.name);       // Original filename
+console.log(file.sizeOriginal); // File size in bytes
+console.log(file.mimeType);   // MIME type
+```
+
+## 8. Update your apps
+
+Replace Vercel Blob usage throughout your application:
+
+```tsx
+// Before (Vercel Blob)
+import { put, del } from '@repo/storage';
+const blob = await put('image.png', file, { access: 'public' });
+await del(blob.url);
+
+// After (Appwrite)
+import { storage, bucketId, ID, InputFile } from '@repo/storage';
+const file = await storage.createFile(
+  bucketId,
+  ID.unique(),
+  InputFile.fromBuffer(buffer, 'image.png')
+);
+await storage.deleteFile(bucketId, file.$id);
+```
+
+## 9. File permissions
+
+Appwrite supports fine-grained file-level permissions. You can set permissions when creating files:
+
+```ts
+import { storage, bucketId, ID, Permission, Role, InputFile } from '@repo/storage';
+
+const file = await storage.createFile(
+  bucketId,
+  ID.unique(),
+  InputFile.fromBuffer(buffer, 'private-doc.pdf'),
+  [
+    Permission.read(Role.user('user-123')),
+    Permission.update(Role.user('user-123')),
+    Permission.delete(Role.user('user-123')),
+  ]
+);
+```
+
+## Additional features
+
+### Image transformations
+
+Appwrite Storage provides built-in image transformations without needing a separate image CDN:
+
+- Resize (width, height)
+- Crop with gravity (center, top-left, etc.)
+- Quality adjustment
+- Format conversion
+- Border radius and background color
+- Rotation and opacity
+
+### Bucket configuration
+
+Each bucket can be configured with:
+
+- **Allowed file extensions** — Restrict which file types can be uploaded
+- **Maximum file size** — Set upload size limits
+- **Encryption** — Enable at-rest encryption
+- **Antivirus** — Scan uploaded files for malware
+- **Compression** — Automatic file compression (gzip, zstd)
+
+For more information, see the [Appwrite Storage documentation](https://appwrite.io/docs/products/storage).

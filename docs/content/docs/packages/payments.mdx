@@ -1,9 +1,16 @@
 ---
 title: Payments
 description: How next-forge handles payments and billing.
+type: reference
+product: Payments
+summary: How payments and billing are configured with Stripe.
+related:
+  - /docs/packages/webhooks/inbound
 ---
 
 next-forge uses [Stripe](https://stripe.com/) by default for payments and billing. Implementing Stripe in your project is straightforward.
+
+Stripe is an optional integration. If `STRIPE_SECRET_KEY` is not set, the `stripe` export will be `undefined` and payment webhooks will be skipped.
 
 ## In-App Purchases
 
@@ -14,12 +21,12 @@ import { stripe } from '@repo/payments';
 
 // ...
 
-await stripe.prices.list();
+await stripe?.prices.list();
 ```
 
 ## Webhooks
 
-next-forge has a pre-built webhook handler for payment events. Read more about [inbound payment webhooks](/packages/webhooks/inbound#payment-events).
+next-forge has a pre-built webhook handler for payment events. Read more about [inbound payment webhooks](/docs/packages/webhooks/inbound#payment-events).
 
 ## Anti-Fraud
 
@@ -58,7 +65,7 @@ Stripe Radar supports more [advanced anti-fraud features](https://docs.stripe.co
     Add the same script to the website in `apps/web/app/layout.tsx`.
   </Step>
   <Step title="Prevent common fraud patterns with Arcjet">
-    Prevent common fraud patterns by using [Arcjet](/packages/security/application) [IP address analysis](https://docs.arcjet.com/reference/nextjs#ip-analysis) to [block requests from VPNs and proxies](https://docs.arcjet.com/blueprints/vpn-proxy-detection). These are commonly used by fraudsters to hide their location, but have legitimate uses as well so are not blocked by default. You could simply block these users, or you could adjust the checkout process to require approval before processing their payment. 
+    Prevent common fraud patterns by using [Arcjet](/docs/packages/security/application) [IP address analysis](https://docs.arcjet.com/reference/nextjs#ip-analysis) to [block requests from VPNs and proxies](https://docs.arcjet.com/blueprints/vpn-proxy-detection). These are commonly used by fraudsters to hide their location, but have legitimate uses as well so are not blocked by default. You could simply block these users, or you could adjust the checkout process to require approval before processing their payment. 
   </Step>
 </Steps>
 

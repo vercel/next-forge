@@ -1,6 +1,10 @@
 ---
 title: Switch to Content Collections
 description: How to switch to Content Collections.
+type: integration
+summary: How to switch to Content Collections for the CMS.
+prerequisites:
+  - /docs/packages/cms/overview
 ---
 
 It's possible to switch to [Content Collections](https://www.content-collections.dev/) to generate type-safe data collections from MDX files. This approach provides a structured way to manage blog posts while maintaining full type safety throughout your application.
@@ -9,15 +13,15 @@ It's possible to switch to [Content Collections](https://www.content-collections
 
 Remove the existing dependencies...
 
-```sh title="Terminal"
-pnpm remove basehub --filter @repo/cms
+```package-install
+npm uninstall basehub --filter @repo/cms
 ```
 
 ... and install the new dependencies...
 
-```sh title="Terminal"
-pnpm add @content-collections/mdx fumadocs-core --filter @repo/cms
-pnpm add -D @content-collections/cli @content-collections/core @content-collections/next --filter @repo/cms
+```package-install
+npm install @content-collections/mdx fumadocs-core --filter @repo/cms
+npm install -D @content-collections/cli @content-collections/core @content-collections/next --filter @repo/cms
 ```
 
 ## 2. Update the `.gitignore` file
@@ -133,7 +137,7 @@ export const Toolbar = () => null;
 ### Table of Contents
 
 ```tsx title="packages/cms/components/toc.tsx"
-import { getTableOfContents } from 'fumadocs-core/server';
+import { getTableOfContents } from 'fumadocs-core/content/toc';
 
 type TableOfContentsProperties = {
   data: string;
@@ -265,7 +269,7 @@ export { default } from '@repo/cms/collections';
 ```
 
 <Note>
-  After creating these files, you'll need to run `pnpm build` in the `packages/cms` directory to generate the types. TypeScript errors about missing `content-collections` module will resolve after the first build.
+  After creating these files, you'll need to run `bun run build` in the `packages/cms` directory to generate the types. TypeScript errors about missing `content-collections` module will resolve after the first build.
 </Note>
 
 ## 7. Create your content
@@ -295,7 +299,7 @@ Finally, remove all instances of `BASEHUB_TOKEN` from the `@repo/env` package.
 
 ### Fumadocs MDX Plugins
 
-You can use the [Fumadocs](/migrations/documentation/fumadocs) MDX plugins to enhance your MDX content.
+You can use the [Fumadocs](/docs/migrations/documentation/fumadocs) MDX plugins to enhance your MDX content.
 
 ```ts title="{1-6,8-13,20-23}"
 import {

@@ -3,3 +3,5 @@ import { initializeSentry } from "@repo/observability/client";
 
 initializeSentry();
 initializeAnalytics();
+
+export { onRouterTransitionStart } from "@repo/observability/client";

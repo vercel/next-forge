@@ -1,6 +1,10 @@
 ---
 title: Switch to ESLint
 description: How to change the default linter to ESLint.
+type: integration
+summary: How to switch the linter to ESLint.
+prerequisites:
+  - /docs/packages/formatting
 ---
 
 Here's how to switch from Biome to [ESLint](https://eslint.org). In this example, we'll also add the Next.js and React plugins, as well as the new ESLint Flat Config.
@@ -9,14 +13,14 @@ Here's how to switch from Biome to [ESLint](https://eslint.org). In this example
 
 First, uninstall the existing dependencies from the root `package.json` file...
 
-```sh title="Terminal"
-pnpm remove -w @biomejs/biome ultracite
+```package-install
+npm uninstall @biomejs/biome ultracite
 ```
 
 ...and install the new ones:
 
-```sh title="Terminal"
-pnpm add -w -D eslint eslint-plugin-next eslint-plugin-react eslint-plugin-react-hooks typescript-eslint
+```package-install
+npm install -D eslint @next/eslint-plugin-next eslint-plugin-react eslint-plugin-react-hooks typescript-eslint
 ```
 
 ## 2. Configure ESLint
@@ -87,7 +91,7 @@ As Next.js uses ESLint for linting, we can re-enable the `lint` script in the ro
 ```json title="apps/app/package.json {3}"
 {
   "scripts": {
-    "lint": "next lint"
+    "lint": "bun --bun next lint"
   }
 }
 ```

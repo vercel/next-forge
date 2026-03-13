@@ -1,9 +1,9 @@
 import { SiGithub } from "@icons-pack/react-simple-icons";
 import { github } from "@/geistdocs";
 
-type EditSourceProps = {
+interface EditSourceProps {
   path: string | undefined;
-};
+}
 
 export const EditSource = ({ path }: EditSourceProps) => {
   let url: string | undefined;

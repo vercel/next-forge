@@ -11,13 +11,21 @@ const I18nMiddleware = createI18nMiddleware({
   defaultLocale: "en",
   urlMappingStrategy: "rewriteDefault",
   resolveLocaleFromRequest: (request: NextRequest) => {
-    const headers = Object.fromEntries(request.headers.entries());
-    const negotiator = new Negotiator({ headers });
-    const acceptedLanguages = negotiator.languages();
+    try {
+      const headers = Object.fromEntries(request.headers.entries());
+      const negotiator = new Negotiator({ headers });
+      const acceptedLanguages = negotiator
+        .languages()
+        .filter((lang) => lang !== "*");
 
-    const matchedLocale = matchLocale(acceptedLanguages, locales, "en");
+      if (acceptedLanguages.length === 0) {
+        return "en";
+      }
 
-    return matchedLocale;
+      return matchLocale(acceptedLanguages, locales, "en");
+    } catch {
+      return "en";
+    }
   },
 });
 
@@ -25,7 +33,9 @@ export const internationalizationMiddleware = (request: NextRequest) =>
   I18nMiddleware(request);
 
 export const config = {
-  matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
+  matcher: [
+    "/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
+  ],
 };
 
 //https://nextjs.org/docs/app/building-your-application/routing/internationalization

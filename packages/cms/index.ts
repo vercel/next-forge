@@ -1,12 +1,13 @@
+import type { QueryGenqlSelection } from "basehub";
 import { basehub as basehubClient, fragmentOn } from "basehub";
-// ensures types are passed through to apps that use this package
-import type * as _types from "./basehub-types.d.ts";
 import { keys } from "./keys";
 import "./basehub.config";
 
-const basehub = basehubClient({
-  token: keys().BASEHUB_TOKEN,
-});
+const { BASEHUB_TOKEN } = keys();
+
+const basehub = BASEHUB_TOKEN
+  ? basehubClient({ token: BASEHUB_TOKEN })
+  : undefined;
 
 /* -------------------------------------------------------------------------------------------------
  * Common Fragments
@@ -56,24 +57,24 @@ export type PostMeta = fragmentOn.infer<typeof postMetaFragment>;
 export type Post = fragmentOn.infer<typeof postFragment>;
 
 export const blog = {
-  postsQuery: fragmentOn("Query", {
+  postsQuery: {
     blog: {
       posts: {
         items: postMetaFragment,
       },
     },
-  }),
+  } satisfies QueryGenqlSelection,
 
-  latestPostQuery: fragmentOn("Query", {
+  latestPostQuery: {
     blog: {
       posts: {
         __args: {
-          orderBy: "_sys_createdAt__DESC",
+          orderBy: "_sys_createdAt__DESC" as const,
         },
         item: postFragment,
       },
     },
-  }),
+  } satisfies QueryGenqlSelection,
 
   postQuery: (slug: string) => ({
     blog: {
@@ -89,22 +90,43 @@ export const blog = {
   }),
 
   getPosts: async (): Promise<PostMeta[]> => {
-    const data = await basehub.query(blog.postsQuery);
+    if (!basehub) {
+      return [];
+    }
 
-    return data.blog.posts.items;
+    try {
+      const data = await basehub.query(blog.postsQuery);
+      return data.blog.posts.items;
+    } catch {
+      return [];
+    }
   },
 
   getLatestPost: async (): Promise<Post | null> => {
-    const data = await basehub.query(blog.latestPostQuery);
+    if (!basehub) {
+      return null;
+    }
 
-    return data.blog.posts.item;
+    try {
+      const data = await basehub.query(blog.latestPostQuery);
+      return data.blog.posts.item;
+    } catch {
+      return null;
+    }
   },
 
   getPost: async (slug: string): Promise<Post | null> => {
-    const query = blog.postQuery(slug);
-    const data = await basehub.query(query);
+    if (!basehub) {
+      return null;
+    }
 
-    return data.blog.posts.item;
+    try {
+      const query = blog.postQuery(slug);
+      const data = await basehub.query(query);
+      return data.blog.posts.item;
+    } catch {
+      return null;
+    }
   },
 };
 
@@ -134,49 +156,88 @@ export type LegalPostMeta = fragmentOn.infer<typeof legalPostMetaFragment>;
 export type LegalPost = fragmentOn.infer<typeof legalPostFragment>;
 
 export const legal = {
-  postsQuery: fragmentOn("Query", {
+  postsMetaQuery: {
+    legalPages: {
+      items: legalPostMetaFragment,
+    },
+  } satisfies QueryGenqlSelection,
+
+  postsQuery: {
     legalPages: {
       items: legalPostFragment,
     },
-  }),
+  } satisfies QueryGenqlSelection,
 
-  latestPostQuery: fragmentOn("Query", {
+  latestPostQuery: {
     legalPages: {
       __args: {
-        orderBy: "_sys_createdAt__DESC",
+        orderBy: "_sys_createdAt__DESC" as const,
+      },
+      item: legalPostFragment,
+    },
+  } satisfies QueryGenqlSelection,
+
+  postQuery: (slug: string) => ({
+    legalPages: {
+      __args: {
+        filter: {
+          _sys_slug: { eq: slug },
+        },
       },
       item: legalPostFragment,
     },
   }),
 
-  postQuery: (slug: string) =>
-    fragmentOn("Query", {
-      legalPages: {
-        __args: {
-          filter: {
-            _sys_slug: { eq: slug },
-          },
-        },
-        item: legalPostFragment,
-      },
-    }),
+  getPostsMeta: async (): Promise<LegalPostMeta[]> => {
+    if (!basehub) {
+      return [];
+    }
+
+    try {
+      const data = await basehub.query(legal.postsMetaQuery);
+      return data.legalPages.items;
+    } catch {
+      return [];
+    }
+  },
 
   getPosts: async (): Promise<LegalPost[]> => {
-    const data = await basehub.query(legal.postsQuery);
+    if (!basehub) {
+      return [];
+    }
 
-    return data.legalPages.items;
+    try {
+      const data = await basehub.query(legal.postsQuery);
+      return data.legalPages.items;
+    } catch {
+      return [];
+    }
   },
 
   getLatestPost: async (): Promise<LegalPost | null> => {
-    const data = await basehub.query(legal.latestPostQuery);
+    if (!basehub) {
+      return null;
+    }
 
-    return data.legalPages.item;
+    try {
+      const data = await basehub.query(legal.latestPostQuery);
+      return data.legalPages.item;
+    } catch {
+      return null;
+    }
   },
 
   getPost: async (slug: string): Promise<LegalPost | null> => {
-    const query = legal.postQuery(slug);
-    const data = await basehub.query(query);
+    if (!basehub) {
+      return null;
+    }
 
-    return data.legalPages.item;
+    try {
+      const query = legal.postQuery(slug);
+      const data = await basehub.query(query);
+      return data.legalPages.item;
+    } catch {
+      return null;
+    }
   },
 };

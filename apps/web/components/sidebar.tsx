@@ -1,12 +1,12 @@
 import { capitalize } from "@repo/design-system/lib/utils";
 import type { ReactNode } from "react";
 
-type SidebarProperties = {
+interface SidebarProperties {
   readonly date: Date;
   readonly readingTime: string;
   readonly tags?: string[];
   readonly toc?: ReactNode;
-};
+}
 
 export const Sidebar = async ({
   date,

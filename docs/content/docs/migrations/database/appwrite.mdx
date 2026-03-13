@@ -1,0 +1,366 @@
+---
+title: Switch to Appwrite Databases
+description: How to change the database provider to Appwrite Databases.
+type: integration
+summary: How to switch the database provider to Appwrite Databases.
+prerequisites:
+  - /docs/packages/database
+related:
+  - /docs/migrations/database/supabase
+  - /docs/migrations/authentication/appwrite
+  - /docs/migrations/storage/appwrite
+---
+
+[Appwrite Databases](https://appwrite.io/docs/products/databases) is a document database service that's part of the Appwrite platform. It provides a flexible schema system with collections, documents, and built-in permissions.
+
+`next-forge` uses Neon as the database provider with Prisma as the ORM. This guide will help you switch from Neon and Prisma to Appwrite Databases.
+
+<Warning>
+Appwrite uses a document database model, not SQL. There is no Prisma ORM equivalent — you'll use Appwrite's SDK and Query builder instead. Your data model will need to be restructured around collections and documents rather than relational tables.
+</Warning>
+
+## 1. Replace the `database` package dependencies
+
+Uninstall the existing Neon and Prisma dependencies from the `database` package...
+
+```package-install
+npm uninstall @neondatabase/serverless @prisma/adapter-neon @prisma/client prisma ws @types/ws --filter @repo/database
+```
+
+...and install the Appwrite dependency:
+
+```package-install
+npm install node-appwrite --filter @repo/database
+```
+
+## 2. Update environment variables
+
+Add the following environment variables to your `.env.local` file. You can find these values in your Appwrite project's Settings page:
+
+```bash title=".env.local"
+NEXT_PUBLIC_APPWRITE_ENDPOINT=https://cloud.appwrite.io/v1
+NEXT_PUBLIC_APPWRITE_PROJECT_ID=your-project-id
+APPWRITE_API_KEY=your-api-key
+APPWRITE_DATABASE_ID=your-database-id
+```
+
+<Note>
+You'll need to create a database in the Appwrite Console first. The `APPWRITE_DATABASE_ID` is the ID of the database you create.
+</Note>
+
+## 3. Update the environment keys
+
+Update the `keys.ts` file to validate the new environment variables:
+
+```ts title="packages/database/keys.ts"
+import { createEnv } from '@t3-oss/env-nextjs';
+import { z } from 'zod';
+
+export const keys = () =>
+  createEnv({
+    server: {
+      APPWRITE_API_KEY: z.string().min(1),
+      APPWRITE_DATABASE_ID: z.string().min(1),
+    },
+    client: {
+      NEXT_PUBLIC_APPWRITE_ENDPOINT: z.string().url(),
+      NEXT_PUBLIC_APPWRITE_PROJECT_ID: z.string().min(1),
+    },
+    runtimeEnv: {
+      APPWRITE_API_KEY: process.env.APPWRITE_API_KEY,
+      APPWRITE_DATABASE_ID: process.env.APPWRITE_DATABASE_ID,
+      NEXT_PUBLIC_APPWRITE_ENDPOINT:
+        process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT,
+      NEXT_PUBLIC_APPWRITE_PROJECT_ID:
+        process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID,
+    },
+  });
+```
+
+## 4. Update the database package
+
+Replace the contents of `index.ts` with a configured Appwrite Databases client:
+
+```ts title="packages/database/index.ts"
+import 'server-only';
+import { Client, Databases, Query, ID, Permission, Role } from 'node-appwrite';
+
+const client = new Client()
+  .setEndpoint(process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT!)
+  .setProject(process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID!)
+  .setKey(process.env.APPWRITE_API_KEY!);
+
+export const database = new Databases(client);
+export const databaseId = process.env.APPWRITE_DATABASE_ID!;
+
+export { Query, ID, Permission, Role };
+```
+
+## 5. Remove Prisma files
+
+Delete the Prisma-specific files that are no longer needed:
+
+```sh title="Terminal"
+rm -rf packages/database/prisma packages/database/prisma.config.ts
+```
+
+Also remove any Prisma-related scripts from your `package.json` files (e.g., `migrate`, `generate`, `studio`).
+
+## 6. Understanding Appwrite's data model
+
+Appwrite organizes data differently from SQL databases:
+
+| SQL (Prisma) | Appwrite |
+| --- | --- |
+| Database | Database |
+| Table | Collection |
+| Row | Document |
+| Column | Attribute |
+| Migration | Console / SDK |
+
+Collections are defined with typed attributes (string, integer, boolean, float, email, enum, URL, IP, datetime, relationship) and can be created via the Appwrite Console or programmatically with the SDK.
+
+## 7. Create collections
+
+You can create collections through the Appwrite Console, or programmatically using the server SDK. Here's an example of creating a `posts` collection:
+
+```ts title="Example: Creating a collection"
+import { database, databaseId, ID, Permission, Role } from '@repo/database';
+
+await database.createCollection(
+  databaseId,
+  ID.unique(),
+  'posts',
+  [
+    Permission.read(Role.any()),
+    Permission.create(Role.users()),
+    Permission.update(Role.users()),
+    Permission.delete(Role.users()),
+  ]
+);
+```
+
+Then define its attributes:
+
+```ts title="Example: Defining attributes"
+const collectionId = 'your-collection-id';
+
+await database.createStringAttribute(
+  databaseId,
+  collectionId,
+  'title',
+  255,
+  true // required
+);
+
+await database.createStringAttribute(
+  databaseId,
+  collectionId,
+  'content',
+  10000,
+  false // optional
+);
+
+await database.createStringAttribute(
+  databaseId,
+  collectionId,
+  'authorId',
+  255,
+  true
+);
+
+await database.createDatetimeAttribute(
+  databaseId,
+  collectionId,
+  'publishedAt',
+  false
+);
+```
+
+<Note>
+For most projects, it's easier to create collections and attributes through the Appwrite Console UI rather than programmatically.
+</Note>
+
+## 8. Perform CRUD operations
+
+Here's how to perform basic CRUD operations with the Appwrite SDK:
+
+### Create a document
+
+```ts
+import { database, databaseId, ID } from '@repo/database';
+
+const post = await database.createDocument(
+  databaseId,
+  'posts', // collection ID
+  ID.unique(),
+  {
+    title: 'Hello World',
+    content: 'This is my first post.',
+    authorId: 'user-123',
+    publishedAt: new Date().toISOString(),
+  }
+);
+```
+
+### Read documents
+
+```ts
+import { database, databaseId, Query } from '@repo/database';
+
+// Get a single document
+const post = await database.getDocument(
+  databaseId,
+  'posts',
+  'document-id'
+);
+
+// List documents with filters
+const posts = await database.listDocuments(
+  databaseId,
+  'posts',
+  [
+    Query.equal('authorId', 'user-123'),
+    Query.orderDesc('publishedAt'),
+    Query.limit(10),
+  ]
+);
+```
+
+### Update a document
+
+```ts
+import { database, databaseId } from '@repo/database';
+
+const updated = await database.updateDocument(
+  databaseId,
+  'posts',
+  'document-id',
+  {
+    title: 'Updated Title',
+  }
+);
+```
+
+### Delete a document
+
+```ts
+import { database, databaseId } from '@repo/database';
+
+await database.deleteDocument(
+  databaseId,
+  'posts',
+  'document-id'
+);
+```
+
+## 9. Permissions
+
+Appwrite uses a document-level permissions system instead of SQL's Row Level Security. You can set permissions when creating or updating documents:
+
+```ts
+import { database, databaseId, ID, Permission, Role } from '@repo/database';
+
+const post = await database.createDocument(
+  databaseId,
+  'posts',
+  ID.unique(),
+  {
+    title: 'Private Post',
+    content: 'Only I can see this.',
+    authorId: 'user-123',
+  },
+  [
+    Permission.read(Role.user('user-123')),
+    Permission.update(Role.user('user-123')),
+    Permission.delete(Role.user('user-123')),
+  ]
+);
+```
+
+Common permission patterns:
+
+- `Role.any()` — Anyone (including guests)
+- `Role.users()` — Any authenticated user
+- `Role.user('userId')` — A specific user
+- `Role.team('teamId')` — Members of a specific team
+- `Role.team('teamId', 'admin')` — Team members with a specific role
+
+## 10. Update your apps
+
+Replace Prisma queries throughout your application with Appwrite SDK calls:
+
+```tsx
+// Before (Prisma)
+import { database } from '@repo/database';
+const posts = await database.post.findMany({
+  where: { authorId: userId },
+  orderBy: { createdAt: 'desc' },
+});
+
+// After (Appwrite)
+import { database, databaseId, Query } from '@repo/database';
+const { documents: posts } = await database.listDocuments(
+  databaseId,
+  'posts',
+  [
+    Query.equal('authorId', userId),
+    Query.orderDesc('$createdAt'),
+    Query.limit(25),
+  ]
+);
+```
+
+## Additional features
+
+### Realtime subscriptions
+
+Appwrite supports realtime subscriptions on the client side. You can listen for changes to documents:
+
+```ts
+import { client } from '@repo/auth/client';
+
+const unsubscribe = client.subscribe(
+  `databases.${databaseId}.collections.posts.documents`,
+  (response) => {
+    // Handle realtime event
+    console.log(response);
+  }
+);
+```
+
+### Relationships
+
+Appwrite supports relationships between collections. You can create one-to-one, one-to-many, and many-to-many relationships via the Console or SDK:
+
+```ts
+import { database, databaseId } from '@repo/database';
+
+await database.createRelationshipAttribute(
+  databaseId,
+  'posts',
+  'comments',
+  'oneToMany',
+  false,
+  'postId',
+  'comments'
+);
+```
+
+### Indexes
+
+For better query performance, create indexes on frequently queried attributes:
+
+```ts
+import { database, databaseId } from '@repo/database';
+
+await database.createIndex(
+  databaseId,
+  'posts',
+  'idx_authorId',
+  'key',
+  ['authorId']
+);
+```
+
+For more information, see the [Appwrite Databases documentation](https://appwrite.io/docs/products/databases).

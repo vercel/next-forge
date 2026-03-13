@@ -9,9 +9,9 @@ import type { Dictionary } from "@repo/internationalization";
 import { PhoneCall } from "lucide-react";
 import Link from "next/link";
 
-type FAQProps = {
+interface FAQProps {
   dictionary: Dictionary;
-};
+}
 
 export const FAQ = ({ dictionary }: FAQProps) => (
   <div className="w-full py-20 lg:py-40">
@@ -38,8 +38,8 @@ export const FAQ = ({ dictionary }: FAQProps) => (
           </div>
         </div>
         <Accordion className="w-full" collapsible type="single">
-          {dictionary.web.home.faq.items.map((item, index) => (
-            <AccordionItem key={index} value={`index-${index}`}>
+          {dictionary.web.home.faq.items.map((item) => (
+            <AccordionItem key={item.question} value={item.question}>
               <AccordionTrigger>{item.question}</AccordionTrigger>
               <AccordionContent>{item.answer}</AccordionContent>
             </AccordionItem>

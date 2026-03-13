@@ -1,9 +1,13 @@
 ---
 title: Switch to Fumadocs
 description: How to change the documentation provider to Fumadocs.
+type: integration
+summary: How to switch the documentation provider to Fumadocs.
+prerequisites:
+  - /docs/apps/docs
 ---
 
-[Fumadocs](https://fumadocs.vercel.app) is a beautiful & powerful docs framework powered by Next.js, allowing advanced customisations.
+[Fumadocs](https://fumadocs.dev) is a beautiful & powerful docs framework powered by Next.js, allowing advanced customisations.
 
 ## 1. Create a Fumadocs App
 
@@ -12,7 +16,7 @@ Fumadocs is similar to a set of libraries built on **Next.js App Router**, which
 To begin, you can use a command to initialize a Fumadocs app quicky:
 
 ```sh title="Terminal"
-pnpm create fumadocs-app
+bunx create-fumadocs-app
 ```
 
 Here we assume you have enabled Fumadocs MDX, Tailwind CSS, and without a default ESLint config.
@@ -27,7 +31,7 @@ Fumadocs is designed carefully to allow a custom content source, there's also ex
 
 ### Update your Tailwind CSS
 
-Start the app with `pnpm dev`.
+Start the app with `bun dev`.
 
 If some styles are missing, it could be due to your monorepo setup, you can change the `content` property in your Tailwind CSS config (`tailwind.config.mjs`) to ensure it works:
 
@@ -53,7 +57,7 @@ Fumadocs, same as Mintlify, utilize MDX for content files. You can move the `.md
 
 <Note>Fumadocs requires a `title` frontmatter property.</Note>
 
-The MDX syntax of Fumadocs is almost identical to Mintlify, despite from having different components and usage for code blocks. Visit [Markdown](https://fumadocs.vercel.app/docs/ui/markdown) for supported Markdown syntax.
+The MDX syntax of Fumadocs is almost identical to Mintlify, despite from having different components and usage for code blocks. Visit [Markdown](https://fumadocs.dev/docs/ui/markdown) for supported Markdown syntax.
 
 ### Code Block
 
@@ -63,7 +67,7 @@ Code block titles are formatted with `title="Title"`.
 
 ````sh title="Mintlify"
 ```sh title="Name"
-pnpm i
+bun install
 ```
 ````
 
@@ -71,7 +75,7 @@ pnpm i
 
 ````sh title="Fumadocs"
 ```sh title="title="Name""
-pnpm i
+bun install
 ```
 ````
 
@@ -137,7 +141,7 @@ console.log('B');
 </Tabs>
 ````
 
-Fumadocs also has a built-in integration for TypeScript Twoslash, check it out in the [Setup Guide](https://fumadocs.vercel.app/docs/ui/twoslash).
+Fumadocs also has a built-in integration for TypeScript Twoslash, check it out in the [Setup Guide](https://fumadocs.dev/docs/ui/twoslash).
 
 ### Callout
 
@@ -198,7 +202,7 @@ Fumadocs also support the rest operator (`...`) if you want to include the other
 }
 ```
 
-Visit the [Pages Organization Guide](https://fumadocs.vercel.app/docs/ui/page-conventions) for an overview of supported syntaxs.
+Visit the [Pages Organization Guide](https://fumadocs.dev/docs/ui/page-conventions) for an overview of supported syntaxs.
 
 ### Appearance
 
@@ -240,7 +244,7 @@ export default {
 };
 ```
 
-See [all available presets](https://fumadocs.vercel.app/docs/ui/theme#presets).
+See [all available presets](https://fumadocs.dev/docs/ui/theme#presets).
 
 ### Layout Styles
 
@@ -272,10 +276,10 @@ export const baseOptions: BaseLayoutProps = {
 };
 ```
 
-See [all supported items](https://fumadocs.vercel.app/docs/ui/blocks/links).
+See [all supported items](https://fumadocs.dev/docs/ui/blocks/links).
 
 ## Done
 
 Now, you should be able to build and preview the docs.
 
-Visit [Fumadocs](https://fumadocs.vercel.app/docs/ui) for details and additional features.
+Visit [Fumadocs](https://fumadocs.dev/docs/ui) for details and additional features.

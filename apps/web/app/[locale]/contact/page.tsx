@@ -3,11 +3,11 @@ import { createMetadata } from "@repo/seo/metadata";
 import type { Metadata } from "next";
 import { ContactForm } from "./components/contact-form";
 
-type ContactProps = {
+interface ContactProps {
   params: Promise<{
     locale: string;
   }>;
-};
+}
 
 export const generateMetadata = async ({
   params,

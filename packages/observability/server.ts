@@ -4,6 +4,7 @@
  * https://docs.sentry.io/platforms/javascript/guides/nextjs/
  */
 
+// biome-ignore lint/performance/noNamespaceImport: Sentry SDK convention
 import * as Sentry from "@sentry/nextjs";
 import { keys } from "./keys";
 
@@ -19,6 +20,9 @@ export const initializeSentry = (): ReturnType<typeof Sentry.init> =>
 
     // Setting this option to true will print useful information to the console while you're setting up Sentry.
     debug: false,
+
+    // Capture local variables in stack traces for better debugging
+    includeLocalVariables: true,
 
     // Integrations for console logging
     integrations: [

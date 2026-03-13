@@ -1,19 +1,25 @@
 ---
 title: Inbound Webhooks
 description: Receive inbound webhooks from other services.
+type: reference
+product: Webhooks
+summary: How to receive inbound webhooks from other services.
+related:
+  - /docs/packages/webhooks/outbound
+  - /docs/packages/authentication
 ---
 
 next-forge has pre-built webhook handlers for several key services.
 
 ## Payment Events
 
-[Payment events](/packages/payments) are handled in the `POST /webhooks/payments` route in the `api` app. This route constructs the event and then switches on the event type to determine how to process the event.
+[Payment events](/docs/packages/payments) are handled in the `POST /webhooks/payments` route in the `api` app. This route constructs the event and then switches on the event type to determine how to process the event.
 
-<Info>To test webhooks locally, we've configured the Stripe CLI to forward webhooks to your local server. This will start automatically when you run `pnpm dev`.</Info>
+<Info>To test webhooks locally, we've configured the Stripe CLI to forward webhooks to your local server. This will start automatically when you run `bun dev`.</Info>
 
 ## Authentication Events
 
-[Authentication events](/packages/authentication) are handled in the `POST /webhooks/auth` route in the `api` app. 
+[Authentication events](/docs/packages/authentication) are handled in the `POST /webhooks/auth` route in the `api` app. 
 
 <Tip>Make sure you enable the webhook events you need in your Clerk project settings.</Tip>
 
@@ -25,4 +31,4 @@ Currently there's no way to easily test Clerk webhooks locally, so you'll have t
 
 One of the most common use cases for inbound webhooks is to notify your application when a database record is created, updated, or deleted. This allows you to react to changes asynchronously, rather than polling the database, cron jobs or other methods.
 
-If you [migrate to Supabase](/migrations/database/supabase), they have an incredibly powerful feature called [Database Webhooks](https://supabase.com/docs/guides/database/webhooks) that helps with this.
+If you [migrate to Supabase](/docs/migrations/database/supabase), they have an incredibly powerful feature called [Database Webhooks](https://supabase.com/docs/guides/database/webhooks) that helps with this.

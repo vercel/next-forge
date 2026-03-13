@@ -9,9 +9,9 @@ import {
 import type { Dictionary } from "@repo/internationalization";
 import { useEffect, useState } from "react";
 
-type CasesProps = {
+interface CasesProps {
   dictionary: Dictionary;
-};
+}
 
 export const Cases = ({ dictionary }: CasesProps) => {
   const [api, setApi] = useState<CarouselApi>();
@@ -43,6 +43,7 @@ export const Cases = ({ dictionary }: CasesProps) => {
           <Carousel className="w-full" setApi={setApi}>
             <CarouselContent>
               {Array.from({ length: 15 }).map((_, index) => (
+                // biome-ignore lint/suspicious/noArrayIndexKey: static list
                 <CarouselItem className="basis-1/4 lg:basis-1/6" key={index}>
                   <div className="flex aspect-square items-center justify-center rounded-md bg-muted p-6">
                     <span className="text-sm">Logo {index + 1}</span>

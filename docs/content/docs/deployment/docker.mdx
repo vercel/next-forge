@@ -1,0 +1,162 @@
+---
+title: Deploying with Docker
+description: How to deploy next-forge with Docker for self-hosting.
+type: guide
+summary: How to deploy next-forge with Docker for self-hosting.
+prerequisites:
+  - /docs/setup/env
+related:
+  - /docs/deployment/vercel
+  - /docs/deployment/netlify
+---
+
+Docker lets you self-host next-forge on any platform that supports containers — such as [Railway](https://railway.app), [Fly.io](https://fly.io), [Coolify](https://coolify.io), [DigitalOcean App Platform](https://www.digitalocean.com/products/app-platform), or your own server.
+
+## Enable standalone output
+
+First, you'll need to enable Next.js [standalone output](https://nextjs.org/docs/app/api-reference/config/next-config-js/output#automatically-copying-traced-files) in your shared config. This creates a self-contained build that includes only the files needed to run your app, significantly reducing the final image size.
+
+In `packages/next-config/index.ts`, add the `output` property:
+
+```ts title="packages/next-config/index.ts"
+export const config: NextConfig = {
+  output: "standalone",
+
+  // ... rest of your config
+};
+```
+
+## Create a Dockerfile
+
+Create a `Dockerfile` in the root of your repository. This uses a multi-stage build to keep the final image small:
+
+```dockerfile title="Dockerfile"
+FROM oven/bun:1 AS base
+
+# Stage 1: Install dependencies
+FROM base AS deps
+WORKDIR /app
+COPY package.json bun.lock turbo.json ./
+COPY apps/ ./apps/
+COPY packages/ ./packages/
+RUN bun install --frozen-lockfile
+
+# Stage 2: Build the application
+FROM base AS builder
+WORKDIR /app
+COPY --from=deps /app/ ./
+
+# Set the app to build: app, web, or api
+ARG APP_NAME=app
+ENV APP_NAME=$APP_NAME
+
+# Add build-time environment variables here
+# ARG DATABASE_URL
+# ENV DATABASE_URL=$DATABASE_URL
+
+RUN bun run build --filter=@repo/${APP_NAME}
+
+# Stage 3: Production runner
+FROM node:20-slim AS runner
+WORKDIR /app
+
+ENV NODE_ENV=production
+
+RUN addgroup --system --gid 1001 nodejs && \
+    adduser --system --uid 1001 nextjs
+
+# Set the app to run
+ARG APP_NAME=app
+ENV APP_NAME=$APP_NAME
+
+COPY --from=builder /app/apps/${APP_NAME}/public ./apps/${APP_NAME}/public
+COPY --from=builder --chown=nextjs:nodejs /app/apps/${APP_NAME}/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/apps/${APP_NAME}/.next/static ./apps/${APP_NAME}/.next/static
+
+USER nextjs
+
+EXPOSE 3000
+ENV PORT=3000
+ENV HOSTNAME="0.0.0.0"
+
+CMD ["node", "apps/${APP_NAME}/server.js"]
+```
+
+<Callout type="info">
+  The `CMD` above uses a shell-interpolated variable. If your container runtime doesn't support this, replace `${APP_NAME}` with the actual app name e.g. `node apps/app/server.js`.
+</Callout>
+
+## Create a .dockerignore
+
+Add a `.dockerignore` to speed up builds and keep secrets out of the image:
+
+```txt title=".dockerignore"
+node_modules
+.next
+.git
+.env
+.env.*
+```
+
+## Build and run
+
+Build and run the image for a specific app by passing the `APP_NAME` build argument:
+
+```bash
+# Build the app
+docker build --build-arg APP_NAME=app -t next-forge-app .
+
+# Run it
+docker run -p 3000:3000 --env-file .env.local next-forge-app
+```
+
+Repeat for `web` and `api` if you want to deploy all three.
+
+## Using Docker Compose
+
+If you'd prefer to run all apps together, create a `docker-compose.yml`:
+
+```yaml title="docker-compose.yml"
+services:
+  app:
+    build:
+      context: .
+      args:
+        APP_NAME: app
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env.local
+
+  web:
+    build:
+      context: .
+      args:
+        APP_NAME: web
+    ports:
+      - "3001:3000"
+    env_file:
+      - .env.local
+
+  api:
+    build:
+      context: .
+      args:
+        APP_NAME: api
+    ports:
+      - "3002:3000"
+    env_file:
+      - .env.local
+```
+
+Then run everything with:
+
+```bash
+docker compose up --build
+```
+
+## Environment variables
+
+When deploying with Docker, pass your environment variables at runtime using `--env-file` or `-e` flags. Do not bake secrets into the image. Learn more about how [environment variables](/docs/setup/env) work in next-forge.
+
+If certain variables are needed at build time (e.g. `DATABASE_URL` for Prisma), uncomment the relevant `ARG` and `ENV` lines in the builder stage.

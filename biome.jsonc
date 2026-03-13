@@ -4,6 +4,13 @@
   "javascript": {
     "globals": ["Liveblocks"]
   },
+  "linter": {
+    "rules": {
+      "performance": {
+        "noBarrelFile": "off"
+      }
+    }
+  },
   "files": {
     "includes": [
       "**/*",
@@ -11,9 +18,7 @@
       "!packages/design-system/lib",
       "!packages/design-system/hooks",
       "!packages/collaboration/config.ts",
-      "!docs/components/ui",
-      "!docs/lib",
-      "!docs/hooks",
+      "!docs",
       "!apps/docs/**/*.json",
       "!apps/email/.react-email",
       "!packages/cms/basehub-types.d.ts"

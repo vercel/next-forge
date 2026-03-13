@@ -1,0 +1,232 @@
+---
+title: Switch to Convex
+description: How to change the database provider to Convex.
+type: integration
+summary: How to switch the database provider to Convex.
+prerequisites:
+  - /docs/packages/database
+---
+
+[Convex](https://convex.dev) is a reactive database platform with real-time sync, TypeScript-first backend functions, and fully managed infrastructure. Unlike traditional databases, Convex combines the database, server functions, and real-time subscriptions into a single platform.
+
+`next-forge` uses Neon as the database provider with Prisma as the ORM. This guide will provide the steps you need to switch the database provider from Neon to Convex. Since Convex replaces both the database and ORM layers, this is a more significant change than switching between SQL databases.
+
+Here's how to switch from Neon to [Convex](https://convex.dev) for your `next-forge` project.
+
+## 1. Sign up to Convex
+
+Create a free account at [convex.dev](https://convex.dev). You can manage your projects through the [Convex Dashboard](https://dashboard.convex.dev).
+
+## 2. Replace the dependencies
+
+Uninstall the existing dependencies...
+
+```package-install
+npm uninstall @neondatabase/serverless @prisma/adapter-neon @prisma/client prisma ws @types/ws --filter @repo/database
+```
+
+... and install Convex:
+
+```package-install
+npm install convex --filter @repo/database
+```
+
+## 3. Initialize Convex
+
+From the root of your project, run:
+
+```sh title="Terminal"
+npx convex dev
+```
+
+This will prompt you to log in, create a new project, and generate a `convex/` directory in your project root with the configuration files. It will also create a `.env.local` file with your `CONVEX_DEPLOYMENT` and `NEXT_PUBLIC_CONVEX_URL` variables.
+
+## 4. Set up the Convex client provider
+
+Create a client component to wrap your app with the Convex provider. Add this to your app:
+
+```tsx title="packages/database/provider.tsx"
+'use client';
+
+import type { ReactNode } from 'react';
+import { ConvexProvider, ConvexReactClient } from 'convex/react';
+import { keys } from './keys';
+
+const convex = new ConvexReactClient(keys().NEXT_PUBLIC_CONVEX_URL);
+
+export const ConvexClientProvider = ({ children }: { children: ReactNode }) => (
+  <ConvexProvider client={convex}>
+    {children}
+  </ConvexProvider>
+);
+```
+
+Then wrap your app layout with the provider:
+
+```tsx title="apps/app/app/layout.tsx"
+import { ConvexClientProvider } from '@repo/database/provider';
+
+// ...
+
+const RootLayout = ({ children }: { children: ReactNode }) => (
+  <html lang="en">
+    <body>
+      <ConvexClientProvider>
+        {children}
+      </ConvexClientProvider>
+    </body>
+  </html>
+);
+
+export default RootLayout;
+```
+
+## 5. Update the database package
+
+Replace the contents of the database package's main export. Since Convex uses its own function system instead of a traditional client, the export changes significantly:
+
+```ts title="packages/database/index.ts"
+export { ConvexClientProvider } from './provider';
+```
+
+Delete the `prisma/` directory from `@repo/database`:
+
+```sh title="Terminal"
+rm -rf packages/database/prisma
+```
+
+Update `keys.ts` to use the Convex environment variable:
+
+```ts title="packages/database/keys.ts"
+import { createEnv } from '@t3-oss/env-nextjs';
+import { z } from 'zod';
+
+export const keys = () =>
+  createEnv({
+    client: {
+      NEXT_PUBLIC_CONVEX_URL: z.url(),
+    },
+    runtimeEnv: {
+      NEXT_PUBLIC_CONVEX_URL: process.env.NEXT_PUBLIC_CONVEX_URL,
+    },
+  });
+```
+
+## 6. Define your schema
+
+Create a schema file in the `convex/` directory. Here's an example equivalent to the default Prisma `Page` model:
+
+```ts title="convex/schema.ts"
+import { defineSchema, defineTable } from 'convex/server';
+import { v } from 'convex/values';
+
+export default defineSchema({
+  pages: defineTable({
+    title: v.string(),
+    content: v.optional(v.string()),
+  }),
+});
+```
+
+Run `npx convex dev` to push your schema to Convex and generate types.
+
+## 7. Write queries and mutations
+
+Create server functions for your data access. Convex uses its own function system instead of raw SQL or an ORM:
+
+```ts title="convex/pages.ts"
+import { query, mutation } from './_generated/server';
+import { v } from 'convex/values';
+
+export const list = query({
+  handler: async (ctx) => {
+    return await ctx.db.query('pages').collect();
+  },
+});
+
+export const create = mutation({
+  args: {
+    title: v.string(),
+    content: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    return await ctx.db.insert('pages', args);
+  },
+});
+```
+
+## 8. Update your app code
+
+Convex uses React hooks for data fetching with automatic real-time updates. Update your components to use `useQuery` and `useMutation`:
+
+```tsx title="app/(authenticated)/components/pages-list.tsx"
+'use client';
+
+import { useQuery, useMutation } from 'convex/react';
+import { api } from '@repo/convex/_generated/api';
+
+export const PagesList = () => {
+  const pages = useQuery(api.pages.list);
+  const createPage = useMutation(api.pages.create);
+
+  return (
+    <div>
+      <button onClick={() => createPage({ title: 'New Page' })}>
+        Create Page
+      </button>
+      {pages?.map((page) => (
+        <div key={page._id}>{page.title}</div>
+      ))}
+    </div>
+  );
+};
+```
+
+<Note>
+Convex queries are reactive by default — your UI will automatically update when the underlying data changes, without any additional configuration.
+</Note>
+
+For server-side data fetching (e.g. in Server Components), use the Convex HTTP client:
+
+```tsx title="app/(authenticated)/page.tsx"
+import { ConvexHttpClient } from 'convex/browser';
+import { api } from '@repo/convex/_generated/api';
+
+const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
+
+const App = async () => {
+  const pages = await convex.query(api.pages.list);
+
+  return (
+    <div>
+      {pages.map((page) => (
+        <div key={page._id}>{page.title}</div>
+      ))}
+    </div>
+  );
+};
+
+export default App;
+```
+
+## 9. Replace Prisma Studio
+
+Delete the now unused Prisma Studio app:
+
+```sh title="Terminal"
+rm -rf apps/studio
+```
+
+To manage your data, use the [Convex Dashboard](https://dashboard.convex.dev) which provides a data browser, function logs, and deployment management.
+
+## 10. Deploy
+
+When deploying your app, set the `NEXT_PUBLIC_CONVEX_URL` environment variable in your hosting provider (e.g. Vercel). You can find this URL in your [Convex Dashboard](https://dashboard.convex.dev) under your project's settings.
+
+To deploy your Convex functions to production, run:
+
+```sh title="Terminal"
+npx convex deploy
+```
+
+This deploys your schema and server functions to your production Convex instance.

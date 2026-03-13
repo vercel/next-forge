@@ -2,9 +2,9 @@ import { ModeToggle } from "@repo/design-system/components/mode-toggle";
 import { CommandIcon } from "lucide-react";
 import type { ReactNode } from "react";
 
-type AuthLayoutProps = {
+interface AuthLayoutProps {
   readonly children: ReactNode;
-};
+}
 
 const AuthLayout = ({ children }: AuthLayoutProps) => (
   <div className="container relative grid h-dvh flex-col items-center justify-center lg:max-w-none lg:grid-cols-2 lg:px-0">

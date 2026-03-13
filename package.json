@@ -10,41 +10,47 @@
   "scripts": {
     "build": "turbo build",
     "dev": "turbo dev",
-    "check": "npx ultracite@latest check",
-    "fix": "npx ultracite@latest fix",
+    "check": "ultracite check",
+    "fix": "ultracite fix",
     "test": "turbo test",
     "analyze": "turbo analyze",
     "translate": "turbo translate",
     "boundaries": "turbo boundaries",
-    "bump-deps": "npx npm-check-updates --deep -u -x recharts && pnpm install",
-    "bump-ui": "npx shadcn@latest add --all --overwrite -c packages/design-system",
-    "migrate": "cd packages/database && npx prisma format && npx prisma generate && npx prisma db push",
-    "clean": "git clean -xdf node_modules"
+    "bump-deps": "bunx npm-check-updates --deep -u && bun install",
+    "bump-ui": "bunx shadcn@latest add --all --overwrite -c packages/design-system",
+    "migrate": "cd packages/database && bunx prisma format && bunx prisma generate && bunx prisma migrate dev",
+    "migrate:deploy": "cd packages/database && bunx prisma generate && bunx prisma migrate deploy",
+    "db:push": "cd packages/database && bunx prisma format && bunx prisma generate && bunx prisma db push",
+    "clean": "git clean -xdf node_modules",
+    "release": "npm publish"
   },
   "devDependencies": {
     "@auto-it/first-time-contributor": "^11.3.6",
-    "@biomejs/biome": "2.3.8",
+    "@biomejs/biome": "2.4.6",
     "@repo/typescript-config": "workspace:*",
-    "@turbo/gen": "^2.6.3",
-    "@types/node": "^24.10.1",
+    "@turbo/gen": "^2.8.14",
+    "@types/node": "^25.3.5",
     "tsup": "^8.5.1",
-    "turbo": "^2.6.3",
+    "turbo": "^2.8.14",
     "typescript": "^5.9.3",
-    "ultracite": "6.3.9",
-    "vitest": "^4.0.15"
+    "ultracite": "7.2.5",
+    "vitest": "^4.0.18"
   },
   "engines": {
     "node": ">=18"
   },
-  "packageManager": "pnpm@10.24.0",
+  "packageManager": "bun@1.3.10",
   "dependencies": {
-    "@clack/prompts": "^0.11.0",
-    "commander": "^14.0.2"
+    "@clack/prompts": "^1.1.0",
+    "commander": "^14.0.3",
+    "nypm": "^0.6.5"
   },
-  "pnpm": {
-    "overrides": {
-      "parse5": "^7.2.1"
-    }
+  "overrides": {
+    "parse5": "^7.2.1"
   },
-  "type": "module"
+  "type": "module",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ]
 }

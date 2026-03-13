@@ -1,6 +1,10 @@
 ---
 title: Switch to Supabase
 description: How to change the database provider to Supabase.
+type: integration
+summary: How to switch the database provider to Supabase.
+prerequisites:
+  - /docs/packages/database
 ---
 
 [Supabase](https://supabase.com) is an open source Firebase alternative providing a Postgres database, Authentication, instant APIs, Edge Functions, Realtime subscriptions, and Storage.
@@ -47,14 +51,14 @@ Prisma doesn't have a Supabase adapter yet, so we just need to remove the Neon a
 
 First, remove the Neon dependencies from the project...
 
-```sh title="Terminal"
-pnpm remove @neondatabase/serverless @prisma/adapter-neon ws @types/ws --filter @repo/database
+```package-install
+npm uninstall @neondatabase/serverless @prisma/adapter-neon ws @types/ws --filter @repo/database
 ```
 
 ... and add the Supabase dependencies:
 
-```sh title="Terminal"
-pnpm install -D supabase --filter @repo/database
+```package-install
+npm install -D supabase --filter @repo/database
 ```
 
 ## 5. Update the database package
@@ -79,14 +83,17 @@ datasource db {
   provider     = "postgresql"
   url          = env("DATABASE_URL")
   directUrl    = env("DIRECT_URL")
-  relationMode = "prisma"
 }
 ```
+
+<Note>
+You don't need `relationMode = "prisma"` here — Supabase is PostgreSQL and supports foreign keys natively. Only add it if you specifically need Prisma to emulate relations (e.g., for compatibility with databases that don't support foreign keys).
+</Note>
 
 Now you can run the migration from the root of your `next-forge` project:
 
 ```sh title="Terminal"
-pnpm run migrate
+bun run migrate
 ```
 
 ## 7. Set up Row Level Security (RLS)

@@ -4,6 +4,7 @@
  * https://docs.sentry.io/platforms/javascript/guides/nextjs/
  */
 
+// biome-ignore lint/performance/noNamespaceImport: Sentry SDK convention
 import * as Sentry from "@sentry/nextjs";
 import { keys } from "./keys";
 
@@ -39,3 +40,5 @@ export const initializeSentry = (): ReturnType<typeof Sentry.init> =>
       Sentry.consoleLoggingIntegration({ levels: ["log", "error", "warn"] }),
     ],
   });
+
+export const onRouterTransitionStart = Sentry.captureRouterTransitionStart;

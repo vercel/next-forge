@@ -1,0 +1,519 @@
+---
+title: Switch to Appwrite Auth
+description: How to change the authentication provider to Appwrite Auth.
+type: integration
+summary: How to switch the authentication provider to Appwrite Auth.
+prerequisites:
+  - /docs/packages/authentication
+related:
+  - /docs/migrations/authentication/authjs
+  - /docs/migrations/authentication/better-auth
+  - /docs/migrations/authentication/supabase
+  - /docs/migrations/database/appwrite
+  - /docs/migrations/storage/appwrite
+---
+
+[Appwrite](https://appwrite.io) is an open-source backend-as-a-service platform that provides authentication, databases, storage, and more. Appwrite Auth supports email/password, OAuth, magic URL, phone, and anonymous authentication methods.
+
+`next-forge` uses Clerk as the authentication provider. This guide will help you switch from Clerk to Appwrite Auth. Since Appwrite doesn't provide built-in organization management like Clerk, this guide includes a pattern to implement team/organization features using Appwrite's built-in Teams API.
+
+## 1. Replace the `auth` package dependencies
+
+Uninstall the existing Clerk dependencies from the `auth` package...
+
+```package-install
+npm uninstall @clerk/nextjs @clerk/themes @clerk/types --filter @repo/auth
+```
+
+...and install the Appwrite dependencies:
+
+```package-install
+npm install appwrite node-appwrite --filter @repo/auth
+```
+
+## 2. Update environment variables
+
+Add the following environment variables to your `.env.local` file in each Next.js application (`app`, `web`, and `api`). You can find these values in your Appwrite project's Settings page:
+
+```bash title=".env.local"
+NEXT_PUBLIC_APPWRITE_ENDPOINT=https://cloud.appwrite.io/v1
+NEXT_PUBLIC_APPWRITE_PROJECT_ID=your-project-id
+APPWRITE_API_KEY=your-api-key
+```
+
+<Note>
+The endpoint and project ID are safe to use in client-side code. The API key should only be used server-side.
+</Note>
+
+## 3. Update the environment keys
+
+Update the `keys.ts` file to validate the new Appwrite environment variables:
+
+```ts title="packages/auth/keys.ts"
+import { createEnv } from '@t3-oss/env-nextjs';
+import { z } from 'zod';
+
+export const keys = () =>
+  createEnv({
+    server: {
+      APPWRITE_API_KEY: z.string().min(1),
+    },
+    client: {
+      NEXT_PUBLIC_APPWRITE_ENDPOINT: z.string().url(),
+      NEXT_PUBLIC_APPWRITE_PROJECT_ID: z.string().min(1),
+    },
+    runtimeEnv: {
+      APPWRITE_API_KEY: process.env.APPWRITE_API_KEY,
+      NEXT_PUBLIC_APPWRITE_ENDPOINT:
+        process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT,
+      NEXT_PUBLIC_APPWRITE_PROJECT_ID:
+        process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID,
+    },
+  });
+```
+
+## 4. Create the server client
+
+Create a server-side Appwrite client using `node-appwrite` with cookie-based session management:
+
+```ts title="packages/auth/server.ts"
+import 'server-only';
+import { Client, Account, Teams } from 'node-appwrite';
+import { cookies } from 'next/headers';
+
+const createAdminClient = () => {
+  const client = new Client()
+    .setEndpoint(process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT!)
+    .setProject(process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID!)
+    .setKey(process.env.APPWRITE_API_KEY!);
+
+  return {
+    get account() {
+      return new Account(client);
+    },
+    get teams() {
+      return new Teams(client);
+    },
+  };
+};
+
+export const createSessionClient = async () => {
+  const client = new Client()
+    .setEndpoint(process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT!)
+    .setProject(process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID!);
+
+  const cookieStore = await cookies();
+  const session = cookieStore.get('appwrite-session');
+
+  if (!session?.value) {
+    throw new Error('No session');
+  }
+
+  client.setSession(session.value);
+
+  return {
+    get account() {
+      return new Account(client);
+    },
+    get teams() {
+      return new Teams(client);
+    },
+  };
+};
+
+export { createAdminClient };
+
+export const currentUser = async () => {
+  try {
+    const { account } = await createSessionClient();
+    return await account.get();
+  } catch {
+    return null;
+  }
+};
+
+export const auth = async () => {
+  const user = await currentUser();
+
+  if (!user) {
+    return { userId: null, orgId: null };
+  }
+
+  const orgId = user.prefs?.activeOrganizationId as string | null ?? null;
+
+  return {
+    userId: user.$id,
+    orgId,
+  };
+};
+```
+
+## 5. Create the browser client
+
+Create a client-side Appwrite client:
+
+```ts title="packages/auth/client.ts"
+'use client';
+
+import { Client, Account, Teams } from 'appwrite';
+
+const client = new Client()
+  .setEndpoint(process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT!)
+  .setProject(process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID!);
+
+export const account = new Account(client);
+export const teams = new Teams(client);
+export { client };
+```
+
+## 6. Update the middleware
+
+Replace `proxy.ts` with `middleware.ts` to handle session validation:
+
+```ts title="packages/auth/middleware.ts"
+import 'server-only';
+import { NextResponse, type NextRequest } from 'next/server';
+
+export const authMiddleware = async (request: NextRequest) => {
+  const session = request.cookies.get('appwrite-session');
+
+  if (!session && request.nextUrl.pathname.startsWith('/dashboard')) {
+    const url = request.nextUrl.clone();
+    url.pathname = '/sign-in';
+    return NextResponse.redirect(url);
+  }
+
+  return NextResponse.next();
+};
+```
+
+<Note>
+Delete the old `proxy.ts` file if it exists, as it was specific to Clerk's proxy functionality.
+</Note>
+
+## 7. Update the Provider file
+
+Appwrite Auth doesn't require a Provider component, so replace it with a stub:
+
+```tsx title="packages/auth/provider.tsx"
+import type { ReactNode } from 'react';
+
+type AuthProviderProps = {
+  children: ReactNode;
+};
+
+export const AuthProvider = ({ children }: AuthProviderProps) => children;
+```
+
+## 8. Update the auth components
+
+Update both the `sign-in.tsx` and `sign-up.tsx` components to use Appwrite Auth:
+
+### Sign In
+
+```tsx title="packages/auth/components/sign-in.tsx"
+'use client';
+
+import { account } from '../client';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+
+export const SignIn = () => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
+
+  const handleSignIn = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+
+    try {
+      const session = await account.createEmailPasswordSession(email, password);
+
+      // Set the session cookie
+      document.cookie = `appwrite-session=${session.$id}; path=/; max-age=86400; secure; samesite=lax`;
+
+      router.push('/dashboard');
+      router.refresh();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to sign in');
+      setLoading(false);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSignIn}>
+      {error && <div className="text-red-500">{error}</div>}
+      <input
+        type="email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        placeholder="Email"
+        required
+      />
+      <input
+        type="password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        placeholder="Password"
+        required
+      />
+      <button type="submit" disabled={loading}>
+        {loading ? 'Signing in...' : 'Sign in'}
+      </button>
+    </form>
+  );
+};
+```
+
+### Sign Up
+
+```tsx title="packages/auth/components/sign-up.tsx"
+'use client';
+
+import { account } from '../client';
+import { ID } from 'appwrite';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+
+export const SignUp = () => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [name, setName] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
+
+  const handleSignUp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+
+    try {
+      await account.create(ID.unique(), email, password, name);
+
+      // Automatically sign in after sign up
+      const session = await account.createEmailPasswordSession(email, password);
+      document.cookie = `appwrite-session=${session.$id}; path=/; max-age=86400; secure; samesite=lax`;
+
+      router.push('/dashboard');
+      router.refresh();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to sign up');
+      setLoading(false);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSignUp}>
+      {error && <div className="text-red-500">{error}</div>}
+      <input
+        type="text"
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+        placeholder="Name"
+        required
+      />
+      <input
+        type="email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        placeholder="Email"
+        required
+      />
+      <input
+        type="password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        placeholder="Password"
+        required
+        minLength={8}
+      />
+      <button type="submit" disabled={loading}>
+        {loading ? 'Signing up...' : 'Sign up'}
+      </button>
+    </form>
+  );
+};
+```
+
+## 9. Set up auth callback route for OAuth
+
+Create a callback route to handle OAuth redirects:
+
+```ts title="apps/app/app/api/auth/callback/route.ts"
+import { createAdminClient } from '@repo/auth/server';
+import { cookies } from 'next/headers';
+import { NextResponse } from 'next/server';
+
+export async function GET(request: Request) {
+  const { searchParams, origin } = new URL(request.url);
+  const userId = searchParams.get('userId');
+  const secret = searchParams.get('secret');
+  const next = searchParams.get('next') ?? '/dashboard';
+
+  if (userId && secret) {
+    const { account } = createAdminClient();
+    const session = await account.createSession(userId, secret);
+
+    const cookieStore = await cookies();
+    cookieStore.set('appwrite-session', session.$id, {
+      path: '/',
+      httpOnly: true,
+      sameSite: 'lax',
+      secure: true,
+      maxAge: 86400,
+    });
+
+    return NextResponse.redirect(`${origin}${next}`);
+  }
+
+  return NextResponse.redirect(`${origin}/sign-in`);
+}
+```
+
+## 10. Implement organization management
+
+Appwrite provides a built-in [Teams API](https://appwrite.io/docs/references/cloud/client-web/teams) for managing groups of users. Create helper functions to manage organizations:
+
+```ts title="packages/auth/organizations.ts"
+import 'server-only';
+import { createSessionClient, createAdminClient } from './server';
+
+export const createOrganization = async (name: string) => {
+  const { teams, account } = await createSessionClient();
+
+  const team = await teams.create('unique()', name);
+
+  // Set as active organization
+  await account.updatePrefs({
+    activeOrganizationId: team.$id,
+  });
+
+  return team;
+};
+
+export const getOrganizations = async () => {
+  const { teams } = await createSessionClient();
+  const result = await teams.list();
+  return result.teams;
+};
+
+export const switchOrganization = async (organizationId: string) => {
+  const { account } = await createSessionClient();
+  await account.updatePrefs({
+    activeOrganizationId: organizationId,
+  });
+};
+
+export const inviteToOrganization = async (
+  organizationId: string,
+  email: string,
+  roles: string[] = ['member']
+) => {
+  const { teams } = await createSessionClient();
+  await teams.createMembership(
+    organizationId,
+    roles,
+    email
+  );
+};
+```
+
+## 11. Update your apps
+
+Replace any remaining Clerk implementations in your apps with Appwrite equivalents:
+
+### Server Components
+
+```tsx
+// Before (Clerk)
+const { userId, orgId } = await auth();
+const user = await currentUser();
+
+// After (Appwrite)
+import { auth, currentUser } from '@repo/auth/server';
+
+const { userId, orgId } = await auth();
+const user = await currentUser();
+```
+
+### Client Components
+
+```tsx
+// Before (Clerk)
+import { useUser } from '@clerk/nextjs';
+const { user } = useUser();
+
+// After (Appwrite)
+'use client';
+import { account } from '@repo/auth/client';
+import { useEffect, useState } from 'react';
+import type { Models } from 'appwrite';
+
+const [user, setUser] = useState<Models.User<Models.Preferences> | null>(null);
+
+useEffect(() => {
+  account.get().then(setUser).catch(() => setUser(null));
+}, []);
+```
+
+### Sign Out
+
+```tsx
+// Before (Clerk)
+import { SignOutButton } from '@clerk/nextjs';
+<SignOutButton />
+
+// After (Appwrite)
+'use client';
+import { account } from '@repo/auth/client';
+
+const handleSignOut = async () => {
+  await account.deleteSession('current');
+  document.cookie = 'appwrite-session=; path=/; max-age=0';
+  router.push('/');
+  router.refresh();
+};
+
+<button onClick={handleSignOut}>Sign out</button>
+```
+
+## Additional features
+
+### OAuth Authentication
+
+To add OAuth providers, configure them in your Appwrite Console under Auth → Settings, then use:
+
+```ts
+import { account } from '@repo/auth/client';
+import { OAuthProvider } from 'appwrite';
+
+account.createOAuth2Session(
+  OAuthProvider.Github, // or Google, Apple, etc.
+  `${window.location.origin}/api/auth/callback`,
+  `${window.location.origin}/sign-in`
+);
+```
+
+### Magic URL Authentication
+
+```ts
+import { account } from '@repo/auth/client';
+import { ID } from 'appwrite';
+
+await account.createMagicURLToken(
+  ID.unique(),
+  email,
+  `${window.location.origin}/api/auth/callback`
+);
+```
+
+<Note>
+Appwrite uses a permissions system instead of Row Level Security. You can set document-level and collection-level permissions directly in the Appwrite Console or via the SDK. See the [Appwrite Permissions documentation](https://appwrite.io/docs/advanced/platform/permissions) for details.
+</Note>
+
+For more information, see the [Appwrite Auth documentation](https://appwrite.io/docs/products/auth).

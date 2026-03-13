@@ -4,10 +4,10 @@ import { NotificationsProvider as RawNotificationsProvider } from "@repo/notific
 import { useTheme } from "next-themes";
 import type { ReactNode } from "react";
 
-type NotificationsProviderProperties = {
+interface NotificationsProviderProperties {
   children: ReactNode;
   userId: string;
-};
+}
 
 export const NotificationsProvider = ({
   children,

@@ -1,6 +1,10 @@
 ---
 title: Structure
 description: Learn how next-forge apps and packages are structured.
+type: conceptual
+summary: How the monorepo, apps, and packages are organized.
+related:
+  - /docs/philosophy
 ---
 
 next-forge is a monorepo, which means it contains multiple packages in a single repository. This is a common pattern for modern web applications, as it allows you to share code between different parts of the application, and manage them all together.
@@ -9,7 +13,7 @@ The monorepo is managed by [Turborepo](https://turborepo.com), which is a tool f
 
 ## Apps
 
-next-forge contains a number of [apps](/apps/api) that make up your project. Each app is a self-contained application that can be deployed independently.
+next-forge contains a number of [apps](/docs/apps/api) that make up your project. Each app is a self-contained application that can be deployed independently.
 
 While you can choose to run these apps on the subdomain of your choice, the recommended subdomains are listed on each page. Remember to add them to your [environment variables](/docs/setup/env) under `NEXT_PUBLIC_APP_URL`, `NEXT_PUBLIC_WEB_URL`, and `NEXT_PUBLIC_DOCS_URL`.
 
@@ -27,5 +31,5 @@ Each package should be self-contained and not depend on other packages. They sho
 
 next-forge uses [Turborepo's boundaries](https://turborepo.com/docs/reference/boundaries) to ensure that Turborepo features work correctly by checking for package manager Workspace violations.
 
-You can run `pnpm run boundaries` to check for any violations.
+You can run `bun run boundaries` to check for any violations.
 

@@ -1,9 +1,16 @@
 ---
 title: Transactional Emails
 descriptions: How all other transactional emails work.
+type: reference
+product: Email
+summary: How transactional emails are configured and sent.
+related:
+  - /docs/apps/email
 ---
 
 We use [Resend](https://resend.com/) to send transactional emails. The templates, located in `@repo/email`, are powered by [React Email](https://react.email/) - a collection of high-quality, unstyled components for creating beautiful emails using React and TypeScript.
+
+Resend is an optional integration. If `RESEND_TOKEN` is not set, the `resend` export will be `undefined`. Make sure to handle this when sending emails.
 
 ## Sending Emails
 
@@ -43,4 +50,4 @@ await resend.emails.send({
 
 ## Previewing Emails
 
-To preview the emails templates, simply run the [`email` app](/apps/email).
+To preview the emails templates, simply run the [`email` app](/docs/apps/email).

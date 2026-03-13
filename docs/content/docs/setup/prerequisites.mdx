@@ -1,6 +1,8 @@
 ---
 title: Prerequisites
 description: How to configure your development environment for next-forge.
+type: guide
+summary: Tools and accounts required before setting up next-forge.
 ---
 
 ## Operating System
@@ -11,20 +13,20 @@ We've tested and confirmed that next-forge works on the following combinations o
 
 | Operating system | next-forge version | Node.js version | Notes |
 | ---------------- | ----------------- | --------------- | ----- |
-| macOS Sequoia 15.0.1 (24A348) | 2.14.3 | 20.12.2 |  |
-| Ubuntu 24.04 Arm64 | 2.14.3 | 20.18.0 |  |
-| Fedora, Release 41 | 2.14.3 | 22.11.0 |  |
-| Windows 11 Pro 24H2 (26100.2033) | 2.14.3 | 20.18.0 | Turborepo only supports specific architectures. `windows ia32` is not supported. |
+| macOS Sequoia 15.0.1 (24A348) | 5.3.2 | 20.12.2 |  |
+| Ubuntu 24.04 Arm64 | 5.3.2 | 20.18.0 |  |
+| Fedora, Release 41 | 5.3.2 | 22.11.0 |  |
+| Windows 11 Pro 24H2 (26100.2033) | 5.3.2 | 20.18.0 | Turborepo only supports specific architectures. `windows ia32` is not supported. |
 
 We're aware of issues on [non-Ubuntu Linux distributions](https://github.com/vercel/next-forge/issues/238). While we don't officially support them, we'd love to know if you get it working!
 
 ## Package Manager
 
-next-forge defaults to using [pnpm](https://pnpm.io/) as a package manager, but you can use [npm](https://www.npmjs.com/), [yarn](https://yarnpkg.com/) or [bun](https://bun.sh/) instead by passing a flag during the [installation](/docs/setup/installation) step.
+next-forge defaults to using [Bun](https://bun.sh) as a package manager, but you can use [npm](https://www.npmjs.com/), [yarn](https://yarnpkg.com/) or [pnpm](https://pnpm.io/) instead by passing a flag during the [installation](/docs/setup/installation) step.
 
 ## Stripe CLI
 
-We use the [Stripe CLI](https://docs.stripe.com/stripe-cli) to forward [payments webhooks](/packages/payments#webhooks) to your local machine.
+We use the [Stripe CLI](https://docs.stripe.com/stripe-cli) to forward [payments webhooks](/docs/packages/payments#webhooks) to your local machine.
 
 Once installed, you can login to authenticate with your Stripe account.
 
@@ -34,17 +36,17 @@ stripe login
 
 ## Mintlify CLI
 
-We use the [Mintlify CLI](https://mintlify.com/docs/development) to preview the [docs](/apps/docs) locally.
+We use the [Mintlify CLI](https://mintlify.com/docs/development) to preview the [docs](/docs/apps/docs) locally.
 
 ## Accounts
 
 next-forge relies on various SaaS products. You will need to create accounts with the following services then set the API keys in your [environment variables](/docs/setup/env):
 
-- [Arcjet](https://arcjet.com), for [application security](/packages/security/application).
-- [BetterStack](https://betterstack.com), for [logging](/packages/observability/logging) and [uptime monitoring](/packages/observability/uptime).
-- [Clerk](https://clerk.com), for [authentication](/packages/authentication).
-- [Google Analytics](https://developers.google.com/analytics), for [web analytics](/packages/analytics/web).
-- [Posthog](https://posthog.com), for [product analytics](/packages/analytics/product).
-- [Resend](https://resend.com), for [transactional emails](/packages/email).
-- [Sentry](https://sentry.io), for [error tracking](/packages/observability/error-capture).
-- [Stripe](https://stripe.com), for [payments](/packages/payments).
+- [Arcjet](https://arcjet.com), for [application security](/docs/packages/security/application).
+- [BetterStack](https://betterstack.com), for [logging](/docs/packages/observability/logging) and [uptime monitoring](/docs/packages/observability/uptime).
+- [Clerk](https://clerk.com), for [authentication](/docs/packages/authentication).
+- [Google Analytics](https://developers.google.com/analytics), for [web analytics](/docs/packages/analytics/web).
+- [Posthog](https://posthog.com), for [product analytics](/docs/packages/analytics/product).
+- [Resend](https://resend.com), for [transactional emails](/docs/packages/email).
+- [Sentry](https://sentry.io), for [error tracking](/docs/packages/observability/error-capture).
+- [Stripe](https://stripe.com), for [payments](/docs/packages/payments).

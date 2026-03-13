@@ -1,9 +1,17 @@
 ---
 title: Switch to EdgeDB
 description: How to change the database provider to EdgeDB.
+type: integration
+summary: How to switch the database provider to EdgeDB.
+prerequisites:
+  - /docs/packages/database
 ---
 
 [EdgeDB](https://edgedb.com) is an open-source Postgres data layer designed to address major ergonomic SQL and relational schema modeling limitations while improving type safety and performance.
+
+<Note>
+EdgeDB rebranded to "Gel" in February 2025. The `edgedb` npm packages and CLI commands still work via compatibility shims. See the [Gel announcement](https://www.geldata.com/blog/edgedb-is-now-gel-and-postgres-is-the-future) for details.
+</Note>
 
 `next-forge` uses Neon as the database provider with Prisma as the ORM as well as Clerk for authentication. This guide will provide the steps you need to switch the database provider from Neon to EdgeDB.
 
@@ -22,14 +30,14 @@ Create an account at [EdgeDB Cloud](https://cloud.edgedb.com/). Once done, creat
 
 Uninstall the existing dependencies...
 
-```sh title="Terminal"
-pnpm remove @prisma/adapter-neon @prisma/client prisma --filter @repo/database
+```package-install
+npm uninstall @prisma/adapter-neon @prisma/client prisma --filter @repo/database
 ```
 
 ... and install the new dependencies:
 
-```sh title="Terminal"
-pnpm add edgedb @edgedb/generate
+```package-install
+npm install edgedb @edgedb/generate
 ```
 
 ## 3. Setup EdgeDB in `@repo/database` package
@@ -90,8 +98,8 @@ module default {
 And apply your changes by running:
 
 ```sh title="Terminal"
-npx migration create
-npx migration apply
+npx edgedb migration create
+npx edgedb migration apply
 ```
 
 Once complete, you can also generate a TypeScript query builder and types from your database schema:

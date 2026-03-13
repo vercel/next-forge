@@ -1,6 +1,7 @@
 import { type InferPageType, loader } from "fumadocs-core/source";
 import { lucideIconsPlugin } from "fumadocs-core/source/lucide-icons";
 import { docs } from "@/.source/server";
+import { basePath } from "@/geistdocs";
 import { i18n } from "./i18n";
 
 // See https://fumadocs.dev/docs/headless/source-api for more info
@@ -16,14 +17,41 @@ export const getPageImage = (page: InferPageType<typeof source>) => {
 
   return {
     segments,
-    url: `/og/${segments.join("/")}`,
+    url: basePath
+      ? `${basePath}/og/${segments.join("/")}`
+      : `/og/${segments.join("/")}`,
   };
 };
 
 export const getLLMText = async (page: InferPageType<typeof source>) => {
   const processed = await page.data.getText("processed");
+  const { title, description, product, type, summary, prerequisites, related } =
+    page.data;
 
-  return `# ${page.data.title}
+  const frontmatter = [
+    "---",
+    `title: ${title}`,
+    description && `description: ${description}`,
+    product && `product: ${product}`,
+    type && `type: ${type}`,
+    summary && `summary: ${summary}`,
+    prerequisites?.length &&
+      `prerequisites:\n${prerequisites.map((p) => `  - ${p}`).join("\n")}`,
+    related?.length && `related:\n${related.map((r) => `  - ${r}`).join("\n")}`,
+    "---",
+  ]
+    .filter(Boolean)
+    .join("\n");
 
-${processed}`;
+  return `${frontmatter}
+
+# ${title}
+
+${processed}
+
+---
+
+For a semantic overview of all documentation, see [/sitemap.md](/sitemap.md)
+
+For an index of all available documentation, see [/llms.txt](/llms.txt)`;
 };

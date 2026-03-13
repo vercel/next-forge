@@ -1,13 +1,20 @@
 ---
 title: Product Analytics
 description: Captures product events and metrics.
+type: reference
+product: Analytics
+summary: How product analytics captures events and metrics.
+related:
+  - /docs/packages/analytics/web
 ---
 
 next-forge has support for product analytics via PostHog — a single platform to analyze, test, observe, and deploy new features.
 
+PostHog is an optional integration. If `NEXT_PUBLIC_POSTHOG_KEY` and `NEXT_PUBLIC_POSTHOG_HOST` are not set, the `analytics` export will be `undefined` and client-side initialization will be skipped.
+
 ## Usage
 
-To capture product events, you can use the `analytics` object exported from the `@repo/analytics` package.
+To capture product events, you can use the `analytics` object exported from the `@repo/analytics` package. Since analytics is optional, use optional chaining when calling methods.
 
 Start by importing the `analytics` object for the relevant environment:
 
@@ -16,13 +23,13 @@ Start by importing the `analytics` object for the relevant environment:
 import { analytics } from '@repo/analytics/server';
 
 // For client-side code
-import { analytics } from '@repo/analytics/posthog/client';
+import { analytics } from '@repo/analytics';
 ```
 
 Then, you can use the `capture` method to send events:
 
 ```tsx
-analytics.capture({
+analytics?.capture({
   event: 'Product Purchased',
   distinctId: 'user_123',
 });

@@ -15,9 +15,9 @@ import { format } from "date-fns";
 import { CalendarIcon, Check, MoveRight } from "lucide-react";
 import { useState } from "react";
 
-type ContactFormProps = {
+interface ContactFormProps {
   dictionary: Dictionary;
-};
+}
 
 export const ContactForm = ({ dictionary }: ContactFormProps) => {
   const [date, setDate] = useState<Date | undefined>(new Date());
@@ -37,10 +37,10 @@ export const ContactForm = ({ dictionary }: ContactFormProps) => {
                 </p>
               </div>
             </div>
-            {dictionary.web.contact.hero.benefits.map((benefit, index) => (
+            {dictionary.web.contact.hero.benefits.map((benefit) => (
               <div
                 className="flex flex-row items-start gap-6 text-left"
-                key={index}
+                key={benefit.title}
               >
                 <Check className="mt-2 h-4 w-4 text-primary" />
                 <div className="flex flex-col gap-1">

@@ -1,0 +1,188 @@
+---
+title: Switch to Novu
+description: How to change the notifications provider to Novu.
+type: integration
+summary: How to switch the notifications provider to Novu.
+prerequisites:
+  - /docs/packages/notifications
+---
+
+[Novu](https://novu.co/) is an open-source notification infrastructure platform that supports in-app, email, SMS, push, and chat channels. It's self-hostable and provides a unified API for managing notifications across multiple channels. Here's how to switch the default notifications provider from Knock to Novu.
+
+## 1. Swap out the required dependencies
+
+First, uninstall the existing dependencies from the Notifications package...
+
+```package-install
+npm uninstall @knocklabs/node @knocklabs/react --filter @repo/notifications
+```
+
+... and install the new dependencies...
+
+```package-install
+npm install @novu/api @novu/react --filter @repo/notifications
+```
+
+## 2. Update the Notification keys
+
+Update the required Notification keys in the `packages/notifications/keys.ts` file:
+
+```ts title="packages/notifications/keys.ts"
+import { createEnv } from '@t3-oss/env-nextjs';
+import { z } from 'zod';
+
+export const keys = () =>
+  createEnv({
+    server: {
+      NOVU_SECRET_KEY: z.string().optional(),
+    },
+    client: {
+      NEXT_PUBLIC_NOVU_APP_ID: z.string().optional(),
+    },
+    runtimeEnv: {
+      NOVU_SECRET_KEY: process.env.NOVU_SECRET_KEY,
+      NEXT_PUBLIC_NOVU_APP_ID: process.env.NEXT_PUBLIC_NOVU_APP_ID,
+    },
+  });
+```
+
+## 3. Update the environment variables
+
+Next, update the environment variables across the project, replacing the existing Knock keys with the new Novu keys:
+
+```js title="apps/app/.env"
+NOVU_SECRET_KEY=""
+NEXT_PUBLIC_NOVU_APP_ID=""
+```
+
+## 4. Update the notifications client
+
+Initialize the notifications client in the `packages/notifications/index.ts` file with the new API key:
+
+```ts title="packages/notifications/index.ts"
+import { Novu } from '@novu/api';
+import { keys } from './keys';
+
+const key = keys().NOVU_SECRET_KEY;
+
+export const notifications = new Novu({ secretKey: key });
+```
+
+## 5. Update the notifications provider
+
+Replace the Knock provider with Novu's `NovuProvider` in `packages/notifications/components/provider.tsx`:
+
+```tsx title="packages/notifications/components/provider.tsx"
+'use client';
+
+import { NovuProvider } from '@novu/react';
+import type { ReactNode } from 'react';
+import { keys } from '../keys';
+
+const novuAppId = keys().NEXT_PUBLIC_NOVU_APP_ID;
+
+interface NotificationsProviderProps {
+  children: ReactNode;
+  theme: 'light' | 'dark';
+  userId: string;
+}
+
+export const NotificationsProvider = ({
+  children,
+  theme,
+  userId,
+}: NotificationsProviderProps) => {
+  if (!novuAppId) {
+    return children;
+  }
+
+  return (
+    <NovuProvider
+      applicationIdentifier={novuAppId}
+      subscriberId={userId}
+      appearance={{ variables: { colorScheme: theme } }}
+    >
+      {children}
+    </NovuProvider>
+  );
+};
+```
+
+## 6. Update the notifications trigger
+
+Replace the Knock notification components with Novu's `Inbox` in `packages/notifications/components/trigger.tsx`:
+
+```tsx title="packages/notifications/components/trigger.tsx"
+'use client';
+
+import { Inbox } from '@novu/react';
+import { keys } from '../keys';
+
+export const NotificationsTrigger = () => {
+  if (!keys().NEXT_PUBLIC_NOVU_APP_ID) {
+    return null;
+  }
+
+  return <Inbox />;
+};
+```
+
+You can also remove the `packages/notifications/styles.css` file, as Novu's `Inbox` component handles its own styling.
+
+## 7. Update the app-level notifications provider
+
+Update the wrapper in `apps/app/app/(authenticated)/components/notifications-provider.tsx`. The existing wrapper should work as-is since the `NotificationsProvider` already accepts a `theme` prop. If the types differ, update accordingly:
+
+```tsx title="apps/app/app/(authenticated)/components/notifications-provider.tsx"
+'use client';
+
+import { NotificationsProvider as RawNotificationsProvider } from '@repo/notifications/components/provider';
+import { useTheme } from 'next-themes';
+import type { ReactNode } from 'react';
+
+interface NotificationsProviderProperties {
+  children: ReactNode;
+  userId: string;
+}
+
+export const NotificationsProvider = ({
+  children,
+  userId,
+}: NotificationsProviderProperties) => {
+  const { resolvedTheme } = useTheme();
+
+  return (
+    <RawNotificationsProvider
+      theme={resolvedTheme as 'light' | 'dark'}
+      userId={userId}
+    >
+      {children}
+    </RawNotificationsProvider>
+  );
+};
+```
+
+## 8. Triggering notifications
+
+To trigger a notification from the server, use the Novu API:
+
+```ts
+import { notifications } from '@repo/notifications';
+
+await notifications.trigger({
+  workflowId: 'your-workflow-id',
+  to: {
+    subscriberId: 'user-123',
+  },
+  payload: {
+    message: 'Hello from Novu!',
+  },
+});
+```
+
+There's quite a lot you can do with Novu, so check out the following resources for more information:
+
+- [Novu Documentation](https://docs.novu.co/)
+- [Workflows](https://docs.novu.co/workflows/introduction)
+- [Inbox Component](https://docs.novu.co/inbox/introduction)
+- [Self-hosting](https://docs.novu.co/community/self-hosting-novu/introduction)

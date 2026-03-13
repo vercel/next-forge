@@ -1,9 +1,17 @@
 ---
 title: Switch to PlanetScale
 description: How to change the database provider to PlanetScale.
+type: integration
+summary: How to switch the database provider to PlanetScale.
+prerequisites:
+  - /docs/packages/database
 ---
 
 Here's how to switch from Neon to [PlanetScale](https://planetscale.com).
+
+<Warning>
+PlanetScale removed their free/Hobby tier in March 2024. The minimum plan now starts at $39/month. Keep this in mind when evaluating PlanetScale for your project.
+</Warning>
 
 ## 1. Create a new database on PlanetScale
 
@@ -33,14 +41,14 @@ Etcetera.
 
 Uninstall the existing dependencies...
 
-```sh title="Terminal"
-pnpm remove @neondatabase/serverless @prisma/adapter-neon ws @types/ws --filter @repo/database
+```package-install
+npm uninstall @neondatabase/serverless @prisma/adapter-neon ws @types/ws --filter @repo/database
 ```
 
 ...and install the new ones:
 
-```sh title="Terminal"
-pnpm add @planetscale/database @prisma/adapter-planetscale --filter @repo/database
+```package-install
+npm install @planetscale/database @prisma/adapter-planetscale --filter @repo/database
 ```
 
 ## 4. Update the database connection code

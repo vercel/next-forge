@@ -1,6 +1,13 @@
 ---
 title: Switch to Supabase Auth
 description: How to change the authentication provider to Supabase Auth.
+type: integration
+summary: How to switch the authentication provider to Supabase Auth.
+prerequisites:
+  - /docs/packages/authentication
+related:
+  - /docs/migrations/authentication/authjs
+  - /docs/migrations/authentication/better-auth
 ---
 
 [Supabase Auth](https://supabase.com/docs/guides/auth) is a comprehensive authentication system that integrates seamlessly with Supabase's Postgres database. It provides email/password, magic link, OAuth, and phone authentication, along with user management and session handling.
@@ -8,21 +15,21 @@ description: How to change the authentication provider to Supabase Auth.
 `next-forge` uses Clerk as the authentication provider. This guide will help you switch from Clerk to Supabase Auth. Since Supabase doesn't provide built-in organization management like Clerk, this guide includes a multi-tenancy schema pattern to implement team/organization features with role-based access control.
 
 <Note>
-This guide assumes you've already [migrated to Supabase](/migrations/database/supabase) for your database. If you haven't done so yet, complete that migration first.
+This guide assumes you've already [migrated to Supabase](/docs/migrations/database/supabase) for your database. If you haven't done so yet, complete that migration first.
 </Note>
 
 ## 1. Replace the `auth` package dependencies
 
 Uninstall the existing Clerk dependencies from the `auth` package...
 
-```sh title="Terminal"
-pnpm remove @clerk/nextjs @clerk/themes @clerk/types --filter @repo/auth
+```package-install
+npm uninstall @clerk/nextjs @clerk/themes @clerk/types --filter @repo/auth
 ```
 
 ...and install the Supabase Auth dependencies:
 
-```sh title="Terminal"
-pnpm add @supabase/supabase-js @supabase/ssr --filter @repo/auth
+```package-install
+npm install @supabase/supabase-js @supabase/ssr --filter @repo/auth
 ```
 
 Additionally, add `@repo/database` to the `auth` package dependencies to enable organization/team management.
@@ -37,7 +44,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 ```
 
 <Note>
-The anon key is safe to use in client-side code as it respects your Row Level Security (RLS) policies.
+The anon key is safe to use in client-side code as it respects your Row Level Security (RLS) policies. Supabase is transitioning `NEXT_PUBLIC_SUPABASE_ANON_KEY` to `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` — both work for now, but consider using the new name for new projects.
 </Note>
 
 ## 3. Set up the database schema for organizations
@@ -75,7 +82,7 @@ model OrganizationMember {
 Then run the migration:
 
 ```sh title="Terminal"
-pnpm run migrate
+bun run migrate
 ```
 
 ## 4. Create Supabase client utilities
@@ -542,7 +549,7 @@ const { error } = await supabase.auth.signInWithOtp({
 ```
 
 <Note>
-To secure your database tables with Row Level Security (RLS) policies, see the [Supabase database migration guide](/migrations/database/supabase) for detailed setup instructions.
+To secure your database tables with Row Level Security (RLS) policies, see the [Supabase database migration guide](/docs/migrations/database/supabase) for detailed setup instructions.
 </Note>
 
 For more information, see the [Supabase Auth documentation](https://supabase.com/docs/guides/auth).

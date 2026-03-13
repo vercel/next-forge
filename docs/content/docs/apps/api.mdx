@@ -1,6 +1,12 @@
 ---
 title: API
 description: How the "API" application works in next-forge.
+type: reference
+product: API
+summary: How the API application works in next-forge.
+related:
+  - /docs/packages/security/rate-limiting
+  - /docs/packages/webhooks/inbound
 ---
 
 <Tip>The `api` application runs on port 3002. We recommend deploying it to `api.{yourdomain}.com`.</Tip>
@@ -15,5 +21,79 @@ Functionally speaking, splitting the API from the main app doesn't matter if you
 
 ## Features
 
-- **Cron jobs**: The API is used to run [cron jobs](/packages/cron). These are defined in the `apps/api/app/cron` directory. Each cron job is a `.ts` file that exports a route handler.
-- **Webhooks**: The API is used to run [inbound webhooks](/packages/webhooks/inbound). These are defined in the `apps/api/app/webhooks` directory. Each webhook is a `.ts` file that exports a route handler.
+- **Cron jobs**: The API is used to run [cron jobs](/docs/packages/cron). These are defined in the `apps/api/app/cron` directory. Each cron job is a `.ts` file that exports a route handler.
+- **Webhooks**: The API is used to run [inbound webhooks](/docs/packages/webhooks/inbound). These are defined in the `apps/api/app/webhooks` directory. Each webhook is a `.ts` file that exports a route handler.
+
+## Connecting to the API
+
+By default, the API app only handles webhooks and cron jobs. However, you can add your own endpoints for use by the `app`, `web`, or external clients like mobile apps.
+
+### When you need the API
+
+In many cases, you don't need to call the API app at all. Since `app` and `web` are both Next.js applications, they can use [Server Components](https://nextjs.org/docs/app/building-your-application/rendering/server-components), [Server Actions](https://nextjs.org/docs/app/building-your-application/data-fetching/server-actions-and-mutations), and [Route Handlers](https://nextjs.org/docs/app/building-your-application/routing/route-handlers) to access the database and other services directly through shared packages like `@repo/database`.
+
+The API app is useful when you need:
+
+- A dedicated endpoint for non-web clients (mobile apps, IoT devices, third-party integrations)
+- A public REST API for your platform
+- Long-running or resource-intensive operations isolated from your user-facing apps
+
+### Adding an endpoint
+
+Create a new route handler in `apps/api/app`. For example, to create a `/users` endpoint:
+
+```ts title="apps/api/app/users/route.ts"
+import { database } from '@repo/database';
+
+export const GET = async () => {
+  const users = await database.user.findMany();
+
+  return Response.json(users);
+};
+```
+
+### Calling the API from another app
+
+Each app has a `NEXT_PUBLIC_API_URL` environment variable pre-configured in its `.env.example` file, pointing to `http://localhost:3002` for local development. Use this variable when making requests to the API.
+
+From a Server Component or Server Action:
+
+```ts title="apps/app/app/actions/users.ts"
+'use server';
+
+import { env } from '@/env';
+
+export const getUsers = async () => {
+  const response = await fetch(`${env.NEXT_PUBLIC_API_URL}/users`);
+
+  return response.json();
+};
+```
+
+From a client component:
+
+```tsx title="apps/app/components/users.tsx"
+'use client';
+
+const Users = () => {
+  const fetchUsers = async () => {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/users`
+    );
+
+    return response.json();
+  };
+
+  // ...
+};
+```
+
+### Preview deployments
+
+In local development, the API URL defaults to `http://localhost:3002`. In production, you set `NEXT_PUBLIC_API_URL` to your API's production URL (e.g. `https://api.yourdomain.com`).
+
+For preview deployments on Vercel, each project gets a unique URL. Since the `app` or `web` preview can't automatically discover the `api` preview URL, you have a few options:
+
+1. **Point previews at the production API.** Set `NEXT_PUBLIC_API_URL` to your production API URL in Vercel's environment variable settings for "Preview" environments. This is the simplest approach and works well if your API is stable.
+2. **Use Vercel's branch-based URLs.** Vercel generates deterministic URLs based on the branch name (e.g. `api-git-my-branch-yourteam.vercel.app`). You can construct the API URL from the `VERCEL_GIT_COMMIT_REF` environment variable if all apps share the same repository and branch.
+3. **Set the URL manually per preview.** For full isolation, override `NEXT_PUBLIC_API_URL` in the Vercel deployment settings for each preview deployment.

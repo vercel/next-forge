@@ -1,6 +1,13 @@
 ---
 title: Switch to Better Auth
 description: How to change the authentication provider to Better Auth.
+type: integration
+summary: How to switch the authentication provider to Better Auth.
+prerequisites:
+  - /docs/packages/authentication
+related:
+  - /docs/migrations/authentication/authjs
+  - /docs/migrations/authentication/supabase
 ---
 
 Better Auth is a comprehensive, open-source authentication framework for TypeScript. It is designed to be framework agnostic, but integrates well with Next.js and provides a lot of features out of the box.
@@ -9,14 +16,14 @@ Better Auth is a comprehensive, open-source authentication framework for TypeScr
 
 Uninstall the existing Clerk dependencies from the `auth` package...
 
-```sh title="Terminal"
-pnpm remove @clerk/nextjs @clerk/themes @clerk/types --filter @repo/auth
+```package-install
+npm uninstall @clerk/nextjs @clerk/themes @clerk/types --filter @repo/auth
 ```
 
 ...and install the Better Auth dependencies:
 
-```sh title="Terminal"
-pnpm add better-auth next --filter @repo/auth
+```package-install
+npm install better-auth next --filter @repo/auth
 ```
 
 Additionally, add `@repo/database` to the `auth` package dependencies.
@@ -26,10 +33,14 @@ Additionally, add `@repo/database` to the `auth` package dependencies.
 Generate a secret with the following command to add it to the `.env.local` file in each Next.js application (`app`, `web` and `api`):
 
 ```sh title="Terminal"
-npx @better-auth/cli secret
+npx @better-auth/cli@latest secret
 ```
 
-This will add a `BETTER_AUTH_SECRET` environment variable to the `.env.local` file.
+This will add a `BETTER_AUTH_SECRET` environment variable to the `.env.local` file. You should also add the `BETTER_AUTH_URL` environment variable, pointing to your app's base URL:
+
+```bash title=".env.local"
+BETTER_AUTH_URL="http://localhost:3000"
+```
 
 ## 3. Setup the server and client auth
 
@@ -159,7 +170,7 @@ You can use different sign-in methods like social providers, phone, username etc
 From the root folder, generate Prisma models for Better Auth by running the following command:
 
 ```sh title="Terminal"
-npx @better-auth/cli generate --output ./packages/database/prisma/schema.prisma --config ./packages/auth/server.ts
+npx @better-auth/cli@latest generate --output ./packages/database/prisma/schema.prisma --config ./packages/auth/server.ts
 ```
 
 <Warning>
@@ -233,7 +244,7 @@ import { auth } from './server';
 export const { POST, GET } = toNextJsHandler(auth);
 ```
 
-```tsx title="apps/app/app/api/auth/[...all.ts]"
+```tsx title="apps/app/app/api/auth/[...all]/route.ts"
 export { POST, GET } from '@repo/auth/handlers'
 ```
 

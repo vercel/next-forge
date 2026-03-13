@@ -9,11 +9,11 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Sidebar } from "@/components/sidebar";
 
-type LegalPageProperties = {
+interface LegalPageProperties {
   readonly params: Promise<{
     slug: string;
   }>;
-};
+}
 
 export const generateMetadata = async ({
   params,
@@ -42,7 +42,6 @@ const LegalPage = async ({ params }: LegalPageProperties) => {
 
   return (
     <Feed queries={[legal.postQuery(slug)]}>
-      {/* biome-ignore lint/suspicious/useAwait: "Server Actions must be async" */}
       {async ([data]) => {
         "use server";
 

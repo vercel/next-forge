@@ -1,5 +1,6 @@
 import { type ApiData, verifyAccess } from "flags";
 import { type NextRequest, NextResponse } from "next/server";
+// biome-ignore lint/performance/noNamespaceImport: flags SDK convention
 import * as flags from "./index";
 
 export const getFlags = async (request: NextRequest) => {

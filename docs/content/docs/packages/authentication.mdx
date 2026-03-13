@@ -1,19 +1,24 @@
 ---
 title: Authentication
 description: We use Clerk to handle authentication, user and organization management.
+type: reference
+product: Authentication
+summary: How Clerk handles authentication and user management.
+related:
+  - /docs/packages/webhooks/inbound
 ---
 
 next-forge manages authentication through the use of a `auth` package. By default, this package is a wrapper around [Clerk](https://clerk.com/) which provides a complete authentication and user management solution that integrates seamlessly with Next.js applications.
 
 ## In-App
 
-The `@repo/auth` package exposes an `AuthProvider`, however you don't need to use this directly. The [`DesignSystemProvider`](/packages/design-system/provider) includes all relevant providers and higher-order components.
+The `@repo/auth` package exposes an `AuthProvider`, however you don't need to use this directly. The [`DesignSystemProvider`](/docs/packages/design-system/provider) includes all relevant providers and higher-order components.
 
 From here, you can use all the pre-built components and hooks provided by Clerk. To demonstrate this, we've added the `<OrganizationSwitcher>` and `<UserButton>` components to the sidebar, as well as built out the Sign In and Sign Up pages.
 
 ## Webhooks
 
-Clerk uses webhooks to handle authentication events and you can send these to your application. Read more about [inbound authentication webhooks](/packages/webhooks/inbound#authentication-events).
+Clerk uses webhooks to handle authentication events and you can send these to your application. Read more about [inbound authentication webhooks](/docs/packages/webhooks/inbound#authentication-events).
 
 ## Email Templates
 

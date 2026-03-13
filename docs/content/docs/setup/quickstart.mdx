@@ -1,0 +1,107 @@
+---
+title: Quickstart
+description: Get next-forge running locally in 5 minutes.
+type: guide
+summary: Get next-forge running locally in 5 minutes.
+prerequisites:
+  - /docs/setup/prerequisites
+related:
+  - /docs/setup/installation
+  - /docs/setup/env
+---
+
+This guide gets you from zero to a running dev server with the minimum required setup. Only two services are truly required to boot: **Clerk** (authentication) and a **PostgreSQL database**.
+
+<Tip>
+  Don't worry about other environment variables — features that need them (Stripe, analytics, email, etc.) will gracefully degrade or show warnings. You can add them later.
+</Tip>
+
+<Steps>
+
+<Step>
+### Prerequisites
+
+You need [Node.js](https://nodejs.org) 18+ and a package manager. We recommend [Bun](https://bun.sh), but npm, yarn, and pnpm all work.
+
+```sh title="Terminal"
+node -v # Should be v18 or higher
+```
+</Step>
+
+<Step>
+### Initialize the project
+
+```package-install
+npx next-forge@latest init
+```
+
+You'll be prompted for a project name and package manager. Once complete, `cd` into your new project directory.
+</Step>
+
+<Step>
+### Set up Clerk
+
+1. Sign up at [clerk.com](https://clerk.com) and create a new application
+2. Go to **API Keys** in your Clerk dashboard
+3. Copy the **Publishable key** (`pk_test_...`) and **Secret key** (`sk_test_...`)
+
+Add them to both `apps/app/.env.local` and `apps/web/.env.local`:
+
+```bash
+CLERK_SECRET_KEY="sk_test_..."
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY="pk_test_..."
+NEXT_PUBLIC_CLERK_SIGN_IN_URL="/sign-in"
+NEXT_PUBLIC_CLERK_SIGN_UP_URL="/sign-up"
+NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL="/"
+NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL="/"
+```
+
+<Info>
+  The `NEXT_PUBLIC_CLERK_*_URL` values are already set in the `.env.example` files. You only need to add the two API keys.
+</Info>
+</Step>
+
+<Step>
+### Set up the database
+
+Get a free PostgreSQL database from [Neon](https://neon.tech) (or use any Postgres instance), then add the connection string to `packages/database/.env`:
+
+```bash
+DATABASE_URL="postgresql://user:password@host:5432/dbname"
+```
+
+Then run the migration to scaffold your tables:
+
+```package-install
+npm run migrate
+```
+</Step>
+
+<Step>
+### Start the dev server
+
+```package-install
+npm run dev
+```
+
+Your apps are now running at:
+
+- [http://localhost:3000](http://localhost:3000) — Main app
+- [http://localhost:3001](http://localhost:3001) — Marketing website
+- [http://localhost:3002](http://localhost:3002) — API
+- [http://localhost:3003](http://localhost:3003) — Email preview
+- [http://localhost:3004](http://localhost:3004) — Docs
+</Step>
+
+</Steps>
+
+## Next steps
+
+Now that you're up and running, you can:
+
+- Review the full [environment variables](/docs/setup/env) page to enable optional features
+- Set up [Stripe](/docs/packages/payments) for payments
+- Set up [Resend](/docs/packages/email) for transactional emails
+- Set up [BaseHub](/docs/packages/cms/overview) for CMS content
+- Configure [analytics](/docs/packages/analytics/web), [error tracking](/docs/packages/observability/error-capture), and [logging](/docs/packages/observability/logging)
+- Read the [deployment](/docs/deployment/vercel) guide when you're ready to go live

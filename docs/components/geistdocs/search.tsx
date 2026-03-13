@@ -18,17 +18,20 @@ import { cn } from "@/lib/utils";
 import { Button } from "../ui/button";
 import { Kbd } from "../ui/kbd";
 
-type SearchButtonProps = {
+interface SearchButtonProps {
   className?: string;
   onClick?: () => void;
-};
+}
 
-export const SearchDialog = (props: SharedProps) => {
+export const SearchDialog = ({
+  basePath,
+  ...props
+}: SharedProps & { basePath: string | undefined }) => {
   const { locale } = useI18n();
   const { search, setSearch, query } = useDocsSearch({
     type: "fetch",
     locale,
-    api: `${process.env.NEXT_PUBLIC_GEISTDOCS_BASE_PATH}/api/search`,
+    api: basePath ? `${basePath}/api/search` : "/api/search",
   });
 
   return (

@@ -1,6 +1,12 @@
 ---
 title: Switch to Paddle Billing
 description: How to change the default payment processor to Paddle Billing.
+type: integration
+summary: How to switch the payment processor to Paddle Billing.
+prerequisites:
+  - /docs/packages/payments
+related:
+  - /docs/migrations/payments/lemon-squeezy
 ---
 
 [Paddle Billing](https://www.paddle.com/) is a merchant of record for selling digital products and subscriptions. It takes care of payments, global tax compliance, fraud prevention, localization, and subscriptions. Here's how to switch the default payment processor from Stripe to Paddle Billing.
@@ -14,14 +20,14 @@ description: How to change the default payment processor to Paddle Billing.
 
 First, uninstall the existing dependencies from the Payments package...
 
-```sh title="Terminal"
-pnpm remove stripe --filter @repo/payments
+```package-install
+npm uninstall stripe --filter @repo/payments
 ```
 
 ... and install the new dependencies...
 
-```sh title="Terminal"
-pnpm add @paddle/paddle-node-sdk --filter @repo/payments
+```package-install
+npm install @paddle/paddle-node-sdk --filter @repo/payments
 ```
 
 ## 2. Update the Payment keys
@@ -80,7 +86,7 @@ Initialize the payments client in the `packages/payments/index.ts` file with the
 
 ```ts title="packages/payments/index.ts"
 import 'server-only';
-import { type Environment, Paddle } from '@paddle/paddle-node-sdk';
+import { Paddle } from '@paddle/paddle-node-sdk';
 import { keys } from './keys';
 
 const { PADDLE_SECRET_KEY, PADDLE_ENV } = keys();
@@ -97,7 +103,7 @@ export * from '@paddle/paddle-node-sdk';
 Update the webhook handler for Paddle:
 
 ```ts title="apps/api/app/webhooks/payments/route.ts"
-import { env } from '@/env';
+import { keys } from '@repo/payments/keys';
 import { NextResponse } from 'next/server';
 import { headers } from 'next/headers';
 import { paddle } from '@repo/payments';
@@ -114,13 +120,15 @@ export const POST = async (request: Request) => {
 
     const event = await paddle.webhooks.unmarshal(
       body,
-      env.PADDLE_WEBHOOK_SECRET,
+      keys().PADDLE_WEBHOOK_SECRET,
       signature
     );
 
     switch (event.eventType) {}
 
     return NextResponse.json({ result: event, ok: true });
+  } catch (error) {
+    return NextResponse.json({ error: 'Webhook error' }, { status: 400 });
   }
 };
 ```
@@ -135,8 +143,8 @@ There's quite a lot you can do with Paddle, so check out the following resources
 
 Create a new file for `checkout` and install `paddle-js`:
 
-```sh title="Terminal"
-pnpm add @paddle/paddle-js --filter @repo/payments
+```package-install
+npm install @paddle/paddle-js --filter @repo/payments
 ```
 
 Then, create a new hook to initialize Paddle in the `packages/payments/checkout.tsx` file:

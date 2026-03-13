@@ -35,3 +35,11 @@ export const translations = {
     displayName: "English",
   },
 };
+
+export const basePath: string | undefined = undefined;
+
+/**
+ * Unique identifier for this site, used in markdown request tracking analytics.
+ * Each site using geistdocs should set this to a unique value (e.g. "ai-sdk-docs", "next-docs").
+ */
+export const siteId: string | undefined = "next-forge";

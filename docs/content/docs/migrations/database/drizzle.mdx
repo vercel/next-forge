@@ -1,6 +1,12 @@
 ---
 title: Switch to Drizzle
 description: How to change the ORM to Drizzle.
+type: integration
+summary: How to switch the ORM to Drizzle.
+prerequisites:
+  - /docs/packages/database
+related:
+  - /docs/migrations/database/prisma-postgres
 ---
 
 Drizzle is a brilliant, type-safe ORM growing quickly in popularity. If you want to switch to Drizzle, you have two options:
@@ -10,19 +16,23 @@ Drizzle is a brilliant, type-safe ORM growing quickly in popularity. If you want
 
 Here, we'll assume you have a working Neon database and cover the second option.
 
+<Callout type="warn">
+Before starting, make sure your Prisma schema has been pushed to your database (e.g. by running `npx prisma db push` in `packages/database`). The `drizzle-kit pull` command in Step 4 introspects the live database — if no tables exist yet, it will generate an empty schema file.
+</Callout>
+
 ## 1. Swap out the required dependencies in `@repo/database`
 
 Uninstall the existing dependencies...
 
-```sh title="Terminal"
-pnpm remove @prisma/adapter-neon @prisma/client prisma --filter @repo/database
+```package-install
+npm uninstall @prisma/adapter-neon @prisma/client prisma --filter @repo/database
 ```
 
 ...and install the new ones:
 
-```sh title="Terminal"
-pnpm add drizzle-orm --filter @repo/database
-pnpm add -D drizzle-kit --filter @repo/database
+```package-install
+npm install drizzle-orm @neondatabase/serverless --filter @repo/database
+npm install -D drizzle-kit --filter @repo/database
 ```
 
 ## 2. Update the database connection code
@@ -61,13 +71,24 @@ export default defineConfig({
 
 ## 4. Generate the schema file
 
-Drizzle uses a schema file to define your database tables. Rather than create one from scratch, we can generate it from the existing database. In the `packages/database` folder, run the following command to generate the schema file:
+Drizzle uses a schema file to define your database tables. Rather than create one from scratch, you can generate it from the existing database. In the `packages/database` folder, run the following command to generate the schema file:
 
 ```sh
 npx drizzle-kit pull
 ```
 
 This should pull the schema from the database, creating a `schema.ts` file containing the table definitions and some other files.
+
+If the generated `schema.ts` is empty, your database likely has no tables yet. You can either push your Prisma schema first (`npx prisma db push`) and re-run the pull, or create the schema manually. For example, the default next-forge `Page` model translates to:
+
+```ts title="packages/database/schema.ts"
+import { pgTable, serial, text } from 'drizzle-orm/pg-core';
+
+export const page = pgTable('Page', {
+  id: serial('id').primaryKey(),
+  name: text('name').notNull(),
+});
+```
 
 ## 5. Update your queries
 

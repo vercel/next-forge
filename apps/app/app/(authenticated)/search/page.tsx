@@ -3,11 +3,11 @@ import { database } from "@repo/database";
 import { notFound, redirect } from "next/navigation";
 import { Header } from "../components/header";
 
-type SearchPageProperties = {
+interface SearchPageProperties {
   searchParams: Promise<{
     q: string;
   }>;
-};
+}
 
 export const generateMetadata = async ({
   searchParams,

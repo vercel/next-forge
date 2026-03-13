@@ -1,6 +1,12 @@
 ---
 title: Switch to Prisma Postgres
 description: How to change the database provider to Prisma Postgres.
+type: integration
+summary: How to switch the database provider to Prisma Postgres.
+prerequisites:
+  - /docs/packages/database
+related:
+  - /docs/migrations/database/drizzle
 ---
 
 Here's how to switch from Neon to [Prisma Postgres](https://www.prisma.io/postgres) — a serverless database with zero cold starts and a generous free tier. You can learn more about its architecture that enables this [here](https://www.prisma.io/blog/announcing-prisma-postgres-early-access).
@@ -25,14 +31,14 @@ DATABASE_URL="prisma+postgres://accelerate.prisma-data.net/?api_key=ey...."
 
 Uninstall the existing dependencies...
 
-```sh title="Terminal"
-pnpm remove @neondatabase/serverless @prisma/adapter-neon ws @types/ws
+```package-install
+npm uninstall @neondatabase/serverless @prisma/adapter-neon ws @types/ws
 ```
 
 ... and install the new dependencies:
 
-```sh title="Terminal"
-pnpm add @prisma/extension-accelerate
+```package-install
+npm install @prisma/extension-accelerate
 ```
 
 ## 4. Update the database connection code
@@ -64,8 +70,10 @@ To cache a query with Prisma Client, you can add the [`swr`](https://www.prisma.
 
 ```ts title="page.tsx"
 const pages = await prisma.page.findMany({
-  swr: 60, // 60 seconds
-  ttl: 60  // 60 seconds
+  cacheStrategy: {
+    swr: 60, // 60 seconds
+    ttl: 60, // 60 seconds
+  },
 });
 ```
 
@@ -73,10 +81,14 @@ Learn more in the [Accelerate documentation](https://www.prisma.io/docs/accelera
 
 ### Real-time database events
 
+<Warning>
+Prisma Pulse (`@prisma/extension-pulse`) has been paused and may be deprecated. Check the [Prisma Pulse documentation](https://www.prisma.io/docs/pulse) for the latest status before proceeding.
+</Warning>
+
 To stream database change events from your database, you first need to install the Pulse extension:
 
-```sh title="Terminal"
-pnpm add @prisma/extension-pulse
+```package-install
+npm install @prisma/extension-pulse
 ```
 
 Next, you need to add your Pulse API key as an environment variable:

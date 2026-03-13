@@ -1,9 +1,9 @@
 import type { Dictionary } from "@repo/internationalization";
 import { User } from "lucide-react";
 
-type FeaturesProps = {
+interface FeaturesProps {
   dictionary: Dictionary;
-};
+}
 
 export const Features = ({ dictionary }: FeaturesProps) => (
   <div className="w-full py-20 lg:py-40">

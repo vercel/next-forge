@@ -4,9 +4,9 @@ import { MoveRight, PhoneCall } from "lucide-react";
 import Link from "next/link";
 import { env } from "@/env";
 
-type CTAProps = {
+interface CTAProps {
   dictionary: Dictionary;
-};
+}
 
 export const CTA = ({ dictionary }: CTAProps) => (
   <div className="w-full py-20 lg:py-40">

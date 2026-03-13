@@ -1,6 +1,9 @@
 ---
 title: Collaboration
 description: next-forge is multiplayer out of the box.
+type: reference
+product: Collaboration
+summary: How multiplayer collaboration works out of the box.
 ---
 
 next-forge maintains a `collaboration` package designed to provide real-time collaborative features to your apps. By default, we use [Liveblocks](https://liveblocks.io) as our collaboration engine. To showcase what you can do with this package, we've built a simple collaborative experience in the `app` application, featuring an avatar stack and live cursors.
@@ -50,7 +53,7 @@ function CollaborativeInput() {
   const inputValue = useStorage((root) => root.inputValue);
   
   // Set the input's value
-  const setValue = useMutation(({ storage }), newValue) => {
+  const setValue = useMutation(({ storage }, newValue) => {
     storage.set("inputValue", newValue);
   }, []);
   
