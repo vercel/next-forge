@@ -38,7 +38,7 @@
     "@repo/typescript-config": "workspace:*",
     "@tailwindcss/postcss": "^4.2.1",
     "@tailwindcss/typography": "^0.5.19",
-    "@types/node": "^25.3.5",
+    "@types/node": "^25.5.0",
     "@types/react": "^19.2.14",
     "postcss": "^8.5.8",
     "tailwindcss": "^4.2.1",
