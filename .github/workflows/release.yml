@@ -1,19 +1,18 @@
-# Name of our action
 name: Release
 
-# The event that will trigger the action
 on:
   push:
     branches: [main]
 
-# what the action will do
+permissions:
+  contents: write
+  pull-requests: write
+  id-token: write
+
 jobs:
   release:
-    # The operating system it will run on
     runs-on: ubuntu-latest
-    # This check needs to be in place to prevent a publish loop with auto and github actions
     if: "!contains(github.event.head_commit.message, 'ci skip') && !contains(github.event.head_commit.message, 'skip ci')"
-    # The list of steps that the action will go through
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -22,7 +21,10 @@ jobs:
         run: git fetch --unshallow --tags
 
       - name: Install Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          registry-url: 'https://registry.npmjs.org'
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
@@ -36,5 +38,5 @@ jobs:
       - name: Create Release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_TOKEN: ""
         run: npx auto shipit
