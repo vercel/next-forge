@@ -26,7 +26,7 @@
     "@types/ws": "^8.18.1",
     "bufferutil": "^4.1.0",
     "dotenv": "^16.5.0",
-    "prisma": "7.4.2",
+    "prisma": "7.5.0",
     "typescript": "^5.9.3"
   }
 }
