@@ -1,0 +1,138 @@
+---
+title: c15t
+description: How to add privacy consent management to your app with c15t.
+type: integration
+summary: How to add consent management with c15t.
+---
+
+## Overview
+
+c15t is an open-source consent management platform that transforms privacy consent from a compliance checkbox into a fully observable system. It provides a TypeScript-first SDK with automatic jurisdiction detection, a customizable consent banner, and support for managing third-party scripts based on user consent.
+
+## Quickstart 
+
+```
+npx @c15t/cli generate
+```
+
+## Installation
+
+Install the c15t Next.js package in the app(s) that need consent management:
+
+```package-install
+npm install @c15t/nextjs
+```
+
+## Setup
+
+### 1. Create the provider
+
+```tsx title="components/consent-manager/provider.tsx"
+'use client';
+
+import { type ReactNode } from 'react';
+import {
+  ConsentManagerProvider,
+  CookieBanner,
+  ConsentManagerDialog,
+} from '@c15t/nextjs/client';
+
+export default function ConsentManager({
+  children,
+}: { children: React.ReactNode }) {
+  return (
+    <ConsentManagerProvider
+      options={{
+        mode: 'c15t',
+        backendURL: '/api/c15t',
+        consentCategories: ['necessary', 'measurement', 'marketing'],
+      }}
+    >
+      <CookieBanner />
+      <ConsentManagerDialog />
+      {children}
+    </ConsentManagerProvider>
+  );
+}
+```
+
+<Tip>
+  For local development or prototyping, you can use `mode: 'offline'` instead of `mode: 'c15t'` to store consent in cookies without a backend.
+</Tip>
+
+### 2. Add to your root layout
+
+Wrap your app with the `ConsentManager` in your root layout:
+
+```tsx title="app/layout.tsx"
+import { ConsentManager } from '@/components/consent-manager';
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <html lang="en">
+      <body>
+        <ConsentManager>
+          {children}
+        </ConsentManager>
+      </body>
+    </html>
+  );
+}
+```
+
+### 3. Configure Next.js rewrites (optional)
+
+To optimize c15t further you can proxy c15t API requests through your Next.js server, which improves latency and reduces risk of blocking via an ad-blocker.
+
+```ts title="next.config.ts"
+import type { NextConfig } from 'next';
+
+const config: NextConfig = {
+  async rewrites() {
+    return [
+      {
+        source: '/api/c15t/:path*',
+        destination: `${process.env.NEXT_PUBLIC_C15T_URL}/:path*`,
+      },
+    ];
+  },
+};
+
+export default config;
+```
+
+## Managing scripts
+
+c15t can conditionally load third-party scripts based on user consent. Pass a `scripts` array to the provider options:
+
+```tsx
+import { googleTagManager } from "@c15t/scripts/google-tag-manager"
+import { metaPixel } from "@c15t/scripts/meta-pixel"
+ 
+<ConsentManagerProvider
+  options={{
+    mode: 'c15t',
+    backendURL: '/api/c15t',
+    scripts: [
+      googleTagManager({ id: 'GTM-XXXXXXX' }),
+      metaPixel({ pixelId: '123456789012345' }),
+      {
+        id: 'example',
+        src: 'https://analytics.example.com/script.js',
+        category: 'measurement',
+      },
+    ],
+  }}
+>
+```
+
+<Tip>
+  Check the [c15t integrations docs](https://c15t.com/docs/integrations/overview) for pre-built helpers for popular services like Google Tag Manager, PostHog, and more.
+</Tip>
+
+
+For more information and detailed documentation, visit the [c15t docs](https://c15t.com/docs/frameworks/next/quickstart).
