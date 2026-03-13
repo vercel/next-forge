@@ -1,5 +1,4 @@
 import { type SpawnSyncOptions, spawnSync } from "node:child_process";
-import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 
 export const url = "https://github.com/vercel/next-forge";
@@ -56,21 +55,28 @@ export const semver = /^\d+\.\d+\.\d+$/;
 export const tempDirName = "next-forge-update";
 
 export const getAvailableVersions = async (): Promise<string[]> => {
-  const changelog = await readFile("CHANGELOG.md", "utf-8");
-  const versionRegex = /# v(\d+\.\d+\.\d+)/g;
-  const matches = [...changelog.matchAll(versionRegex)];
+  const result = run("git", ["ls-remote", "--tags", "--refs", url], {
+    stdio: "pipe",
+  });
 
-  return matches
-    .map((match) => match[1])
-    .sort((a, b) => {
-      const [aMajor, aMinor, aPatch] = a.split(".").map(Number);
-      const [bMajor, bMinor, bPatch] = b.split(".").map(Number);
-      if (aMajor !== bMajor) {
-        return bMajor - aMajor;
-      }
-      if (aMinor !== bMinor) {
-        return bMinor - aMinor;
-      }
-      return bPatch - aPatch;
-    });
+  const output = result.stdout.toString().trim();
+  const versionRegex = /refs\/tags\/v(\d+\.\d+\.\d+)$/;
+
+  const versions = output
+    .split("\n")
+    .map((line) => line.match(versionRegex))
+    .filter((match): match is RegExpMatchArray => match !== null)
+    .map((match) => match[1]);
+
+  return versions.sort((a, b) => {
+    const [aMajor, aMinor, aPatch] = a.split(".").map(Number);
+    const [bMajor, bMinor, bPatch] = b.split(".").map(Number);
+    if (aMajor !== bMajor) {
+      return bMajor - aMajor;
+    }
+    if (aMinor !== bMinor) {
+      return bMinor - aMinor;
+    }
+    return bPatch - aPatch;
+  });
 };
