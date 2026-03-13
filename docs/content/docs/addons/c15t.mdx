@@ -110,15 +110,15 @@ export default config;
 c15t can conditionally load third-party scripts based on user consent. Pass a `scripts` array to the provider options:
 
 ```tsx
-import { GoogleTagManager } from "@c15t/scripts/google-tag-manager"
-import { MetaPixel } from "@c15t/scripts/meta-pixel"
+import { googleTagManager } from "@c15t/scripts/google-tag-manager"
+import { metaPixel } from "@c15t/scripts/meta-pixel"
  
 <ConsentManagerProvider
   options={{
     mode: 'c15t',
     backendURL: '/api/c15t',
     scripts: [
-      googleTagManager({ id: 'GTM-XXXXXXX' })
+      googleTagManager({ id: 'GTM-XXXXXXX' }),
       metaPixel({ pixelId: '123456789012345' }),
       {
         id: 'example',
