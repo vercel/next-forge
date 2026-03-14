@@ -1,0 +1,34 @@
+---
+title: Joyful
+description: Generate delightful, random word combinations for your app — perfect for project names, usernames, or unique identifiers.
+type: integration
+summary: How to generate friendly random words for project names.
+---
+
+### Installation
+
+To install `joyful`, simply run the following command:
+
+```package-install
+npm install joyful
+```
+
+### Usage
+
+Here is an example of how to use `joyful` for generating friendly words:
+
+```tsx title="get-project-name.ts"
+import { joyful } from "joyful";
+
+const words = joyful(); // "amber-fox"
+const words = joyful({ segments: 3 }); // "golden-marble-cathedral"
+const words = joyful({ segments: 3, separator: "_" }); // "swift_northern_lights"
+const words = joyful({ maxLength: 8 }); // "tan-elk"
+```
+
+### Benefits
+
+- **Easy to Use**: `joyful` is easy to use and generates friendly words with a simple API.
+- **Customizable**: You can customize the number of segments and the separator.
+
+For more information and detailed documentation, visit the [`joyful` GitHub repo](https://github.com/haydenbleasel/joyful).
