@@ -125,7 +125,12 @@ bun run format               # Fix code style
 
 ```bash
 bun run test                 # Run tests across monorepo
+bun run test --filter app    # Single app
 ```
+
+Tests use Vitest with JUnit XML reporters for CI. When creating new test files, place them in `apps/<name>/__tests__/`. When adding tests to a new app, include both the `default` and `junit` reporters in the Vitest config so CI can track results.
+
+For full details, see `references/testing.md`.
 
 ### Building
 
@@ -143,4 +148,5 @@ For detailed setup and customization instructions, see:
 - `references/setup.md` — Installation, prerequisites, environment variables, database and Stripe CLI setup
 - `references/packages.md` — Detailed documentation for every package
 - `references/customization.md` — Swapping providers, extending features, deployment configuration
+- `references/testing.md` — Test framework, configs, CI integration, adding tests to new apps
 - `references/architecture.md` — Full monorepo structure, Turborepo pipeline, scripts
