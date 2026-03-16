@@ -1,28 +1,19 @@
 ---
 title: Trunk Flaky Tests
-description: Automatically detect, quarantine, and eliminate flaky tests in your next-forge project with Trunk Flaky Tests.
+description: How to add flaky test detection to your next-forge project with Trunk.
 type: integration
-summary: How to add flaky test detection and quarantining with Trunk.
+summary: How to add flaky test detection with Trunk.
 ---
 
-While next-forge ships with Vitest for testing, tracking flaky tests across a monorepo can be challenging. [Trunk Flaky Tests](https://trunk.io/flaky-tests) automatically detects flaky tests, quarantines them so they don't block CI, and helps you eliminate them over time.
+[Trunk Flaky Tests](https://trunk.io/flaky-tests) tracks your test results over time and identifies tests with inconsistent pass/fail behavior. It ingests JUnit XML reports uploaded from CI.
 
-## Overview
-
-Trunk Flaky Tests analyzes your JUnit XML test reports over time to identify tests with inconsistent pass/fail behavior. It provides:
-
-- **Automatic flaky test detection** across all your workspace packages
-- **Quarantining** so flaky tests don't block PRs
-- **AI-powered failure grouping** to help you fix root causes
-- **History tracking** to see test health trends
-
-## Signing up
+## Setup
 
 Create a Trunk account at [app.trunk.io](https://app.trunk.io) and connect your GitHub repository.
 
 ## Adding JUnit reporters
 
-Update each Vitest config to output JUnit XML reports. In `apps/app/vitest.config.mts` and `apps/api/vitest.config.mts`, add the JUnit reporter:
+Add the JUnit reporter to each Vitest config. In `apps/app/vitest.config.mts` and `apps/api/vitest.config.mts`:
 
 ```ts title="apps/app/vitest.config.mts"
 export default defineConfig({
@@ -38,19 +29,19 @@ export default defineConfig({
 ```
 
 <Tip>
-  Disable automatic test retries in Vitest, as retries can mask flaky behavior and reduce detection accuracy.
+  Disable automatic test retries in Vitest, as retries compromise flaky test detection accuracy.
 </Tip>
 
 ## Uploading results from CI
 
-Add the Trunk analytics uploader step to your test workflow. The step should run after your test command, with `if: always()` so results are uploaded even when tests fail:
+Add the upload step after your test command. Use `if: always()` so results are uploaded even when tests fail:
 
 ```yaml title=".github/workflows/test.yml"
 - name: Run tests
   run: bun run test
   continue-on-error: true
 
-- name: Upload test results to Trunk Flaky Tests
+- name: Upload test results to Trunk
   if: always()
   uses: trunk-io/analytics-uploader@v1
   with:
@@ -61,15 +52,9 @@ Add the Trunk analytics uploader step to your test workflow. The step should run
 
 ## Required secrets
 
-Add the following to your GitHub repository secrets:
+Add the following to your GitHub repository:
 
-- **`TRUNK_API_TOKEN`** — Your API token from [Trunk organization settings](https://app.trunk.io)
-- **`TRUNK_ORG_SLUG`** — Your Trunk organization slug (can be set as a repository variable instead of a secret)
-
-## Benefits
-
-- **Reduced CI friction** — Flaky tests are automatically quarantined so they stop blocking legitimate PRs.
-- **Monorepo-aware** — Tracks tests across all workspace packages (`apps/app`, `apps/api`, etc.) in a single dashboard.
-- **Zero runtime overhead** — Trunk Flaky Tests only processes JUnit XML reports in CI; it adds nothing to your production bundle.
+- **`TRUNK_API_TOKEN`** — API token from [Trunk organization settings](https://app.trunk.io)
+- **`TRUNK_ORG_SLUG`** — Your Trunk organization slug (can be a repository variable)
 
 For more information, visit the [Trunk Flaky Tests documentation](https://docs.trunk.io/flaky-tests).
