@@ -2,7 +2,9 @@ name: Release
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
+      - 'trunk-merge/**'
 
 permissions:
   contents: write
@@ -39,6 +41,7 @@ jobs:
         run: bunx tsup
 
       - name: Create Release
+        if: github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: npx auto shipit

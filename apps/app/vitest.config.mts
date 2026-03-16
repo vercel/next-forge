@@ -6,6 +6,10 @@ export default defineConfig({
   plugins: [react()],
   test: {
     environment: "jsdom",
+    reporters: [
+      "default",
+      ["junit", { outputFile: "./junit.xml", addFileAttribute: true }],
+    ],
   },
   resolve: {
     alias: {

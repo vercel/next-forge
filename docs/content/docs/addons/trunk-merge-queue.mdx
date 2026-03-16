@@ -1,0 +1,72 @@
+---
+title: Trunk Merge Queue
+description: An intelligent merge queue for GitHub that tests PRs against the predicted state of your main branch.
+type: integration
+summary: How to add an intelligent merge queue with Trunk.
+---
+
+As your team grows, merging PRs to `main` becomes a bottleneck. [Trunk Merge Queue](https://trunk.io/merge-queue) replaces GitHub's native merge queue with predictive testing, parallel queues, and anti-flake protection — so PRs land faster and safer.
+
+## Overview
+
+Trunk Merge Queue tests your PR against the predicted state of the target branch, including all the PRs ahead of yours in the queue. This eliminates the "merge and pray" problem where CI passes on your branch but breaks on `main`. Key features include:
+
+- **Predictive testing** — tests your changes against what `main` will look like, not what it looks like now
+- **Parallel queues** — non-overlapping changes are tested simultaneously
+- **Batching** — up to 100 PRs can be tested together
+- **Anti-flake protection** — automatically retries failed tests and identifies flakes
+
+## Setting up
+
+### 1. Install the Trunk GitHub App
+
+Sign in at [app.trunk.io](https://app.trunk.io), navigate to the Merge Queue tab, and install the Trunk GitHub App on your repository.
+
+### 2. Update CI workflow triggers
+
+Your CI workflows need to run on `trunk-merge/**` branches, which the merge queue creates for testing PR combinations. Update your workflow triggers:
+
+```yaml title=".github/workflows/test.yml"
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches:
+      - main
+      - 'trunk-merge/**'
+```
+
+Apply the same change to any other workflows that must pass before merging (linting, type checking, etc.).
+
+### 3. Configure branch protection
+
+In your GitHub repository settings under **Branches > Branch protection rules** for `main`:
+
+- Allow the `trunk-io` bot to push to your protected branch
+- **Disable** "Require branches to be up to date before merging" (this conflicts with the queue's predictive testing)
+- Ensure `trunk-temp/*` and `trunk-merge/*` branches are **not** blocked by wildcard protection rules
+
+### 4. Submit PRs to the queue
+
+Once set up, submit PRs to the queue by either:
+
+- Checking the box in the Trunk bot's PR comment
+- Commenting `/trunk merge` on the PR
+
+## Conditional steps
+
+Some CI steps (like publishing releases) should only run on actual merges to `main`, not on queue test branches. Use a condition:
+
+```yaml
+- name: Create Release
+  if: github.ref == 'refs/heads/main'
+  run: npx auto shipit
+```
+
+## Benefits
+
+- **Faster merges** — parallel queues and batching eliminate the serial bottleneck of traditional merge queues.
+- **Fewer broken builds** — predictive testing catches integration issues before they land on `main`.
+- **No code changes required** — the only repo change is adding `trunk-merge/**` to your workflow triggers.
+
+For more information, visit the [Trunk Merge Queue documentation](https://docs.trunk.io/merge-queue).

@@ -1,0 +1,38 @@
+name: Test
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches:
+      - main
+      - 'trunk-merge/**'
+
+permissions:
+  contents: read
+  checks: write
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Install dependencies
+        run: bun install
+
+      - name: Run tests
+        run: bun run test
+        continue-on-error: true
+
+      - name: Upload test results to Trunk Flaky Tests
+        if: always()
+        uses: trunk-io/analytics-uploader@v1
+        with:
+          junit-paths: '**/junit.xml'
+          org-slug: ${{ vars.TRUNK_ORG_SLUG }}
+          token: ${{ secrets.TRUNK_API_TOKEN }}
