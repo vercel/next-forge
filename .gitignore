@@ -277,6 +277,3 @@ packages/database/generated
 .contentlayer
 .content-collections
 .source
-
-# Test reports
-junit.xml
