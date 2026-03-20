@@ -1,0 +1,111 @@
+---
+title: Trunk
+description: How to add Trunk's merge queue and flaky test detection to your next-forge project.
+type: integration
+summary: How to add a merge queue and flaky test detection with Trunk.
+---
+
+[Trunk](https://trunk.io) provides a merge queue and flaky test detection for GitHub repositories. This guide covers setting up both features with your next-forge project.
+
+## Setup
+
+Create a Trunk account at [app.trunk.io](https://app.trunk.io) and connect your GitHub repository.
+
+## Merge Queue
+
+[Trunk Merge Queue](https://trunk.io/merge-queue) tests PRs against the predicted state of the target branch before merging, including PRs ahead of yours in the queue.
+
+### Update CI workflow triggers
+
+The merge queue creates `trunk-merge/**` branches to test PR combinations. Your CI workflows need to run on these branches:
+
+```yaml title=".github/workflows/test.yml"
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches:
+      - main
+      - 'trunk-merge/**'
+```
+
+Apply the same change to any other workflows that must pass before merging.
+
+### Configure branch protection
+
+In your GitHub repository settings under **Branches > Branch protection rules** for `main`:
+
+- Allow the `trunk-io` bot to push to your protected branch
+- **Disable** "Require branches to be up to date before merging"
+- Ensure `trunk-temp/*` and `trunk-merge/*` branches are **not** blocked by wildcard protection rules
+
+### Guard main-only steps
+
+Steps that should only run on actual merges to `main` (not queue test branches) need a condition:
+
+```yaml
+- name: Create Release
+  if: github.ref == 'refs/heads/main'
+  run: npx auto shipit
+```
+
+### Usage
+
+Submit PRs to the queue by either:
+
+- Checking the box in the Trunk bot's PR comment
+- Commenting `/trunk merge` on the PR
+
+For more information, visit the [Trunk Merge Queue documentation](https://docs.trunk.io/merge-queue).
+
+## Flaky Tests
+
+[Trunk Flaky Tests](https://trunk.io/flaky-tests) tracks your test results over time and identifies tests with inconsistent pass/fail behavior. It ingests JUnit XML reports uploaded from CI.
+
+### Adding JUnit reporters
+
+Add the JUnit reporter to each Vitest config. In `apps/app/vitest.config.mts` and `apps/api/vitest.config.mts`:
+
+```ts title="apps/app/vitest.config.mts"
+export default defineConfig({
+  // ...existing config
+  test: {
+    environment: "jsdom",
+    reporters: [
+      "default",
+      ["junit", { outputFile: "./junit.xml", addFileAttribute: true }],
+    ],
+  },
+});
+```
+
+<Tip>
+  Disable automatic test retries in Vitest, as retries compromise flaky test detection accuracy.
+</Tip>
+
+### Uploading results from CI
+
+Add the upload step after your test command. Use `if: always()` so results are uploaded even when tests fail:
+
+```yaml title=".github/workflows/test.yml"
+- name: Run tests
+  run: bun run test
+  continue-on-error: true
+
+- name: Upload test results to Trunk
+  if: always()
+  uses: trunk-io/analytics-uploader@v1
+  with:
+    junit-paths: '**/junit.xml'
+    org-slug: $\{{ vars.TRUNK_ORG_SLUG }}
+    token: $\{{ secrets.TRUNK_API_TOKEN }}
+```
+
+## Required secrets
+
+Add the following to your GitHub repository:
+
+- **`TRUNK_API_TOKEN`** — API token from [Trunk organization settings](https://app.trunk.io)
+- **`TRUNK_ORG_SLUG`** — Your Trunk organization slug (can be a repository variable)
+
+For more information, visit the [Trunk Flaky Tests documentation](https://docs.trunk.io/flaky-tests).
