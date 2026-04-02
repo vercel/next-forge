@@ -7,6 +7,7 @@ import {
 } from "next/server";
 import { i18n } from "@/lib/geistdocs/i18n";
 import { trackMdRequest } from "@/lib/geistdocs/md-tracking";
+import { generateNotFoundMarkdown, isAIAgent } from "@vercel/agent-readability";
 
 const { rewrite: rewriteLLM } = rewritePath(
   "/docs/*path",
@@ -56,6 +57,39 @@ const proxy = (request: NextRequest, context: NextFetchEvent) => {
       return NextResponse.rewrite(new URL(result, request.nextUrl));
     }
   }
+
+  // AI agent detection — rewrite docs pages to markdown for agents
+  if (
+    (pathname === "/docs" || pathname.startsWith("/docs/")) &&
+    !pathname.includes("/llms.mdx/")
+  ) {
+    const agentResult = isAIAgent(request);
+    if (agentResult.detected && !isMarkdownPreferred(request)) {
+      const result =
+        pathname === "/docs"
+          ? `/${i18n.defaultLanguage}/llms.mdx`
+          : rewriteLLM(pathname);
+
+      if (result) {
+        context.waitUntil(
+          trackMdRequest({
+            path: pathname,
+            userAgent: request.headers.get("user-agent"),
+            referer: request.headers.get("referer"),
+            acceptHeader: request.headers.get("accept"),
+            requestType: "agent-rewrite",
+            detectionMethod: agentResult.method,
+          })
+        );
+        return NextResponse.rewrite(new URL(result, request.nextUrl));
+      }
+      // Agent requested a non-existent docs URL
+      return new NextResponse(generateNotFoundMarkdown(pathname), {
+        headers: { "Content-Type": "text/markdown; charset=utf-8" },
+      });
+    }
+  }
+
 
   // Handle Accept header content negotiation and track the request
   if (isMarkdownPreferred(request)) {
