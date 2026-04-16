@@ -157,7 +157,7 @@ export const POST = async (request: Request): Promise<Response> => {
 
   // If there are no headers, error out
   if (!(svixId && svixTimestamp && svixSignature)) {
-    return new Response("Error occured -- no svix headers", {
+    return new Response("Error occurred -- no svix headers", {
       status: 400,
     });
   }
@@ -180,7 +180,7 @@ export const POST = async (request: Request): Promise<Response> => {
     }) as WebhookEvent;
   } catch (error) {
     log.error("Error verifying webhook:", { error });
-    return new Response("Error occured", {
+    return new Response("Error occurred", {
       status: 400,
     });
   }
