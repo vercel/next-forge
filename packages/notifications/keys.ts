@@ -3,6 +3,7 @@ import { z } from "zod";
 
 export const keys = () =>
   createEnv({
+    skipValidation: process.env.SKIP_ENV_VALIDATION === "true",
     server: {
       KNOCK_SECRET_API_KEY: z.string().optional(),
     },

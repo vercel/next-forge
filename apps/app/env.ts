@@ -12,6 +12,7 @@ import { keys as webhooks } from "@repo/webhooks/keys";
 import { createEnv } from "@t3-oss/env-nextjs";
 
 export const env = createEnv({
+  skipValidation: process.env.SKIP_ENV_VALIDATION === "true",
   extends: [
     auth(),
     analytics(),
