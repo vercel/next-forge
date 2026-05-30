@@ -6,6 +6,7 @@ import {
   NextResponse,
 } from "next/server";
 import { i18n } from "@/lib/geistdocs/i18n";
+import { isAIAgent } from "@/lib/ai-agent-detection";
 import { trackMdRequest } from "@/lib/geistdocs/md-tracking";
 
 const { rewrite: rewriteLLM } = rewritePath(
@@ -54,6 +55,35 @@ const proxy = (request: NextRequest, context: NextFetchEvent) => {
         })
       );
       return NextResponse.rewrite(new URL(result, request.nextUrl));
+    }
+  }
+
+  // AI agent detection — rewrite docs pages to markdown for agents
+  // so they always get structured content without needing .md URLs or Accept headers
+  if (
+    (pathname === "/docs" || pathname.startsWith("/docs/")) &&
+    !pathname.includes("/llms.mdx/")
+  ) {
+    const agentResult = isAIAgent(request);
+    if (agentResult.detected && !isMarkdownPreferred(request)) {
+      const result =
+        pathname === "/docs"
+          ? `/${i18n.defaultLanguage}/llms.mdx`
+          : rewriteLLM(pathname);
+
+      if (result) {
+        context.waitUntil(
+          trackMdRequest({
+            path: pathname,
+            userAgent: request.headers.get("user-agent"),
+            referer: request.headers.get("referer"),
+            acceptHeader: request.headers.get("accept"),
+            requestType: "agent-rewrite",
+            detectionMethod: agentResult.method,
+          })
+        );
+        return NextResponse.rewrite(new URL(result, request.nextUrl));
+      }
     }
   }
 
