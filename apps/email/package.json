@@ -20,7 +20,7 @@
     "@repo/typescript-config": "workspace:*",
     "@types/node": "25.3.5",
     "@types/react": "19.2.14",
-    "next": "16.1.6",
+    "next": "16.1.7",
     "typescript": "^5.9.3"
   }
 }
