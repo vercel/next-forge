@@ -118,7 +118,9 @@ const updatePackageManagerConfiguration = async (
 const dlxCommands: Partial<Record<PackageManagerName, string>> = {
   npm: "npx",
   pnpm: "pnpm dlx",
-  yarn: "yarn dlx",
+  // Yarn is pinned to Classic (1.22.x) in updatePackageManagerConfiguration, which has no
+  // `dlx` subcommand (introduced in Yarn 2/Berry). `npx` is the Yarn Classic equivalent of `bunx`.
+  yarn: "npx",
 };
 
 // The template ships bun-specific scripts (`bun --bun next ...`, `bunx ...`,
