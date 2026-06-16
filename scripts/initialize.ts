@@ -112,6 +112,80 @@ const updatePackageManagerConfiguration = async (
   await writeFile(packageJsonPath, `${newPackageJson}\n`);
 };
 
+// Package managers whose scripts the template needs rewriting for, mapped to
+// their "download and execute" command (the equivalent of `bunx`). Bun is the
+// template default and so is intentionally absent.
+const dlxCommands: Partial<Record<PackageManagerName, string>> = {
+  npm: "npx",
+  pnpm: "pnpm dlx",
+  yarn: "yarn dlx",
+};
+
+// The template ships bun-specific scripts (`bun --bun next ...`, `bunx ...`,
+// `bun install`). When another package manager is selected they must be
+// rewritten to that manager's equivalents, otherwise the generated project's
+// scripts only work if bun is installed. See issue #733.
+const rewriteBunScripts = (
+  scripts: Record<string, string>,
+  packageManager: PackageManagerName,
+  dlx: string
+): Record<string, string> => {
+  const rewritten: Record<string, string> = {};
+
+  for (const [name, command] of Object.entries(scripts)) {
+    rewritten[name] = command
+      // `bun --bun next ...` runs Next.js through bun's runtime; drop the
+      // prefix so the selected package manager runs it directly.
+      .replaceAll("bun --bun ", "")
+      // `bunx <pkg>` -> the selected manager's "download and execute" command.
+      .replaceAll("bunx ", `${dlx} `)
+      // `bun install` -> `<pm> install`.
+      .replaceAll("bun install", `${packageManager} install`);
+  }
+
+  return rewritten;
+};
+
+const updatePackageJsonScripts = async (
+  path: string,
+  packageManager: PackageManagerName,
+  dlx: string
+) => {
+  const pkgJsonFile = await readFile(path, "utf8");
+  const pkgJson = JSON.parse(pkgJsonFile);
+
+  if (!pkgJson.scripts) {
+    return;
+  }
+
+  pkgJson.scripts = rewriteBunScripts(pkgJson.scripts, packageManager, dlx);
+
+  await writeFile(path, `${JSON.stringify(pkgJson, null, 2)}\n`);
+};
+
+const updatePackageManagerScripts = async (
+  projectDir: string,
+  packageManager: PackageManagerName
+) => {
+  const dlx = dlxCommands[packageManager];
+
+  // No rewrite needed for managers that share bun's defaults (e.g. bun itself).
+  if (!dlx) {
+    return;
+  }
+
+  const scriptPackageJsons = [
+    join(projectDir, "package.json"),
+    join(projectDir, "apps", "app", "package.json"),
+    join(projectDir, "apps", "web", "package.json"),
+    join(projectDir, "apps", "api", "package.json"),
+  ];
+
+  for (const path of scriptPackageJsons) {
+    await updatePackageJsonScripts(path, packageManager, dlx);
+  }
+};
+
 const updateWorkspaceConfiguration = async (
   projectDir: string,
   packageManager: PackageManagerName
@@ -252,6 +326,9 @@ export const initialize = async (options: {
     if (packageManager !== "bun") {
       s.message("Updating package manager configuration...");
       await updatePackageManagerConfiguration(projectDir, packageManager);
+
+      s.message("Updating package manager scripts...");
+      await updatePackageManagerScripts(projectDir, packageManager);
 
       s.message("Updating workspace config...");
       await updateWorkspaceConfiguration(projectDir, packageManager);
