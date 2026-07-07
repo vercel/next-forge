@@ -1,0 +1,253 @@
+---
+title: Eve
+description: How to add durable backend AI agents to your app with Eve.
+type: integration
+summary: How to add a durable backend AI agent with Eve.
+---
+
+## Overview
+
+[Eve](https://eve.dev) is Vercel's open-source (Apache-2.0) framework for building durable backend AI agents. An agent is a directory of files — `instructions.md` for the system prompt, TypeScript tools, markdown skills, channels, and schedules — that compiles into an app running on Vercel Functions, with durable execution (sessions survive crashes and redeploys), a per-agent sandbox, and built-in human-in-the-loop approvals.
+
+A monorepo is exactly where an agent shines: its tools can reuse the same workspace packages, Prisma schema, and validated environment keys your apps already use.
+
+<Tip>
+  Eve is in beta and moves quickly, with frequent breaking changes. Pin an
+  exact version and read its changelog when you upgrade. Eve requires Node.js
+  24 or newer.
+</Tip>
+
+## Installation
+
+Create a new workspace app:
+
+```sh
+mkdir -p apps/agent
+```
+
+Add its `package.json` before scaffolding, so the scaffold has nothing to guess:
+
+```json title="apps/agent/package.json"
+{
+  "name": "agent",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "eve dev --no-ui",
+    "build": "eve build",
+    "start": "eve start",
+    "eval": "eve eval --strict",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@neondatabase/serverless": "^1.1.0",
+    "@prisma/adapter-neon": "7.4.2",
+    "@repo/database": "workspace:*",
+    "@vercel/connect": "0.2.2",
+    "ai": "^7.0.0",
+    "eve": "0.20.0",
+    "ws": "^8.21.0",
+    "zod": "4.4.3"
+  },
+  "devDependencies": {
+    "@types/node": "24.x",
+    "@types/ws": "^8.18.1",
+    "typescript": "^5.9.3"
+  },
+  "engines": { "node": ">=24" }
+}
+```
+
+Then scaffold the agent files and install:
+
+```sh
+cd apps/agent
+npx eve@0.20.0 init .
+bun install
+```
+
+`eve init` generates `agent/agent.ts`, `agent/instructions.md`, and `agent/channels/eve.ts`. It merges its own entries over yours — it rewrites the `eve` dependency to a caret range and may reset scripts to template defaults, so re-check `package.json` and restore the exact pin afterward. It may also touch the workspace root: if the root `engines.node` doesn't already satisfy Node 24, it's rewritten to `24.x`; and depending on your package manager, Eve adds dependency pins (`overrides` for npm and Bun — note this pins `ai` for the whole workspace — `resolutions` for Yarn, or a hygiene block in `pnpm-workspace.yaml`).
+
+Add a `tsconfig.json` using bundler resolution — Eve bundles authored modules, and bundler resolution lets tools import workspace packages the same way:
+
+```json title="apps/agent/tsconfig.json"
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "preserve",
+    "moduleResolution": "bundler",
+    "strict": true,
+    "noEmit": true,
+    "skipLibCheck": true
+  },
+  "include": ["agent/**/*.ts", "evals/**/*.ts", ".eve/**/*.d.ts"]
+}
+```
+
+Finally, add `.eve` and `.workflow-data` to your `.gitignore` — they hold local dev-server state.
+
+## Setup
+
+<Steps>
+<Step>
+
+### Write the instructions
+
+```md title="apps/agent/agent/instructions.md"
+# Identity
+
+You are the operations agent for this application.
+
+# Behavior
+
+- Answer questions about the application's data using your tools.
+- When a tool reports an integration is disabled, say so plainly and tell
+  the user which environment variable enables it.
+```
+
+</Step>
+<Step>
+
+### Pick a model
+
+The scaffolded default routes through the Vercel AI Gateway — set `AI_GATEWAY_API_KEY` in `apps/agent/.env.local`, or run `npx eve link` once to use your Vercel project's gateway credentials:
+
+```ts title="apps/agent/agent/agent.ts"
+import { defineAgent } from "eve";
+
+export default defineAgent({
+  model: "anthropic/claude-sonnet-4.6",
+});
+```
+
+To use a provider key directly instead, construct the model with its AI SDK provider — for example `createGoogleGenerativeAI()` from `@ai-sdk/google` with `GEMINI_API_KEY` — and pass it as `model`.
+
+</Step>
+<Step>
+
+### Give it a tool that uses your monorepo
+
+Make sure the Prisma client has been generated first (`bun run migrate`, or `bun run build` in `packages/database`) — the tool below imports it.
+
+Tools are TypeScript files in `agent/tools/` with a Zod input schema. This one counts rows using the same generated Prisma client and validated env keys as [Database](/packages/database):
+
+```ts title="apps/agent/agent/tools/count-pages.ts"
+import { neonConfig } from "@neondatabase/serverless";
+import { PrismaNeon } from "@prisma/adapter-neon";
+import { PrismaClient } from "@repo/database/generated/client";
+import { keys } from "@repo/database/keys";
+import { defineTool } from "eve/tools";
+import ws from "ws";
+import { z } from "zod";
+
+let database: PrismaClient | undefined;
+
+const getDatabase = () => {
+  if (!database) {
+    neonConfig.webSocketConstructor = ws;
+    const adapter = new PrismaNeon({ connectionString: keys().DATABASE_URL });
+    database = new PrismaClient({ adapter });
+  }
+  return database;
+};
+
+export default defineTool({
+  description: "Count the Page records in the application database.",
+  inputSchema: z.object({}),
+  execute: async () => {
+    try {
+      const count = await getDatabase().page.count();
+      return { ok: true, count };
+    } catch (error) {
+      return {
+        ok: false,
+        disabled: true,
+        reason:
+          "Database is not reachable. Set DATABASE_URL in packages/database/.env to enable this tool.",
+        detail: String(error).slice(0, 300),
+      };
+    }
+  },
+});
+```
+
+Two things to know about tools in a next-forge workspace:
+
+1. Import `@repo/database/generated/client` and `@repo/database/keys` directly rather than `@repo/database`. The package's root entry carries a `server-only` guard, which only the Next.js runtime satisfies — Eve agents run on Nitro. The same applies to other `@repo/*` packages with `server-only` entries.
+2. Keep tool imports static. Eve bundles each tool into a single module, and dynamic `import()` fails the build.
+
+Errors are caught and returned as data, so a missing `DATABASE_URL` degrades gracefully instead of crashing the agent — the same optional-integration philosophy the rest of next-forge follows.
+
+</Step>
+<Step>
+
+### Run it
+
+From `apps/agent`:
+
+```sh
+bun run dev
+```
+
+Exercise the HTTP channel directly:
+
+```sh
+curl -X POST http://127.0.0.1:2000/eve/v1/session \
+  -H 'content-type: application/json' \
+  -d '{"message":"How many pages are in the database right now?"}'
+# => {"continuationToken":"eve:...","ok":true,"sessionId":"wrun_..."}
+
+curl http://127.0.0.1:2000/eve/v1/session/<sessionId>/stream
+```
+
+The stream is newline-delimited JSON: the session starts, the model calls the tool, the tool result comes back, and the assistant replies. Run `npx eve dev` (without `--no-ui`) for the interactive terminal UI instead.
+
+</Step>
+<Step>
+
+### Add an eval
+
+Evals live in `evals/` next to `agent/` and run as scored sessions against a real server:
+
+```ts title="apps/agent/evals/evals.config.ts"
+import { defineEvalConfig } from "eve/evals";
+
+export default defineEvalConfig({});
+```
+
+```ts title="apps/agent/evals/smoke.eval.ts"
+import { defineEval } from "eve/evals";
+import { includes } from "eve/evals/expect";
+
+export default defineEval({
+  description: "Agent reports the database integration status",
+  async test(t) {
+    await t.send("How many pages are in the database right now?");
+    t.succeeded();
+    t.calledTool("count-pages");
+    t.check(t.reply, includes("DATABASE_URL"));
+  },
+});
+```
+
+Run them with `bun run eval` from `apps/agent`. In CI, either provide a model key or point a fixture agent at `mockModel()` from `eve/evals` for deterministic, provider-free runs.
+
+</Step>
+</Steps>
+
+## Calling the agent from your apps
+
+Use `useEveAgent` from `eve/react` in `apps/app` to build a chat surface over the agent's HTTP channel — it returns `data.messages`, `status`, and `send()`. Before exposing the agent to browsers in production, replace the scaffolded `placeholderAuth()` in `agent/channels/eve.ts` with an auth function that validates your [Authentication](/packages/authentication) session — the Eve channel is fail-closed by default.
+
+<Tip>
+  Eve also ships `withEve()` from `eve/next`, which mounts the agent inside a
+  Next.js app so both deploy as a single Vercel project. Co-deployment on
+  Vercel is still experimental — deploying the agent as its own project is
+  the reliable path today.
+</Tip>
+
+## Deployment
+
+Deploy `apps/agent` as its own Vercel project, the same way the other apps deploy: set the project's root directory to `apps/agent` and Node.js to 24, then run `npx eve deploy` from the app directory (or connect the repo and push). Durable sessions, sandbox provisioning, and agent observability are handled by the platform.
+
+For channels (Slack, GitHub, cron schedules), connections, skills, and approvals, see the [Eve documentation](https://eve.dev/docs).
