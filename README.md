@@ -45,6 +45,7 @@ next-forge comes with batteries included:
 - **Docs** — Documentation site powered by Mintlify
 - **Email** — Email templates with React Email
 - **Storybook** — Component development environment
+- **Agent** — Optional durable backend AI agent powered by [Eve](https://eve.dev)
 
 ### Packages
 
