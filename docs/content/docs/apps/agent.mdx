@@ -1,0 +1,122 @@
+---
+title: Agent
+description: How the agent application works in next-forge.
+type: reference
+product: Agent
+summary: How the durable backend AI agent application works.
+related:
+  - /docs/packages/database
+---
+
+<Tip>
+  The `agent` application requires Node.js 24 or newer (the rest of the monorepo
+  runs on 18+). It boots with zero API keys — see [Graceful
+  degradation](#graceful-degradation).
+</Tip>
+
+next-forge ships an optional durable backend AI agent, located in the
+`apps/agent` folder. It's built with [Eve](https://eve.dev), Vercel's
+open-source (Apache-2.0) framework for durable agents, and deploys to Vercel
+Functions with sessions that survive crashes and redeploys.
+
+For the full integration guide — installation, channels, connections, and
+deployment — see [Eve's documentation](https://eve.dev/docs). This page
+describes the app that ships in the template.
+
+## Overview
+
+An Eve agent is a directory of files that compiles into a deployable app:
+
+```text
+apps/agent/
+├── agent/
+│   ├── agent.ts            # Runtime config: model + graceful fallback
+│   ├── instructions.md     # System prompt
+│   ├── channels/
+│   │   └── eve.ts          # Inbound HTTP channel + auth
+│   └── tools/
+│       └── count-pages.ts  # A monorepo-native tool
+├── evals/
+│   ├── evals.config.ts     # Shared eval defaults
+│   └── smoke.eval.ts       # Deterministic smoke test
+├── .env.example
+├── package.json            # Pins an exact `eve` version
+└── tsconfig.json           # `moduleResolution: "bundler"`
+```
+
+Run it from the repo root:
+
+```sh
+# Start the agent's dev server (TUI-less) on port 2000
+bun run dev --filter=agent
+
+# Grade the agent against real sessions
+bun run eval --filter=agent
+```
+
+## The monorepo advantage
+
+The agent's tools reuse the same workspace packages your apps already depend on.
+`count-pages` counts `Page` records through the shared `@repo/database` package —
+the same Prisma schema, generated client, and validated environment keys the
+rest of the monorepo uses:
+
+```ts title="apps/agent/agent/tools/count-pages.ts"
+// @repo/database's index.ts carries a `server-only` guard that only the Next.js
+// runtime satisfies — Eve agents run on Nitro. So the tool imports the
+// generated client and keys directly instead of the package root.
+import { PrismaClient } from "@repo/database/generated/client";
+import { keys } from "@repo/database/keys";
+```
+
+<Callout type="info">
+  A runtime-neutral entrypoint on `@repo/database` (a guard-free `/server`
+  subpath) would let the tool import the package root directly. It's proposed
+  upstream but kept out of this app to keep the change minimal — see the PR
+  notes.
+</Callout>
+
+## Graceful degradation
+
+Like every other next-forge integration, the agent degrades politely instead of
+crashing when its credentials are missing. Model access is resolved in
+`agent.ts`:
+
+- **With** an AI Gateway credential (`AI_GATEWAY_API_KEY` locally, or the Vercel
+  OIDC token on a deployment), the agent routes to a real model through the
+  [Vercel AI Gateway](https://vercel.com/ai-gateway/models).
+- **Without** one, it answers from a deterministic offline fixture
+  (`mockModel`). `bun run dev`, `bun run build`, and `bun run eval` all stay
+  green with zero API keys — so adding the agent never breaks the first
+  `bun run dev` for the other applications.
+
+The `count-pages` tool degrades the same way: with no reachable database it
+returns a disabled result explaining which environment variable to set, rather
+than throwing.
+
+## Evals
+
+Evals are scored checks that drive the agent over real sessions and assert on
+what it did. Because the offline fallback is deterministic, the smoke eval runs
+provider-free:
+
+```ts title="apps/agent/evals/smoke.eval.ts"
+export default defineEval({
+  async test(t) {
+    await t.send("How many pages are in the database right now?");
+    t.succeeded();
+    t.calledTool("count-pages");
+    t.check(t.reply, includes("DATABASE_URL"));
+  },
+});
+```
+
+Run them in CI with `eve eval --strict` so soft-threshold misses fail the build.
+
+## Deployment
+
+Deploy the agent as its own Vercel project, the same way each other app in the
+monorepo deploys independently. Set `AI_GATEWAY_API_KEY` (or enable the Vercel
+AI Gateway via OIDC) on that project to switch from the offline fallback to a
+live model. See [Eve's documentation](https://eve.dev/docs) for channels,
+connections, and production auth.

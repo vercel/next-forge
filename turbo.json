@@ -11,7 +11,8 @@
         "!.next/cache/**",
         "**/generated/**",
         "storybook-static/**",
-        ".react-email/**"
+        ".react-email/**",
+        ".output/**"
       ]
     },
     "test": {
