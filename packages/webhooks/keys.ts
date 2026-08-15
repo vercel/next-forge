@@ -3,6 +3,7 @@ import { z } from "zod";
 
 export const keys = () =>
   createEnv({
+    emptyStringAsUndefined: true,
     skipValidation: process.env.SKIP_ENV_VALIDATION === "true",
     server: {
       SVIX_TOKEN: z

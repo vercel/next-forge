@@ -3,6 +3,7 @@ import { z } from "zod";
 
 export const keys = () =>
   createEnv({
+    emptyStringAsUndefined: true,
     skipValidation: process.env.SKIP_ENV_VALIDATION === "true",
     server: {
       UPSTASH_REDIS_REST_URL: z.url().optional(),

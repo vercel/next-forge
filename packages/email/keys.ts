@@ -3,6 +3,7 @@ import { z } from "zod";
 
 export const keys = () =>
   createEnv({
+    emptyStringAsUndefined: true,
     skipValidation: process.env.SKIP_ENV_VALIDATION === "true",
     server: {
       RESEND_FROM: z.string().email().optional(),
