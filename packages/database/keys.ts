@@ -3,6 +3,7 @@ import { z } from "zod";
 
 export const keys = () =>
   createEnv({
+    emptyStringAsUndefined: true,
     skipValidation: process.env.SKIP_ENV_VALIDATION === "true",
     server: {
       DATABASE_URL: z.url(),
