@@ -1,0 +1,71 @@
+---
+title: AI
+description: How AI SDK integration is configured in next-forge.
+type: reference
+product: AI
+summary: How the AI package exposes models, UI helpers, and AI SDK utilities.
+related:
+  - /docs/examples/ai-chatbot
+---
+
+next-forge includes an `@repo/ai` package for building AI-powered features with the [AI SDK](https://sdk.vercel.ai/).
+
+The package centralizes the shared model configuration, re-exports AI SDK helpers, and includes small React components for rendering chat interfaces.
+
+## Environment
+
+The default model provider uses OpenAI. Add an `OPENAI_API_KEY` environment variable before calling the configured models:
+
+```js title=".env.local"
+OPENAI_API_KEY="sk-..."
+```
+
+The package validates this value in `packages/ai/keys.ts`. The key is optional so the rest of the app can still run without AI features configured.
+
+## Models
+
+Reusable model handles are exported from `@repo/ai/lib/models`:
+
+```tsx title="route.ts"
+import { convertToModelMessages, streamText, type UIMessage } from '@repo/ai';
+import { models } from '@repo/ai/lib/models';
+
+export const POST = async (request: Request) => {
+  const { messages }: { messages: UIMessage[] } = await request.json();
+
+  const result = streamText({
+    model: models.chat,
+    system: 'You are a helpful assistant.',
+    messages: await convertToModelMessages(messages),
+  });
+
+  return result.toUIMessageStreamResponse();
+};
+```
+
+By default, `models.chat` uses `gpt-4o-mini` and `models.embeddings` uses `text-embedding-3-small`.
+
+## React helpers
+
+Client-side React helpers are re-exported from `@repo/ai/lib/react`:
+
+```tsx title="chatbot.tsx"
+'use client';
+
+import { useChat } from '@repo/ai/lib/react';
+
+export const Chatbot = () => {
+  const { messages, sendMessage } = useChat();
+
+  // Render messages and call sendMessage from your form.
+};
+```
+
+## Components
+
+The package also includes lightweight UI primitives for chat interfaces:
+
+- `@repo/ai/components/thread` renders a scrollable message thread.
+- `@repo/ai/components/message` renders message content with markdown support.
+
+These components are intentionally small so you can replace them with your product-specific chat UI when needed.

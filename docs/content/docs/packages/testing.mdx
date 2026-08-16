@@ -1,0 +1,73 @@
+---
+title: Testing
+description: How tests are configured in next-forge.
+type: reference
+product: Testing
+summary: How app and API tests run with Vitest.
+---
+
+next-forge uses [Vitest](https://vitest.dev/) for application tests.
+
+The template includes tests in both `apps/app` and `apps/api`, with each app owning its own Vitest configuration and test script.
+
+## Running tests
+
+Run all tests through Turborepo from the repository root:
+
+```sh title="Terminal"
+bun test
+```
+
+To run tests for a single app, filter the target:
+
+```sh title="Terminal"
+bun test --filter app
+bun test --filter api
+```
+
+You can also run an app's test script from its workspace:
+
+```sh title="Terminal"
+cd apps/app && bun test
+cd apps/api && bun test
+```
+
+## App tests
+
+The `apps/app` workspace is configured with Vitest, React Testing Library, and `jsdom`, which makes it suitable for testing React components and pages.
+
+Tests live in `apps/app/__tests__`:
+
+```tsx title="apps/app/__tests__/sign-in.test.tsx"
+import { render } from '@testing-library/react';
+import { expect, test } from 'vitest';
+import Page from '../app/(unauthenticated)/sign-in/[[...sign-in]]/page';
+
+test('Sign In Page', () => {
+  const { container } = render(<Page />);
+  expect(container).toBeDefined();
+});
+```
+
+## API tests
+
+The `apps/api` workspace uses Vitest for route-level tests.
+
+Tests live in `apps/api/__tests__`:
+
+```ts title="apps/api/__tests__/health.test.ts"
+import { expect, test } from 'vitest';
+import { GET } from '../app/health/route';
+
+test('Health Check', async () => {
+  const response = await GET();
+  expect(response.status).toBe(200);
+  expect(await response.text()).toBe('OK');
+});
+```
+
+## Configuration
+
+Both app workspaces include a `vitest.config.mts` file that enables the React plugin, uses the `jsdom` environment, and maps monorepo imports for `@` and `@repo`.
+
+Add new tests next to the app they cover so each workspace can keep its own dependencies and configuration local.
