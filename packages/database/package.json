@@ -17,14 +17,11 @@
     "@t3-oss/env-nextjs": "^0.13.10",
     "server-only": "^0.0.1",
     "undici": "^7.22.0",
-    "ws": "^8.19.0",
     "zod": "^4.3.6"
   },
   "devDependencies": {
     "@repo/typescript-config": "workspace:*",
     "@types/node": "25.3.5",
-    "@types/ws": "^8.18.1",
-    "bufferutil": "^4.1.0",
     "dotenv": "^16.5.0",
     "prisma": "7.4.2",
     "typescript": "^5.9.3"
