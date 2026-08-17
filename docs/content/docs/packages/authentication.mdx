@@ -22,25 +22,9 @@ Clerk uses webhooks to handle authentication events and you can send these to yo
 
 ### Local Development
 
-Clerk cannot reach `localhost`, so you need a public URL that forwards to the API app on port 3002. [Clerk recommends ngrok](https://clerk.com/docs/guides/development/webhooks/syncing) with a static domain so the webhook URL stays the same between sessions.
+Clerk cannot reach `localhost`. Register `<YOUR_FORWARDING_URL>/webhooks/auth` in Clerk. `<YOUR_FORWARDING_URL>` is the full `https://` host shown in the ngrok dashboard, so the endpoint looks like `https://fawn-two-nominally.ngrok-free.app/webhooks/auth`.
 
-<Steps>
-  <Step title="Install ngrok">
-    Create an [ngrok](https://ngrok.com/) account and install the CLI. On the ngrok dashboard homepage, follow the setup guide and pick **Static domain**. That gives you a stable forwarding URL you can leave in Clerk.
-  </Step>
-  <Step title="Start the tunnel">
-    With the API app running (`bun dev --filter api`):
-
-    ```sh title="Terminal"
-    ngrok http --url=<YOUR_FORWARDING_URL> 3002
-    ```
-  </Step>
-  <Step title="Point Clerk at the API route">
-    In the Clerk Dashboard, add an endpoint at `https://<YOUR_FORWARDING_URL>/webhooks/auth` and subscribe to the events you need. Copy the **Signing Secret** into `CLERK_WEBHOOK_SECRET` in `apps/api/.env.local`.
-  </Step>
-</Steps>
-
-You can also deploy a staging Vercel project with development environment variables (for example `staging-api.example.com`) and add that URL in Clerk instead.
+The tunnel command, signing secret, and Clerk Dashboard testing steps are in [inbound webhooks](/docs/packages/webhooks/inbound#local-development).
 
 ## Email Templates
 

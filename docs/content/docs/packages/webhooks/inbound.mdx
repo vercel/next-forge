@@ -25,7 +25,7 @@ next-forge has pre-built webhook handlers for several key services.
 
 ### Local Development
 
-Clerk cannot reach `localhost`, so you need a public URL that forwards to the API app on port 3002. [Clerk recommends ngrok](https://clerk.com/docs/guides/development/webhooks/syncing) with a static domain so the webhook URL stays the same between sessions.
+Clerk cannot reach `localhost`, so you need a public URL that forwards to the API app on port 3002. [Clerk recommends ngrok](https://clerk.com/docs/guides/development/webhooks/syncing) with a static domain so the webhook URL stays the same between sessions. `<YOUR_FORWARDING_URL>` is the full `https://` host shown in the ngrok dashboard.
 
 <Steps>
   <Step title="Install ngrok">
@@ -39,11 +39,11 @@ Clerk cannot reach `localhost`, so you need a public URL that forwards to the AP
     ```
   </Step>
   <Step title="Point Clerk at the API route">
-    In the Clerk Dashboard, add an endpoint at `https://<YOUR_FORWARDING_URL>/webhooks/auth` and subscribe to the events you need. Copy the **Signing Secret** into `CLERK_WEBHOOK_SECRET` in `apps/api/.env.local`.
+    In the Clerk Dashboard, add an endpoint at `<YOUR_FORWARDING_URL>/webhooks/auth` (for example `https://fawn-two-nominally.ngrok-free.app/webhooks/auth`) and subscribe to the events you need. Copy the **Signing Secret** into `CLERK_WEBHOOK_SECRET` in `apps/api/.env.local`. After the endpoint is saved, open it in the Clerk Dashboard and use **Testing → Send Example** to confirm the local handler receives events.
   </Step>
 </Steps>
 
-You can also deploy a staging Vercel project with development environment variables (for example `staging-api.example.com`) and add that URL in Clerk instead.
+You can also deploy a staging Vercel project with development environment variables (for example `staging-api.example.com/webhooks/auth`) and add that URL in Clerk instead.
 
 ## Database Events
 
