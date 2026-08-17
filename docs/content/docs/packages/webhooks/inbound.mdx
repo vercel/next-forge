@@ -25,7 +25,25 @@ next-forge has pre-built webhook handlers for several key services.
 
 ### Local Development
 
-Currently there's no way to easily test Clerk webhooks locally, so you'll have to test them in a staging environment. This means deploying your app to a "production" state Vercel project with development environment variables e.g. `staging-api.example.com`. Then you can add this URL to your Clerk project's webhook settings.
+Clerk cannot reach `localhost`, so you need a public URL that forwards to the API app on port 3002. [Clerk recommends ngrok](https://clerk.com/docs/guides/development/webhooks/syncing) with a static domain so the webhook URL stays the same between sessions.
+
+<Steps>
+  <Step title="Install ngrok">
+    Create an [ngrok](https://ngrok.com/) account and install the CLI. On the ngrok dashboard homepage, follow the setup guide and pick **Static domain**. That gives you a stable forwarding URL you can leave in Clerk.
+  </Step>
+  <Step title="Start the tunnel">
+    With the API app running (`bun dev --filter api`):
+
+    ```sh title="Terminal"
+    ngrok http --url=<YOUR_FORWARDING_URL> 3002
+    ```
+  </Step>
+  <Step title="Point Clerk at the API route">
+    In the Clerk Dashboard, add an endpoint at `https://<YOUR_FORWARDING_URL>/webhooks/auth` and subscribe to the events you need. Copy the **Signing Secret** into `CLERK_WEBHOOK_SECRET` in `apps/api/.env.local`.
+  </Step>
+</Steps>
+
+You can also deploy a staging Vercel project with development environment variables (for example `staging-api.example.com`) and add that URL in Clerk instead.
 
 ## Database Events
 
