@@ -1,0 +1,187 @@
+---
+title: Switch to AgentaOS
+description: How to change the default payment processor to AgentaOS.
+type: integration
+summary: How to switch the payment processor to AgentaOS.
+prerequisites:
+  - /docs/packages/payments
+related:
+  - /docs/migrations/payments/lemon-squeezy
+  - /docs/migrations/payments/paddle
+---
+
+[AgentaOS](https://agentaos.ai) is a merchant of record for selling digital products and subscriptions. It sells your product in its own name, charges VAT and sales tax, issues the invoice and pays you out, including in many countries where Stripe isn't available. Here's how to switch the default payment processor from Stripe to AgentaOS.
+
+## 1. Swap out the required dependencies
+
+First, uninstall the existing dependencies from the Payments package...
+
+```package-install
+npm uninstall stripe --filter @repo/payments
+```
+
+... and install the new dependencies...
+
+```package-install
+npm install @agentaos/pay --filter @repo/payments
+```
+
+## 2. Update the Payment keys
+
+Update the required Payment keys in the `packages/payments/keys.ts` file:
+
+```ts title="packages/payments/keys.ts"
+import { createEnv } from '@t3-oss/env-nextjs';
+import { z } from 'zod';
+
+export const keys = () =>
+  createEnv({
+    skipValidation: process.env.SKIP_ENV_VALIDATION === 'true',
+    server: {
+      AGENTAOS_API_KEY: z
+        .union([
+          z.string().min(1).startsWith('sk_live_'),
+          z.string().min(1).startsWith('sk_test_'),
+        ])
+        .optional(),
+      AGENTAOS_WEBHOOK_SECRET: z.string().startsWith('whsec_').optional(),
+    },
+    runtimeEnv: {
+      AGENTAOS_API_KEY: process.env.AGENTAOS_API_KEY,
+      AGENTAOS_WEBHOOK_SECRET: process.env.AGENTAOS_WEBHOOK_SECRET,
+    },
+  });
+```
+
+## 3. Update the environment variables
+
+Next, update the environment variables across the project, replacing the existing Stripe keys with the new AgentaOS keys:
+
+```js title="apps/app/.env"
+AGENTAOS_API_KEY="sk_test_"
+AGENTAOS_WEBHOOK_SECRET="whsec_"
+```
+
+In the [AgentaOS dashboard](https://app.agentaos.ai), switch to test mode and open **Developers → API keys** to generate a test key. Add your webhook URL (for example `https://api.your-domain.com/webhooks/payments`) in **Settings → Developers → Webhooks**, then click **Reveal signing secret**.
+
+## 4. Update the payments client
+
+Initialize the payments client in the `packages/payments/index.ts` file with the new API key.
+
+```ts title="packages/payments/index.ts"
+import 'server-only';
+import { AgentaOS } from '@agentaos/pay';
+import { keys } from './keys';
+
+const { AGENTAOS_API_KEY } = keys();
+
+export const agentaos = AGENTAOS_API_KEY
+  ? new AgentaOS(AGENTAOS_API_KEY)
+  : undefined;
+
+export type { WebhookEvent } from '@agentaos/pay';
+```
+
+## 5. Update the payments webhook handler
+
+AgentaOS signs the raw request body, so read it with `request.text()` before anything parses it:
+
+```ts title="apps/api/app/webhooks/payments/route.ts"
+import { analytics } from '@repo/analytics/server';
+import { agentaos } from '@repo/payments';
+import { keys } from '@repo/payments/keys';
+import { headers } from 'next/headers';
+import { NextResponse } from 'next/server';
+
+export const POST = async (request: Request) => {
+  const { AGENTAOS_WEBHOOK_SECRET } = keys();
+  if (!agentaos || !AGENTAOS_WEBHOOK_SECRET) {
+    return NextResponse.json({ message: 'Not configured', ok: false });
+  }
+
+  try {
+    const body = await request.text();
+    const headerPayload = await headers();
+    const event = agentaos.webhooks.verify(
+      body,
+      headerPayload.get('x-agentaos-signature') ?? '',
+      AGENTAOS_WEBHOOK_SECRET
+    );
+
+    switch (event.type) {
+      case 'checkout.session.completed': {
+        const userId = event.data.metadata.userId;
+        if (typeof userId === 'string') {
+          analytics?.capture({ event: 'User Subscribed', distinctId: userId });
+        }
+        break;
+      }
+      case 'subscription.canceled': {
+        // event.data.customerEmail identifies the buyer
+        break;
+      }
+      default:
+        break;
+    }
+
+    return NextResponse.json({ result: event, ok: true });
+  } catch (error) {
+    return NextResponse.json({ error: 'Webhook error' }, { status: 400 });
+  }
+};
+```
+
+AgentaOS sends `checkout.session.completed`, `subscription.created`, `subscription.renewed`, `subscription.updated`, `subscription.payment_failed` and `subscription.canceled`, among others. Check out the following resources for more information:
+
+- [Webhooks](https://docs.agentaos.ai/payments/webhooks)
+- [Subscriptions](https://docs.agentaos.ai/payments/subscriptions)
+- [SDK reference](https://docs.agentaos.ai/sdk/pay-overview)
+
+## 6. Create a Checkout action
+
+Create a product in the AgentaOS dashboard and copy its link ID. Then create a server action that starts a checkout for the signed-in user, so their id comes back on the webhook:
+
+```ts title="apps/app/app/actions/checkout.ts"
+'use server';
+
+import { currentUser } from '@repo/auth/server';
+import { agentaos } from '@repo/payments';
+import { redirect } from 'next/navigation';
+
+export const checkout = async (productId: string) => {
+  const user = await currentUser();
+  if (!user || !agentaos) {
+    throw new Error('Not signed in or payments not configured');
+  }
+
+  const session = await agentaos.checkouts.create({
+    linkId: productId,
+    buyerEmail: user.emailAddresses.at(0)?.emailAddress,
+    metadata: { userId: user.id },
+    successUrl: 'https://app.your-domain.com/?checkout=success',
+    cancelUrl: 'https://app.your-domain.com/pricing',
+  });
+
+  redirect(session.checkoutUrl);
+};
+```
+
+## 7. Use the Checkout action
+
+Finally, call the action from your pricing page:
+
+```tsx title="apps/app/app/pricing/page.tsx"
+import { checkout } from '../actions/checkout';
+
+const Pricing = () => (
+  <form action={checkout.bind(null, 'your-product-link-id')}>
+    <Button className="mt-8 gap-4" type="submit">
+      Subscribe now <MoveRight className="h-4 w-4" />
+    </Button>
+  </form>
+);
+
+export default Pricing;
+```
+
+To show the checkout inline on your own page instead of redirecting, use [`@agentaos/checkout`](https://www.npmjs.com/package/@agentaos/checkout), which has a React component. In test mode, pay with the card `4242 4242 4242 4242`, any future date and any CVC.
