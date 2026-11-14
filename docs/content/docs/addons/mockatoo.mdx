@@ -73,6 +73,9 @@ export const auth = betterAuth({
   database: prismaAdapter(database, {
     provider: "postgresql",
   }),
+  emailAndPassword: {
+    enabled: true,
+  },
   // Production signs in with GitHub. Everywhere else, Mockatoo stands in for it.
   socialProviders: isProduction ? { github } : {},
   plugins: [...(isProduction ? [] : [mockGitHub(github)]), nextCookies()],
