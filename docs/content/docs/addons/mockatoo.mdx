@@ -1,0 +1,155 @@
+---
+title: Mockatoo
+description: How to sign in with GitHub in development and tests without registering an OAuth app, using Mockatoo.
+type: integration
+summary: How to test GitHub sign-in locally and in CI with Mockatoo.
+prerequisites:
+  - /docs/migrations/authentication/better-auth
+---
+
+## Overview
+
+[Mockatoo](https://mockatoo.globalunderdog.com) is a free hosted mock OAuth provider. Outside production, it stands in for GitHub (or Google, Discord, and other providers), so a fresh clone can use social sign-in, and Playwright can sign in for real in CI, without registering an OAuth app or getting past GitHub's bot checks. Production still signs in with GitHub.
+
+This guide assumes you have followed [Switch to Better Auth](/docs/migrations/authentication/better-auth).
+
+## Installation
+
+Install the Mockatoo Better Auth plugin in the `auth` package:
+
+```package-install
+npm install @mockatoo/connect-better-auth --filter @repo/auth
+```
+
+## Setup
+
+### 1. Add the GitHub keys
+
+GitHub credentials are only required in production, so a fresh clone runs without them:
+
+```ts title="packages/auth/keys.ts"
+import { createEnv } from "@t3-oss/env-nextjs";
+import { z } from "zod";
+
+// Real GitHub credentials are only needed in production.
+const githubKey =
+  process.env.NODE_ENV === "production"
+    ? z.string().min(1)
+    : z.string().optional();
+
+export const keys = () =>
+  createEnv({
+    skipValidation: process.env.SKIP_ENV_VALIDATION === "true",
+    server: {
+      GITHUB_CLIENT_ID: githubKey,
+      GITHUB_CLIENT_SECRET: githubKey,
+    },
+    runtimeEnv: {
+      GITHUB_CLIENT_ID: process.env.GITHUB_CLIENT_ID,
+      GITHUB_CLIENT_SECRET: process.env.GITHUB_CLIENT_SECRET,
+    },
+  });
+```
+
+### 2. Add GitHub to the server config
+
+Use GitHub in production and Mockatoo's GitHub everywhere else. Both use the provider id `github`, so the client code and the callback URL (`/api/auth/callback/github`) are the same:
+
+```ts title="packages/auth/server.ts"
+import { mockGitHub } from "@mockatoo/connect-better-auth";
+import { database } from "@repo/database";
+import { betterAuth } from "better-auth";
+import { prismaAdapter } from "better-auth/adapters/prisma";
+import { nextCookies } from "better-auth/next-js";
+import { keys } from "./keys";
+
+const isProduction = process.env.NODE_ENV === "production";
+const github = {
+  clientId: keys().GITHUB_CLIENT_ID ?? "",
+  clientSecret: keys().GITHUB_CLIENT_SECRET ?? "",
+};
+
+export const auth = betterAuth({
+  database: prismaAdapter(database, {
+    provider: "postgresql",
+  }),
+  // Production signs in with GitHub. Everywhere else, Mockatoo stands in for it.
+  socialProviders: isProduction ? { github } : {},
+  plugins: [...(isProduction ? [] : [mockGitHub(github)]), nextCookies()],
+});
+```
+
+<Tip>
+  `next build` and `next start` always set `NODE_ENV` to `production`, including on Vercel preview deployments, so every deployment uses the real GitHub provider. The mock runs only under `next dev` and in tests.
+</Tip>
+
+### 3. Add a sign-in button
+
+Add a GitHub button to the sign-in component:
+
+```tsx title="packages/auth/components/sign-in.tsx"
+<button
+  onClick={() => signIn.social({ provider: "github", callbackURL: "/" })}
+  type="button"
+>
+  Sign in with GitHub
+</button>
+```
+
+Run `npm run dev`, open the app, and click **Sign in with GitHub**. You land on Mockatoo's login page. Sign in with a free [Mockatoo account](https://app.mockatoo.globalunderdog.com), click **Authorize**, and you are back in the app, signed in.
+
+## Testing with Playwright
+
+The first test needs no account: it checks that the button leads to Mockatoo. The second signs in end to end, and skips unless `MOCKATOO_TEST_EMAIL` and `MOCKATOO_TEST_PASSWORD` are set, so CI stays green without them.
+
+```ts title="apps/app/e2e/sign-in.e2e.ts"
+import { expect, test } from "@playwright/test";
+
+const email = process.env.MOCKATOO_TEST_EMAIL;
+const password = process.env.MOCKATOO_TEST_PASSWORD;
+const mockatooUrl = /^https:\/\/app\.mockatoo\.globalunderdog\.com\//;
+
+test("GitHub sign-in opens Mockatoo outside production", async ({ page }) => {
+  await page.goto("/sign-in");
+  await page.getByRole("button", { name: "Sign in with GitHub" }).click();
+  await expect(page).toHaveURL(mockatooUrl);
+  await expect(page.locator("#email")).toBeVisible();
+});
+
+test("signs in with GitHub through Mockatoo", async ({ page }) => {
+  test.skip(
+    !(email && password),
+    "Set MOCKATOO_TEST_EMAIL and MOCKATOO_TEST_PASSWORD to run the full sign-in."
+  );
+  await page.goto("/sign-in");
+  await page.getByRole("button", { name: "Sign in with GitHub" }).click();
+  await page.locator("#email").fill(email as string);
+  await page.locator("#password").fill(password as string);
+  await page.getByRole("button", { name: "Log in with password" }).click();
+  await page.getByRole("button", { name: "Authorize" }).click();
+  await expect(page).toHaveURL("/");
+});
+```
+
+Run the tests against `next dev`, since production builds use the real provider:
+
+```ts title="apps/app/playwright.config.ts"
+import { defineConfig } from "@playwright/test";
+
+export default defineConfig({
+  testDir: "./e2e",
+  testMatch: "**/*.e2e.ts", // keeps these out of Vitest
+  timeout: 120_000, // the first request compiles routes
+  expect: { timeout: 30_000 },
+  use: { baseURL: "http://localhost:3000" },
+  webServer: {
+    command: "npm run dev",
+    url: "http://localhost:3000/sign-in",
+    reuseExistingServer: !process.env.CI,
+  },
+});
+```
+
+To run the full sign-in in CI, add `MOCKATOO_TEST_EMAIL` and `MOCKATOO_TEST_PASSWORD` as repository secrets.
+
+For other providers (Google, Microsoft, Apple, Discord, LinkedIn, X, Facebook), see the [`@mockatoo/connect-better-auth` docs](https://github.com/mockatoo/connectors/tree/main/packages/connect-better-auth).
