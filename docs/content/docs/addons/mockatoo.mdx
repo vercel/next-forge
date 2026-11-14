@@ -103,6 +103,12 @@ Run `npm run dev`, open the app, and click **Sign in with GitHub**. You land on 
 
 ## Testing with Playwright
 
+Install Playwright in the `app` application:
+
+```package-install
+npm install -D @playwright/test --filter app
+```
+
 The first test needs no account: it checks that the button leads to Mockatoo. The second signs in end to end, and skips unless `MOCKATOO_TEST_EMAIL` and `MOCKATOO_TEST_PASSWORD` are set, so CI stays green without them.
 
 ```ts title="apps/app/e2e/sign-in.e2e.ts"
