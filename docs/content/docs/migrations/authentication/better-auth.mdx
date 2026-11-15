@@ -58,6 +58,9 @@ export const auth = betterAuth({
   database: prismaAdapter(database, {
     provider: 'postgresql',
   }),
+  emailAndPassword: {
+    enabled: true,
+  },
   plugins: [
     nextCookies()
     // organization() // if you want to use organization plugin
@@ -193,12 +196,15 @@ export const AuthProvider = ({ children }: AuthProviderProps) => children;
 
 ## 7. Change Middleware
 
-Change the middleware in the `auth` package to the following. The middleware checks for a session cookie and redirects unauthenticated users to the sign-in page. The optional `middlewareFn` parameter allows you to add custom logic before the authentication check:
+Change the middleware in the `auth` package to the following. The middleware checks for a session cookie and redirects unauthenticated users to the sign-in page, except on the sign-in and sign-up pages and Better Auth's own routes. The optional `middlewareFn` parameter allows you to add custom logic before the authentication check:
 
-```tsx title="packages/auth/middleware.ts"
+```tsx title="packages/auth/proxy.ts"
 import { getSessionCookie } from "better-auth/cookies";
 import type { NextFetchEvent, NextRequest } from "next/server";
 import { NextResponse } from "next/server";
+
+// Pages and endpoints that must load without a session.
+const publicPaths = ["/sign-in", "/sign-up", "/api/auth"];
 
 export function authMiddleware(
   middlewareFn?: (
@@ -222,7 +228,11 @@ export function authMiddleware(
       }
     }
 
-    if (!sessionCookie) {
+    const isPublic = publicPaths.some((path) =>
+      request.nextUrl.pathname.startsWith(path)
+    );
+
+    if (!sessionCookie && !isPublic) {
       return NextResponse.redirect(new URL("/sign-in", request.url));
     }
 
