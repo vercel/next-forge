@@ -1,0 +1,75 @@
+---
+title: Spooky Particles
+description: How to get alerted when a cron job doesn't run, with Spooky Particles check-ins.
+type: integration
+summary: How to add check-ins to cron routes with Spooky Particles.
+---
+
+[Spooky Particles](https://spookyparticles.com) is a pager for apps on Vercel and for scheduled jobs. A cron job pings a check-in link each time it runs. If a run is late or fails, Spooky tells your coding agent and alerts you by email or an ntfy topic.
+
+## Overview
+
+next-forge runs its cron jobs as route handlers in `apps/api/app/cron`, such as `keep-alive`. A check-in tells you when one of them stops running or starts failing. Any check-in service works the same way; this guide uses Spooky Particles.
+
+## Setting up the job
+
+Create a job in Spooky Particles and copy its check-in link. Follow the [check-ins guide](https://spookyparticles.com/docs/check-ins) for the steps.
+
+In Vercel, add the link to the `api` project as an environment variable named `SPOOKY_PING_URL`. Anyone with the link can report a run, so keep it out of your code and logs.
+
+## Adding a check-in to a cron route
+
+Install the [`spooky-checkin`](https://spookyparticles.com/docs/npm-package) package in the `api` app:
+
+```package-install
+npm install spooky-checkin
+```
+
+Then wrap the handler of the route. Here is the `keep-alive` route:
+
+```ts title="apps/api/app/cron/keep-alive/route.ts"
+import { database } from "@repo/database";
+import { withCheckin } from "spooky-checkin";
+
+export const GET = withCheckin(async () => {
+  const newPage = await database.page.create({
+    data: {
+      name: "cron-temp",
+    },
+  });
+
+  await database.page.delete({
+    where: {
+      id: newPage.id,
+    },
+  });
+
+  return new Response("OK", { status: 200 });
+});
+```
+
+A 2xx or 3xx response checks in as ok. A thrown error or a 4xx or 5xx response checks in as a failure. Your route's response and errors pass through unchanged, and the job still runs if Spooky can't be reached. By default only calls from Vercel's scheduler count as runs.
+
+## Using fetch instead
+
+If you'd rather not add a package, ping the link yourself. A bare link means ok, `/start` means started and `/fail` means failed:
+
+```ts title="apps/api/app/cron/keep-alive/route.ts"
+export const GET = async () => {
+  // Do stuff
+
+  await fetch(process.env.SPOOKY_PING_URL as string, { method: "POST" });
+
+  return new Response("OK", { status: 200 });
+};
+```
+
+## Checking that it works
+
+Run the following to see the job's status, last check-in and next due time. It doesn't record a run:
+
+```sh title="Terminal"
+curl -fsS "$SPOOKY_PING_URL/status"
+```
+
+For more information, visit the [Spooky Particles documentation](https://spookyparticles.com/docs/check-ins).
