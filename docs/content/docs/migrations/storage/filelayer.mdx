@@ -1,0 +1,324 @@
+---
+title: Switch to Filelayer
+description: How to change the default storage provider to Filelayer, for files that belong to an organization.
+type: integration
+summary: How to switch the storage provider to Filelayer.
+prerequisites:
+  - /docs/packages/storage
+related:
+  - /docs/migrations/storage/upload-thing
+  - /docs/migrations/storage/appwrite
+---
+
+[Filelayer](https://filelayer.dev) is an open-source (Apache-2.0) Node library for the files your users upload: per-file permissions for each user and organization role, share links that expire and can be revoked, and an audit trail of every allowed and refused access. It runs in your Next.js process, keeps its tables in a Postgres database of yours and the bytes in your own S3 or R2 bucket. It is in alpha.
+
+`next-forge` uses Vercel Blob as the default storage provider. This guide replaces it with Filelayer, using the Clerk organizations that `next-forge` already has: a file belongs to the active organization, its members can read it, and nobody outside it can tell it exists.
+
+## 1. Replace the `storage` package dependencies
+
+Uninstall the existing Vercel Blob dependency from the storage package...
+
+```package-install
+npm uninstall @vercel/blob --filter @repo/storage
+```
+
+...and install Filelayer (0.36.0 or later) and the `pg` driver it uses, with its types:
+
+```package-install
+npm install @filelayer/core pg --filter @repo/storage
+```
+
+```package-install
+npm install -D @types/pg --filter @repo/storage
+```
+
+## 2. Create the database and the bucket
+
+Filelayer needs its own tables. Give it a database of its own, for example a second database in the same Neon project, so that Prisma's migrations in `@repo/database` never see tables they did not create. Apply the schema once:
+
+```bash title="Terminal"
+psql "$FILELAYER_DATABASE_URL" -f packages/storage/node_modules/@filelayer/core/schema.sql
+```
+
+Then create a **private** bucket on S3 or Cloudflare R2. Filelayer decides who is given a file; a public bucket answers anyone who has the object's address.
+
+Add the environment variables to your `.env.local` file:
+
+```bash title=".env.local"
+FILELAYER_DATABASE_URL=postgres://...
+FILELAYER_BASE_URL=http://localhost:3000
+S3_ENDPOINT=https://<account>.r2.cloudflarestorage.com
+S3_BUCKET=your-private-bucket
+S3_ACCESS_KEY_ID=...
+S3_SECRET_ACCESS_KEY=...
+```
+
+## 3. Update the environment keys
+
+Update the `keys.ts` file to validate the new environment variables:
+
+```ts title="packages/storage/keys.ts"
+import { createEnv } from '@t3-oss/env-nextjs';
+import { z } from 'zod';
+
+export const keys = () =>
+  createEnv({
+    skipValidation: process.env.SKIP_ENV_VALIDATION === 'true',
+    server: {
+      FILELAYER_DATABASE_URL: z.url(),
+      FILELAYER_BASE_URL: z.url(),
+      S3_ENDPOINT: z.url(),
+      S3_BUCKET: z.string().min(1),
+      S3_ACCESS_KEY_ID: z.string().min(1),
+      S3_SECRET_ACCESS_KEY: z.string().min(1),
+    },
+    runtimeEnv: {
+      FILELAYER_DATABASE_URL: process.env.FILELAYER_DATABASE_URL,
+      FILELAYER_BASE_URL: process.env.FILELAYER_BASE_URL,
+      S3_ENDPOINT: process.env.S3_ENDPOINT,
+      S3_BUCKET: process.env.S3_BUCKET,
+      S3_ACCESS_KEY_ID: process.env.S3_ACCESS_KEY_ID,
+      S3_SECRET_ACCESS_KEY: process.env.S3_SECRET_ACCESS_KEY,
+    },
+  });
+```
+
+## 4. Update the server storage file
+
+Replace the contents of `index.ts` with one Filelayer instance:
+
+```ts title="packages/storage/index.ts"
+import 'server-only';
+
+import { Filelayer, S3Storage } from '@filelayer/core';
+import pg from 'pg';
+import { keys } from './keys';
+
+const env = keys();
+
+export const storage = new Filelayer(
+  new pg.Pool({ connectionString: env.FILELAYER_DATABASE_URL }),
+  new S3Storage({
+    endpoint: env.S3_ENDPOINT,
+    bucket: env.S3_BUCKET,
+    region: 'auto',
+    accessKeyId: env.S3_ACCESS_KEY_ID,
+    secretAccessKey: env.S3_SECRET_ACCESS_KEY,
+  }),
+  // The address of apps/app, where share links are served.
+  { baseUrl: env.FILELAYER_BASE_URL }
+);
+
+export { deliveryFetch, FilelayerError } from '@filelayer/core';
+```
+
+Remove `client.ts`: there is no client SDK. The browser posts files to your own route, below.
+
+## 5. Mirror your Clerk organizations
+
+Filelayer keeps its own list of who belongs to which organization, and every access decision reads it. `next-forge` already receives Clerk's organization webhooks in `apps/api`, so the membership is copied there. Clerk ids are used as they are.
+
+```ts title="packages/storage/membership.ts"
+import 'server-only';
+
+import type { OrgRole } from '@filelayer/core';
+import { storage } from './index';
+
+const roles: Record<string, OrgRole> = {
+  'org:admin': 'admin',
+  'org:member': 'member',
+};
+
+// A role your app adds later maps to the weakest one until you map it here.
+const toFilelayerRole = (role: string): OrgRole => roles[role] ?? 'viewer';
+
+type ClerkEvent =
+  | { type: 'organization.created'; data: { id: string; created_by?: string } }
+  | {
+      type:
+        | 'organizationMembership.created'
+        | 'organizationMembership.updated'
+        | 'organizationMembership.deleted';
+      data: {
+        organization: { id: string; created_by?: string };
+        public_user_data: { user_id: string };
+        role: string;
+      };
+    }
+  | { type: string; data: unknown };
+
+export const mirrorToFilelayer = async (event: ClerkEvent) => {
+  if (event.type === 'organization.created') {
+    const { id, created_by } = event.data as { id: string; created_by?: string };
+    if (created_by) {
+      // The creator owns the Filelayer organization. Safe to repeat on a retry.
+      await storage.orgs.create(id, { owner: created_by });
+    }
+    return;
+  }
+
+  if (!event.type.startsWith('organizationMembership.')) {
+    return;
+  }
+
+  const { organization, public_user_data, role } = event.data as {
+    organization: { id: string; created_by?: string };
+    public_user_data: { user_id: string };
+    role: string;
+  };
+  const owner = organization.created_by;
+  if (!owner || public_user_data.user_id === owner) {
+    return;
+  }
+
+  if (event.type === 'organizationMembership.deleted') {
+    await storage.orgs.removeMember(organization.id, public_user_data.user_id, { as: owner });
+  } else {
+    await storage.orgs.setRole(organization.id, public_user_data.user_id, toFilelayerRole(role), {
+      as: owner,
+    });
+  }
+};
+```
+
+Call it from the existing webhook route, once the event is verified and before the `switch`:
+
+```ts title="apps/api/app/webhooks/auth/route.ts"
+import { mirrorToFilelayer } from '@repo/storage/membership';
+
+// ...after webhook.verify():
+await mirrorToFilelayer(event);
+```
+
+Add `@repo/storage` to `apps/api`'s dependencies, and subscribe the Clerk webhook to `organizationMembership.updated` as well as the events `next-forge` already handles.
+
+Clerk retries webhooks, and every call above sets a state rather than toggling one, so a retry is harmless. A new member can reach your app before their webhook does; their first upload is then refused until it arrives. If the creator leaves the organization, `created_by` is no longer an owner: store the owner you created the Filelayer organization with and use that instead.
+
+## 6. Create the upload route
+
+Create a route handler that takes the user and the organization from Clerk's session, never from the request:
+
+```ts title="apps/app/app/api/files/route.ts"
+import { auth } from '@repo/auth/server';
+import { storage } from '@repo/storage';
+
+const MAX_BYTES = 10 * 1024 * 1024;
+
+export const POST = async (request: Request) => {
+  const { userId, orgId } = await auth();
+  if (!(userId && orgId)) {
+    return Response.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  const file = (await request.formData()).get('file');
+  if (!(file instanceof File)) {
+    return Response.json({ error: 'No file' }, { status: 400 });
+  }
+  if (file.size > MAX_BYTES) {
+    return Response.json({ error: 'Too large' }, { status: 413 });
+  }
+
+  try {
+    const { id } = await storage.files.put(new Uint8Array(await file.arrayBuffer()), {
+      org: orgId,
+      owner: userId,
+      visibility: 'org',
+      name: file.name,
+    });
+    return Response.json({ id, url: `/f/${id}` }, { status: 201 });
+  } catch (error) {
+    // The organization.created webhook has not been mirrored yet. Filelayer
+    // refuses the upload instead of creating an organization without its owner.
+    if ((error as { code?: string }).code === 'not_found') {
+      return Response.json({ error: 'Organization not ready, retry shortly' }, { status: 409 });
+    }
+    throw error;
+  }
+};
+
+export const GET = async () => {
+  const { userId, orgId } = await auth();
+  if (!(userId && orgId)) {
+    return Response.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  return Response.json(await storage.files.list({ as: userId, org: orgId }));
+};
+```
+
+## 7. Create the share route
+
+A link that expires, and can be taken back before it does:
+
+```ts title="apps/app/app/api/files/[id]/share/route.ts"
+import { auth } from '@repo/auth/server';
+import { storage } from '@repo/storage';
+
+export const POST = async (_request: Request, { params }: { params: Promise<{ id: string }> }) => {
+  const { userId } = await auth();
+  if (!userId) {
+    return Response.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  const { id } = await params;
+  const link = await storage.shares.create(id, { as: userId, expiresIn: 7 * 24 * 60 * 60 });
+
+  return Response.json({ grantId: link.grantId, url: link.url, expiresAt: link.expiresAt }, { status: 201 });
+};
+
+export const DELETE = async (request: Request) => {
+  const { userId } = await auth();
+  if (!userId) {
+    return Response.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  const { grantId } = (await request.json()) as { grantId: string };
+  await storage.shares.revoke(grantId, { as: userId });
+
+  return new Response(null, { status: 204 });
+};
+```
+
+## 8. Serve the files
+
+Files are served at `/f/<id>` to signed-in members and share links at `/d/<token>` to anyone holding one. Both go through one handler, which checks the caller on every request:
+
+```ts title="apps/app/app/lib/files.ts"
+import { auth } from '@repo/auth/server';
+import { deliveryFetch, storage } from '@repo/storage';
+
+const serve = deliveryFetch(storage, {
+  principal: async () => ({ as: (await auth()).userId }),
+});
+
+export const handler = async (request: Request) =>
+  (await serve(request)) ?? Response.json({ error: 'Not found' }, { status: 404 });
+```
+
+```ts title="apps/app/app/f/[id]/route.ts"
+export { handler as GET, handler as HEAD } from '@/app/lib/files';
+```
+
+```ts title="apps/app/app/d/[token]/route.ts"
+export { handler as GET, handler as HEAD, handler as POST } from '@/app/lib/files';
+```
+
+Add `/d/(.*)` to the public routes in your Clerk middleware, so that someone with a link who is not signed in reaches the handler. The handler, not the middleware, decides whether the link is still valid.
+
+A refusal is a `404`, so someone outside the organization cannot tell that a file exists. The reason is in the audit trail.
+
+## 9. What changes from Vercel Blob
+
+- **The bytes go through your server.** That is what lets a revoked link stop working on the next request. For public images at volume, a bucket behind a CDN is the better tool.
+- **Reads are enforced by the library**, for calls made through it. A query that reads Filelayer's tables directly is checked by nothing.
+- **Every access is recorded.** An admin of the organization can read who opened a file and who was refused:
+
+```ts
+const refused = await storage.orgs.audit(orgId, { as: userId, decision: 'deny' });
+```
+
+You can learn more in the [Filelayer documentation](https://github.com/filelayer/filelayer#readme):
+
+- [Quickstart](https://github.com/filelayer/filelayer/blob/main/docs/QUICKSTART.md)
+- [Expiring and revocable file links](https://github.com/filelayer/filelayer/blob/main/docs/guides/expiring-and-revocable-file-links.md)
+- [Limitations](https://github.com/filelayer/filelayer/blob/main/LIMITATIONS.md)
