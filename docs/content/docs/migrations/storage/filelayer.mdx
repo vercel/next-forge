@@ -22,10 +22,14 @@ Uninstall the existing Vercel Blob dependency from the storage package...
 npm uninstall @vercel/blob --filter @repo/storage
 ```
 
-...and install Filelayer and the `pg` driver it uses:
+...and install Filelayer (0.36.0 or later) and the `pg` driver it uses, with its types:
 
 ```package-install
 npm install @filelayer/core pg --filter @repo/storage
+```
+
+```package-install
+npm install -D @types/pg --filter @repo/storage
 ```
 
 ## 2. Create the database and the bucket
@@ -214,14 +218,22 @@ export const POST = async (request: Request) => {
     return Response.json({ error: 'Too large' }, { status: 413 });
   }
 
-  const { id } = await storage.files.put(new Uint8Array(await file.arrayBuffer()), {
-    org: orgId,
-    owner: userId,
-    visibility: 'org',
-    name: file.name,
-  });
-
-  return Response.json({ id, url: `/f/${id}` }, { status: 201 });
+  try {
+    const { id } = await storage.files.put(new Uint8Array(await file.arrayBuffer()), {
+      org: orgId,
+      owner: userId,
+      visibility: 'org',
+      name: file.name,
+    });
+    return Response.json({ id, url: `/f/${id}` }, { status: 201 });
+  } catch (error) {
+    // The organization.created webhook has not been mirrored yet. Filelayer
+    // refuses the upload instead of creating an organization without its owner.
+    if ((error as { code?: string }).code === 'not_found') {
+      return Response.json({ error: 'Organization not ready, retry shortly' }, { status: 409 });
+    }
+    throw error;
+  }
 };
 
 export const GET = async () => {
